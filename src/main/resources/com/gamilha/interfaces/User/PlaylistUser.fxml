@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15"
+      style="-fx-background-color:#0a0f1e;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.playlist.PlaylistUserController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+
+        <Label text="🎓 Mes Playlists de Coaching"
+               style="-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;"/>
+
+        <Pane HBox.hgrow="ALWAYS"/>
+
+        <Button text="➕ Nouvelle Playlist"
+                onAction="#openAddForm"
+                style="-fx-background-color:#7c3aed;-fx-text-fill:white;
+                       -fx-font-weight:bold;-fx-background-radius:8;-fx-padding:9 18;"/>
+    </HBox>
+
+    <!-- ═══ RECHERCHE / FILTRE ══════════════════════════════════════════════ -->
+    <HBox spacing="10">
+
+        <TextField fx:id="searchInput"
+                   promptText="🔍 Rechercher par titre ou description..."
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                          -fx-prompt-text-fill:#64748b;-fx-background-radius:6;-fx-padding:8;"/>
+
+        <ComboBox fx:id="filterNiveau"
+                  promptText="Niveau"
+                  style="-fx-background-color:#1e293b;-fx-text-fill:white;"/>
+    </HBox>
+
+    <!-- ═══ FORMULAIRE INLINE (ADD / EDIT) ══════════════════════════════════ -->
+    <VBox fx:id="formPanel"
+          spacing="14"
+          style="-fx-background-color:#1e293b;-fx-background-radius:10;-fx-padding:20;
+                 -fx-border-color:#334155;-fx-border-radius:10;-fx-border-width:1;"
+          visible="false"
+          managed="false">
+
+        <Label fx:id="formTitle"
+               text="➕ Nouvelle Playlist"
+               style="-fx-text-fill:#c084fc;-fx-font-size:17;-fx-font-weight:bold;"/>
+
+        <!-- Titre / Niveau / Catégorie -->
+        <HBox spacing="15">
+
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Titre *" style="-fx-text-fill:#94a3b8;-fx-font-size:12;"/>
+                <TextField fx:id="tfTitle"
+                           promptText="Titre de la playlist"
+                           style="-fx-background-color:#0f172a;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:6;-fx-padding:8;"/>
+            </VBox>
+
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Niveau" style="-fx-text-fill:#94a3b8;-fx-font-size:12;"/>
+                <TextField fx:id="tfNiveau"
+                           promptText="Débutant / Intermédiaire / Avancé"
+                           style="-fx-background-color:#0f172a;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:6;-fx-padding:8;"/>
+            </VBox>
+
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Catégorie" style="-fx-text-fill:#94a3b8;-fx-font-size:12;"/>
+                <TextField fx:id="tfCategorie"
+                           promptText="FPS / RPG / MOBA / ..."
+                           style="-fx-background-color:#0f172a;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:6;-fx-padding:8;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Description -->
+        <VBox spacing="5">
+            <Label text="Description" style="-fx-text-fill:#94a3b8;-fx-font-size:12;"/>
+            <TextField fx:id="tfDescription"
+                       promptText="Description de la playlist"
+                       style="-fx-background-color:#0f172a;-fx-text-fill:white;
+                              -fx-prompt-text-fill:#475569;-fx-background-radius:6;-fx-padding:8;"/>
+        </VBox>
+
+        <!-- Image URL -->
+        <VBox spacing="5">
+            <Label text="Image (URL)" style="-fx-text-fill:#94a3b8;-fx-font-size:12;"/>
+            <TextField fx:id="tfImage"
+                       promptText="https://... (lien vers l'image)"
+                       style="-fx-background-color:#0f172a;-fx-text-fill:white;
+                              -fx-prompt-text-fill:#475569;-fx-background-radius:6;-fx-padding:8;"/>
+        </VBox>
+
+        <!-- Boutons -->
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="✖ Annuler"
+                    onAction="#cancelForm"
+                    style="-fx-background-color:#374151;-fx-text-fill:white;
+                           -fx-background-radius:8;-fx-padding:9 22;-fx-font-size:13;"/>
+            <Button text="💾 Enregistrer"
+                    onAction="#saveForm"
+                    style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-font-weight:bold;
+                           -fx-background-radius:8;-fx-padding:9 22;-fx-font-size:13;"/>
+        </HBox>
+
+    </VBox>
+
+    <!-- ═══ TABLE ════════════════════════════════════════════════════════════ -->
+    <ScrollPane VBox.vgrow="ALWAYS"
+                fitToWidth="true"
+                style="-fx-background-color:transparent;-fx-background:#020617;-fx-border-color:transparent;">
+
+        <GridPane fx:id="tableGrid"
+                  hgap="0" vgap="0"
+                  style="-fx-background-color:#020617;-fx-border-color:#1e293b;-fx-border-radius:8;">
+        </GridPane>
+
+    </ScrollPane>
+
+</VBox>

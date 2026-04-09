@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20"
+      style="-fx-background-color:#0a0f1e;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.playlist.AddPlaylistController">
+
+    <padding>
+        <Insets top="30" right="40" bottom="30" left="40"/>
+    </padding>
+
+    <!-- HEADER -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="➕ Nouvelle Playlist"
+               style="-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;"/>
+    </HBox>
+
+    <!-- FORM CARD -->
+    <VBox spacing="16"
+          style="-fx-background-color:#1e293b;-fx-background-radius:12;-fx-padding:25;">
+
+        <!-- Titre -->
+        <VBox spacing="6">
+            <Label text="Titre *" style="-fx-text-fill:#94a3b8;-fx-font-size:13;"/>
+            <TextField fx:id="txtTitle"
+                       promptText="Titre de la playlist"
+                       style="-fx-background-color:#0f172a;-fx-text-fill:white;-fx-prompt-text-fill:#475569;
+                              -fx-background-radius:6;-fx-padding:10;-fx-font-size:13;"/>
+        </VBox>
+
+        <!-- Description -->
+        <VBox spacing="6">
+            <Label text="Description" style="-fx-text-fill:#94a3b8;-fx-font-size:13;"/>
+            <TextArea fx:id="txtDescription"
+                      promptText="Description de la playlist..."
+                      prefRowCount="3"
+                      style="-fx-background-color:#0f172a;-fx-text-fill:white;-fx-prompt-text-fill:#475569;
+                             -fx-background-radius:6;-fx-padding:10;-fx-font-size:13;"/>
+        </VBox>
+
+        <!-- Niveau + Catégorie -->
+        <HBox spacing="16">
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Niveau" style="-fx-text-fill:#94a3b8;-fx-font-size:13;"/>
+                <ComboBox fx:id="cmbNiveau"
+                          maxWidth="Infinity"
+                          style="-fx-background-color:#0f172a;-fx-text-fill:white;"/>
+            </VBox>
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label text="Catégorie" style="-fx-text-fill:#94a3b8;-fx-font-size:13;"/>
+                <TextField fx:id="txtCategorie"
+                           promptText="Ex: Football, Basketball..."
+                           style="-fx-background-color:#0f172a;-fx-text-fill:white;-fx-prompt-text-fill:#475569;
+                                  -fx-background-radius:6;-fx-padding:10;-fx-font-size:13;"/>
+            </VBox>
+        </HBox>
+
+        <!-- Image URL -->
+        <VBox spacing="6">
+            <Label text="Image (URL)" style="-fx-text-fill:#94a3b8;-fx-font-size:13;"/>
+            <TextField fx:id="txtImage"
+                       promptText="https://..."
+                       style="-fx-background-color:#0f172a;-fx-text-fill:white;-fx-prompt-text-fill:#475569;
+                              -fx-background-radius:6;-fx-padding:10;-fx-font-size:13;"/>
+        </VBox>
+
+        <!-- Error -->
+        <Label fx:id="lblError"
+               style="-fx-text-fill:#f87171;-fx-font-size:13;"/>
+
+        <!-- BUTTONS -->
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button fx:id="btnCancel" text="Annuler"
+                    style="-fx-background-color:#374151;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:9 20;"/>
+            <Button fx:id="btnSave" text="✅ Sauvegarder"
+                    style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-font-weight:bold;
+                           -fx-background-radius:8;-fx-padding:9 20;"/>
+        </HBox>
+
+    </VBox>
+
+</VBox>

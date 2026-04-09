@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.NavBarAdminController"
+            style="-fx-background-color:#111827;">
+
+    <!-- SIDEBAR -->
+    <left>
+
+        <VBox spacing="10"
+              prefWidth="260"
+              style="-fx-background-color:black;
+                     -fx-padding:20;">
+
+            <!-- LOGO -->
+            <Label text="🎮 Gamilha Admin"
+                   style="-fx-text-fill:white;
+                          -fx-font-size:20;
+                          -fx-font-weight:bold;" />
+
+            <Region minHeight="10"/>
+
+            <!-- MENU -->
+            <Button text="📊 Dashboard"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="👥 Utilisateurs"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="📅 Événements"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="🏆 Matchs"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="🧩 Brackets"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="👨‍👩‍👧 Équipes"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="🎓 Playlists"
+                    onAction="#goCoaching"
+                    style="-fx-text-fill:#c084fc;
+                           -fx-background-color:transparent;
+                           -fx-font-weight:bold;" />
+
+            <Button text="🎬 Coach Vidéo"
+                    onAction="#goCoachVideo"
+                    style="-fx-text-fill:#38bdf8;
+                           -fx-background-color:transparent;
+                           -fx-font-weight:bold;" />
+
+            <Button text="🌐 Social"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="📡 Streams"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="💰 Donations"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="💳 Les Abonnements"
+                    onAction="#goAbonnement"
+                    style="-fx-text-fill:#00ffcc;
+                           -fx-background-color:transparent;
+                           -fx-font-weight:bold;" />
+
+            <Button text="👤 Les inscriptions"
+                    onAction="#goInscriptions"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Button text="🧾 Historique Paiement"
+                    style="-fx-text-fill:white;
+                           -fx-background-color:transparent;" />
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button text="🚪 Déconnexion"
+            onAction="#logout"
+            style="-fx-text-fill:#ff4d4d;
+            -fx-background-color:transparent;" />
+
+        </VBox>
+
+    </left>
+
+
+    <!-- TOP BAR -->
+    <top>
+
+        <HBox alignment="CENTER_RIGHT"
+              style="-fx-background-color:black;
+                     -fx-padding:12;
+                     -fx-border-color:#374151;
+                     -fx-border-width:0 0 1 0;">
+
+            <Label fx:id="welcomeLabel"
+                   style="-fx-text-fill:white; -fx-font-size:14;" />
+
+        </HBox>
+
+    </top>
+
+
+    <!-- CONTENT -->
+    <center>
+
+        <BorderPane fx:id="contentArea"
+                    style="-fx-background-color:#1f2937;
+                           -fx-padding:20;" />
+
+    </center>
+
+</BorderPane>

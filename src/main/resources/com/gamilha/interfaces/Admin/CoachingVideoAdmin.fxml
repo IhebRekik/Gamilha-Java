@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15"
+      style="-fx-background-color:#0f172a;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.video.CoachingVideoAdminController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+
+        <Label text="🎬 Coach Vidéos"
+               style="-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;"/>
+
+        <Pane HBox.hgrow="ALWAYS"/>
+
+        <Label text="👁 Mode lecture seule (Admin)"
+               style="-fx-text-fill:#94a3b8;-fx-font-size:13;
+                      -fx-background-color:#1e293b;-fx-background-radius:6;-fx-padding:5 12;"/>
+    </HBox>
+
+    <!-- ═══ RECHERCHE / FILTRES ═════════════════════════════════════════════ -->
+    <HBox spacing="10">
+
+        <TextField fx:id="searchInput"
+                   promptText="🔍 Rechercher une vidéo..."
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                          -fx-prompt-text-fill:#64748b;-fx-background-radius:6;-fx-padding:8;"/>
+
+        <ComboBox fx:id="filterNiveau"
+                  promptText="Niveau"
+                  style="-fx-background-color:#1e293b;-fx-text-fill:white;"/>
+
+        <ComboBox fx:id="filterPremium"
+                  promptText="Type"
+                  style="-fx-background-color:#1e293b;-fx-text-fill:white;"/>
+    </HBox>
+
+    <!-- ═══ TABLE ════════════════════════════════════════════════════════════ -->
+    <ScrollPane VBox.vgrow="ALWAYS"
+                fitToWidth="true"
+                style="-fx-background-color:transparent;-fx-background:#020617;-fx-border-color:transparent;">
+
+        <GridPane fx:id="tableGrid"
+                  hgap="0" vgap="0"
+                  style="-fx-background-color:#020617;-fx-border-color:#1e293b;-fx-border-radius:8;">
+        </GridPane>
+
+    </ScrollPane>
+
+</VBox>

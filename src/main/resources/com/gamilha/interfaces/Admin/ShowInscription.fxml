@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="25"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.inscriptions.ShowInscriptionController"
+      style="-fx-background-color:#0f172a;">
+
+    <padding>
+        <Insets top="30" right="40" bottom="30" left="40"/>
+    </padding>
+
+
+    <!-- HEADER -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+
+        <Button fx:id="btnRetour"
+                text="←"
+                style="-fx-background-color:#1e293b;
+                       -fx-text-fill:white;
+                       -fx-background-radius:8;
+                       -fx-padding:6 12 6 12;"/>
+
+        <Label text="Détails de l'inscription"
+               style="-fx-text-fill:white;
+                      -fx-font-size:22;
+                      -fx-font-weight:bold;"/>
+
+    </HBox>
+
+
+
+    <!-- CARD -->
+    <VBox spacing="20"
+          style="-fx-background-color:#020617;
+                 -fx-padding:30;
+                 -fx-background-radius:16;
+                 -fx-border-radius:16;
+                 -fx-border-color:#1e40af;">
+
+
+        <GridPane hgap="40" vgap="18">
+
+            <columnConstraints>
+                <ColumnConstraints prefWidth="150"/>
+                <ColumnConstraints prefWidth="350"/>
+            </columnConstraints>
+
+
+            <Label text="ID"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="idLabel"
+                   GridPane.columnIndex="1"
+                   style="-fx-text-fill:white;"/>
+
+
+
+            <Label text="Date début"
+                   GridPane.rowIndex="1"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="dateDebutLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="1"
+                   style="-fx-text-fill:white;"/>
+
+
+
+            <Label text="Date fin"
+                   GridPane.rowIndex="2"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="dateFinLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="2"
+                   style="-fx-text-fill:white;"/>
+
+
+
+            <Label text="Utilisateur"
+                   GridPane.rowIndex="3"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="userLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="3"
+                   style="-fx-text-fill:white;"/>
+
+
+
+            <Label text="Abonnement"
+                   GridPane.rowIndex="4"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="abonnementLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="4"
+                   style="-fx-text-fill:white;"/>
+
+        </GridPane>
+
+
+
+        <!-- ACTIONS -->
+        <HBox spacing="12"
+              alignment="CENTER_RIGHT">
+
+            <Button fx:id="btnModifier"
+                    text="Modifier"
+                    style="-fx-background-color:#facc15;
+                           -fx-text-fill:black;
+                           -fx-background-radius:8;
+                           -fx-padding:8 18 8 18;"/>
+
+
+            <Button fx:id="btnSupprimer"
+                    text="Supprimer"
+                    style="-fx-background-color:#ef4444;
+                           -fx-text-fill:white;
+                           -fx-background-radius:8;
+                           -fx-padding:8 18 8 18;"/>
+
+        </HBox>
+
+
+    </VBox>
+
+</VBox>
