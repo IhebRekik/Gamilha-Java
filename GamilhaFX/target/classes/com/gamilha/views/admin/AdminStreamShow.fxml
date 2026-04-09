@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.admin.AdminStreamShowController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA — ADMIN" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Retour"     onAction="#onBack"      styleClass="btn-secondary"/>
+                <Button text="✏ Modifier"   onAction="#onEdit"      styleClass="btn-warning"/>
+                <Button text="💰 Donations" onAction="#onDonations" styleClass="btn-primary"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="page-header">
+                <padding><Insets top="14" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="lblTitle" text="" styleClass="page-title" wrapText="true"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblStatus" text=""/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <VBox spacing="20">
+                <padding><Insets topRightBottomLeft="28"/></padding>
+                <HBox spacing="22" alignment="TOP_LEFT">
+                    <ImageView fx:id="imgThumb" fitWidth="460" fitHeight="260" preserveRatio="true"/>
+                    <VBox spacing="12" HBox.hgrow="ALWAYS" styleClass="info-panel">
+                        <padding><Insets topRightBottomLeft="20"/></padding>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label fx:id="lblGame"    text="" styleClass="badge-game"/>
+                            <Label fx:id="lblViewers" text="" styleClass="badge-viewers"/>
+                        </HBox>
+                        <Label fx:id="lblDesc" text="" styleClass="show-desc" wrapText="true"/>
+                        <Label fx:id="lblDate" text="" styleClass="meta-lbl"/>
+                        <Hyperlink fx:id="lnkUrl" text="" styleClass="link-style"/>
+                    </VBox>
+                </HBox>
+                <VBox fx:id="obsBox" spacing="8" styleClass="obs-box" visible="false" managed="false">
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                    <Label text="🎬 Configuration OBS" styleClass="obs-title"/>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Serveur RTMP :" styleClass="obs-key"/>
+                        <Label fx:id="lblRtmp" text="" styleClass="obs-val"/>
+                    </HBox>
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Clé de flux :"  styleClass="obs-key"/>
+                        <Label fx:id="lblKey" text="" styleClass="obs-code"/>
+                    </HBox>
+                </VBox>
+                <VBox spacing="10" styleClass="section-box">
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                    <HBox alignment="CENTER_LEFT" spacing="16">
+                        <Label text="📋 Donations" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblTotal" text="" styleClass="total-badge"/>
+                    </HBox>
+                    <FlowPane fx:id="donGrid" hgap="12" vgap="12">
+                        <padding><Insets top="4" bottom="4"/></padding>
+                    </FlowPane>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.admin.AdminDonationFormController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA — ADMIN" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Annuler" onAction="#onCancel" styleClass="btn-secondary"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" styleClass="page-header">
+                <padding><Insets top="14" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="pageTitle" text="✏ Modifier la Donation (Admin)" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <VBox spacing="18" maxWidth="640" styleClass="form-wrap">
+                <padding><Insets top="20" right="40" bottom="30" left="40"/></padding>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="DONATEUR" styleClass="section-lbl"/>
+                    <VBox spacing="3">
+                        <Label text="Nom *" styleClass="field-lbl"/>
+                        <TextField fx:id="donorField" promptText="Nom du donateur" styleClass="field-dark"/>
+                        <Label fx:id="errDonor" styleClass="err-lbl" visible="false" managed="false"/>
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="MONTANT" styleClass="section-lbl"/>
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Montant (€) *" styleClass="field-lbl"/>
+                            <Spinner fx:id="amtSpinner" prefWidth="200" styleClass="spinner-dark" editable="true"/>
+                            <Label fx:id="errAmt" styleClass="err-lbl" visible="false" managed="false"/>
+                        </VBox>
+                        <VBox spacing="4" alignment="CENTER">
+                            <Label text="Aperçu" styleClass="field-lbl"/>
+                            <Label fx:id="emojiPrev" text="🍩" styleClass="emoji-big"/>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="10">
+                        <Button text="🍩 1 €"  onAction="#onE1"  styleClass="emoji-btn"      prefWidth="110"/>
+                        <Button text="🍕 5 €"  onAction="#onE5"  styleClass="emoji-btn"      prefWidth="110"/>
+                        <Button text="💎 10 €" onAction="#onE10" styleClass="emoji-btn-blue" prefWidth="110"/>
+                        <Button text="🚀 50 €" onAction="#onE50" styleClass="emoji-btn-red"  prefWidth="110"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="STREAM" styleClass="section-lbl"/>
+                    <VBox spacing="3">
+                        <Label text="Stream associé *" styleClass="field-lbl"/>
+                        <ComboBox fx:id="streamCombo" prefWidth="400" styleClass="combo-dark"/>
+                        <Label fx:id="errStream" styleClass="err-lbl" visible="false" managed="false"/>
+                    </VBox>
+                </VBox>
+
+                <HBox spacing="12" alignment="CENTER_RIGHT">
+                    <Button text="Annuler" onAction="#onCancel" styleClass="btn-secondary" prefWidth="130"/>
+                    <Button fx:id="submitBtn" text="Enregistrer" onAction="#onSubmit" styleClass="btn-success" prefWidth="200"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
