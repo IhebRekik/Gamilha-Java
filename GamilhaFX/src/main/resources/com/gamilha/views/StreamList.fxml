@@ -9,19 +9,19 @@
             prefWidth="1280" prefHeight="800">
     <top>
         <VBox>
-            <!-- ══ NAVBAR ══ -->
+            <!-- NAVBAR -->
             <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
                 <padding><Insets topRightBottomLeft="14"/></padding>
                 <Label text="🎮 GAMILHA" styleClass="brand"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="⚙ Admin"  onAction="#onGoAdmin"  styleClass="btn-warning"/>
+                <Button text="⚙ Admin" onAction="#onGoAdmin" styleClass="btn-warning"/>
             </HBox>
 
             <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-header">
                 <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
                 <Label text="📡 Streams en direct" styleClass="page-title"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="↺" onAction="#onRefresh"   styleClass="btn-secondary"/>
+                <!-- Bouton Actualiser supprimé -->
                 <Button text="🔴 Lancer un Stream" onAction="#onNewStream" styleClass="btn-danger"/>
             </HBox>
 
