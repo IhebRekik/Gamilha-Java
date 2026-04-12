@@ -120,8 +120,8 @@ public class CoachingVideoController {
     private MediaPlayer activePlayer  = null;
 
     // ─── VLCJ — lecteur universel (H.264 + H.265 + tous codecs) ──────────
-    private MediaPlayerFactory  vlcFactory = null;
-    private EmbeddedMediaPlayer vlcPlayer  = null;
+    private MediaPlayerFactory  vlcFactory   = null;
+    private EmbeddedMediaPlayer vlcPlayer    = null;
 
     // ─── Cache thumbs locaux ──────────────────────────────────────────────
     private static final File THUMB_CACHE_DIR =
@@ -592,6 +592,17 @@ public class CoachingVideoController {
 
         boolean isYoutube = url.contains("youtube") || url.contains("youtu.be");
 
+        // ── Vidéo locale : demander le mode de lecture ──────────────────────
+        if (!isYoutube && !url.startsWith("http")) {
+            File f = new File(url);
+            if (!f.exists()) {
+                videoContainer.getChildren().add(errorLabel("❌ Fichier introuvable : " + url));
+                return;
+            }
+            showLaunchChoiceScreen(f, url);
+            return;
+        }
+
         if (isYoutube) {
             // ── YouTube → thumbnail + bouton "Ouvrir dans YouTube" ─────────
             String videoId = extractYoutubeId(url);
@@ -659,32 +670,115 @@ public class CoachingVideoController {
             ytBox.getChildren().addAll(ytLabel, openBtn);
             videoContainer.getChildren().add(ytBox);
 
-        } else if (!url.startsWith("http")) {
-            // ══════════════════════════════════════════════════════════════
-            //  Fichier LOCAL — 3 niveaux de fallback :
-            //  1) VLCJ  (tous codecs — VLC installé)
-            //  2) JavaFX MediaPlayer  (H.264/AAC uniquement)
-            //  3) Ouvrir avec lecteur système (Desktop.open)
-            // ══════════════════════════════════════════════════════════════
-            File f = new File(url);
-            if (!f.exists()) {
-                videoContainer.getChildren().add(errorLabel("❌ Fichier introuvable : " + url));
-            } else {
-                videoContainer.setStyle("-fx-background-color:#000;-fx-background-radius:10;");
-
-                // ── NIVEAU 1 : VLCJ ───────────────────────────────────────
-                String vlcHome = findVlcPath();
-                if (vlcHome != null) {
-                    buildVlcPlayerInContainer(f.getAbsolutePath(), videoContainer);
-                } else {
-                    // ── NIVEAU 2 : JavaFX MediaPlayer (H.264) ─────────────
-                    buildJfxPlayerInContainer(f, url, videoContainer);
-                }
-            } // fin else (fichier existe)
-
         } else {
             videoContainer.getChildren().add(errorLabel("⚠️ Aucun lecteur disponible pour cette URL."));
         }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  ÉCRAN DE CHOIX — Lancer dans l'app  OU  avec lecteur externe
+    // ════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Affiche un écran de choix stylisé directement dans videoContainer.
+     * L'utilisateur choisit entre lecteur intégré et lecteur externe.
+     */
+    private void showLaunchChoiceScreen(File f, String url) {
+        videoContainer.getChildren().clear();
+        videoContainer.setStyle(
+            "-fx-background-color:linear-gradient(to bottom,#0c1a2e,#0a0f1a);" +
+            "-fx-background-radius:10;"
+        );
+
+        // ── Icône / titre ────────────────────────────────────────────────
+        Label ico = new Label("🎬");
+        ico.setStyle("-fx-font-size:52;");
+
+        String fname = f.getName();
+        Label nameLabel = new Label("📁  " + fname);
+        nameLabel.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
+
+        Label question = new Label("Comment voulez-vous lire cette vidéo ?");
+        question.setStyle("-fx-text-fill:#e2e8f0;-fx-font-size:15;-fx-font-weight:bold;");
+
+        // ── Bouton : Lire dans l'application ────────────────────────────
+        VBox btnInApp = buildChoiceButton(
+            "▶  Lire dans l'application",
+            "Lecteur intégré  •  Recommandé pour PC performant",
+            "#0284c7",
+            "#0c1a2e",
+            "rgba(2,132,199,0.25)"
+        );
+        btnInApp.setOnMouseClicked(e -> {
+            videoContainer.setStyle("-fx-background-color:#000;-fx-background-radius:10;");
+            videoContainer.getChildren().clear();
+            buildJfxPlayerInContainer(f, url, videoContainer);
+        });
+
+        // ── Bouton : Ouvrir avec lecteur externe ─────────────────────────
+        VBox btnExternal = buildChoiceButton(
+            "📂  Ouvrir avec lecteur externe",
+            "VLC, Windows Media Player…  •  Recommandé pour PC modeste",
+            "#7c3aed",
+            "#1a0c2e",
+            "rgba(124,58,237,0.25)"
+        );
+        btnExternal.setOnMouseClicked(e -> openWithSystem(f));
+
+        // ── Layout ───────────────────────────────────────────────────────
+        HBox buttons = new HBox(20, btnInApp, btnExternal);
+        buttons.setAlignment(Pos.CENTER);
+        buttons.setMaxWidth(Double.MAX_VALUE);
+
+        VBox box = new VBox(16, ico, nameLabel, question, buttons);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(24));
+        box.setMaxWidth(Double.MAX_VALUE);
+
+        videoContainer.getChildren().add(box);
+    }
+
+    /** Construit un bouton de choix stylisé (carte cliquable). */
+    private VBox buildChoiceButton(String title, String subtitle,
+                                   String borderColor, String bgColor,
+                                   String hoverBg) {
+        Label titleLbl = new Label(title);
+        titleLbl.setStyle("-fx-text-fill:white;-fx-font-size:14;-fx-font-weight:bold;");
+
+        Label subLbl = new Label(subtitle);
+        subLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:11;");
+        subLbl.setWrapText(true);
+
+        VBox card = new VBox(6, titleLbl, subLbl);
+        card.setAlignment(Pos.CENTER);
+        card.setPrefWidth(220);
+        card.setMaxWidth(220);
+        card.setPadding(new Insets(18, 20, 18, 20));
+        card.setStyle(
+            "-fx-background-color:" + bgColor + ";" +
+            "-fx-background-radius:12;" +
+            "-fx-border-color:" + borderColor + ";" +
+            "-fx-border-radius:12;-fx-border-width:2;" +
+            "-fx-cursor:hand;" +
+            "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.5),10,0,0,4);"
+        );
+        card.setOnMouseEntered(e -> card.setStyle(
+            "-fx-background-color:" + hoverBg + ";" +
+            "-fx-background-radius:12;" +
+            "-fx-border-color:" + borderColor + ";" +
+            "-fx-border-radius:12;-fx-border-width:2;" +
+            "-fx-cursor:hand;" +
+            "-fx-effect:dropshadow(gaussian," + borderColor + ",16,0.3,0,0);"
+        ));
+        card.setOnMouseExited(e -> card.setStyle(
+            "-fx-background-color:" + bgColor + ";" +
+            "-fx-background-radius:12;" +
+            "-fx-border-color:" + borderColor + ";" +
+            "-fx-border-radius:12;-fx-border-width:2;" +
+            "-fx-cursor:hand;" +
+            "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.5),10,0,0,4);"
+        ));
+        return card;
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -802,12 +896,21 @@ public class CoachingVideoController {
             System.setProperty("jna.library.path", vlcHome);
 
             // Canvas qui recevra chaque frame décodée par VLC
+            // ⚠️ Taille bornée à 1280×720 max pour éviter le dépassement
+            //    de texture GPU (NPE NGCanvas$RenderBuf sur cartes faibles)
             Canvas canvas = new Canvas(720, 405);
             canvas.setStyle("-fx-background-color:#000;");
+            
 
-            // Agrandir le canvas avec le container
-            canvas.widthProperty().bind(container.widthProperty());
-            canvas.heightProperty().bind(container.heightProperty().subtract(60));
+            // Lier la taille au container, mais JAMAIS au-delà de 1280×720
+            canvas.widthProperty().bind(
+                javafx.beans.binding.Bindings.min(container.widthProperty(), 1280)
+            );
+            canvas.heightProperty().bind(
+                javafx.beans.binding.Bindings.min(
+                    container.heightProperty().subtract(60), 720
+                )
+            );
 
             WritableImage[] imgRef = {new WritableImage(1280, 720)};
 
@@ -820,7 +923,9 @@ public class CoachingVideoController {
             BufferFormatCallback bfc = new BufferFormatCallback() {
                 @Override
                 public BufferFormat getBufferFormat(int sw, int sh) {
-                    Platform.runLater(() -> imgRef[0] = new WritableImage(sw, sh));
+                    // Guard : dimensions valides avant de créer la WritableImage
+                    if (sw > 0 && sh > 0)
+                        Platform.runLater(() -> imgRef[0] = new WritableImage(sw, sh));
                     return new RV32BufferFormat(sw, sh);
                 }
                 @Override public void allocatedBuffers(ByteBuffer[] buffers) {}
@@ -834,14 +939,19 @@ public class CoachingVideoController {
                 buf.rewind();
                 Platform.runLater(() -> {
                     WritableImage img = imgRef[0];
-                    if (img != null && (int) img.getWidth() == fmt.getWidth()) {
+                    double cw = canvas.getWidth();
+                    double ch = canvas.getHeight();
+                    // Guard : canvas doit avoir des dimensions valides
+                    //         ET la WritableImage doit correspondre au format reçu
+                    if (img != null && cw > 1 && ch > 1
+                            && (int) img.getWidth() == fmt.getWidth()) {
                         img.getPixelWriter().setPixels(
                                 0, 0, fmt.getWidth(), fmt.getHeight(),
                                 PixelFormat.getByteBgraInstance(),
                                 bytes, 0, fmt.getWidth() * 4
                         );
                         canvas.getGraphicsContext2D()
-                                .drawImage(img, 0, 0, canvas.getWidth(), canvas.getHeight());
+                                .drawImage(img, 0, 0, cw, ch);
                     }
                 });
             };
@@ -937,7 +1047,7 @@ public class CoachingVideoController {
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  LECTEUR JavaFX MediaPlayer (H.264 uniquement, fallback)
+    //  LECTEUR JavaFX MediaPlayer (H.264/MP4 natif — aucune dépendance externe)
     // ════════════════════════════════════════════════════════════════════════
 
     private void buildJfxPlayerInContainer(File f, String url, StackPane container) {
@@ -1021,60 +1131,40 @@ public class CoachingVideoController {
     }
 
     /**
-     * Affiche un écran de remplacement quand le codec n'est pas supporté par javafx-media.
-     * Propose d'ouvrir la vidéo avec le lecteur Windows natif (VLC, MPC, Windows Media Player…).
+     * Affiché quand JavaFX MediaPlayer ne peut pas décoder le codec.
+     * Tout reste DANS l'application — aucun lecteur externe n'est ouvert.
      */
     private void showFallbackPlayer(StackPane container, File f, String originalUrl) {
         container.getChildren().clear();
         container.setStyle(
                 "-fx-background-color:linear-gradient(to bottom,#0c1a2e,#0a0f1a);" +
-                        "-fx-background-radius:10;"
+                "-fx-background-radius:10;"
         );
 
-        // Icône film
-        Label filmIco = new Label("🎬");
-        filmIco.setStyle("-fx-font-size:52;-fx-text-fill:rgba(255,255,255,0.15);");
+        String ext = f.getName().contains(".")
+                ? f.getName().substring(f.getName().lastIndexOf('.') + 1).toUpperCase() : "?";
 
-        // Titre
-        Label titre = new Label("Format vidéo non pris en charge");
+        Label ico  = new Label("🎬");
+        ico.setStyle("-fx-font-size:48;-fx-text-fill:rgba(255,255,255,0.15);");
+
+        Label titre = new Label("Codec non supporté");
         titre.setStyle("-fx-text-fill:#f1f5f9;-fx-font-size:16;-fx-font-weight:bold;");
 
-        // Sous-titre
-        String ext = f.getName().contains(".")
-                ? f.getName().substring(f.getName().lastIndexOf('.') + 1).toUpperCase()
-                : "?";
         Label sub = new Label(
-                "Le lecteur intégré supporte uniquement H.264/MP4.\n" +
-                        "Votre fichier (" + ext + ") sera ouvert dans votre lecteur système."
+                "Le lecteur intégré ne peut pas lire ce fichier " + ext + ".\n" +
+                "Installez VLC sur votre PC pour activer la lecture de tous les formats."
         );
-        sub.setStyle("-fx-text-fill:#64748b;-fx-font-size:12;-fx-text-alignment:center;");
-        sub.setWrapText(true);
-        sub.setMaxWidth(460);
-        sub.setAlignment(Pos.CENTER);
+        sub.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:12;-fx-text-alignment:center;");
+        sub.setWrapText(true); sub.setMaxWidth(400); sub.setAlignment(Pos.CENTER);
 
-        // Nom du fichier
         Label fname = new Label("📁  " + f.getName());
-        fname.setStyle(
-                "-fx-text-fill:#38bdf8;-fx-font-size:11;" +
-                        "-fx-background-color:#0c2a3e;-fx-background-radius:4;-fx-padding:4 10;"
-        );
+        fname.setStyle("-fx-text-fill:#38bdf8;-fx-font-size:11;" +
+                "-fx-background-color:#0c2a3e;-fx-background-radius:4;-fx-padding:4 10;");
 
-        // Bouton principal
-        Button openBtn = new Button("▶  Ouvrir avec le lecteur système");
-        openBtn.setStyle(
-                "-fx-background-color:#0284c7;" +
-                        "-fx-text-fill:white;-fx-font-size:14;-fx-font-weight:bold;" +
-                        "-fx-background-radius:8;-fx-padding:11 28;" +
-                        "-fx-effect:dropshadow(gaussian,rgba(2,132,199,0.5),14,0,0,4);" +
-                        "-fx-cursor:hand;"
-        );
-        openBtn.setOnAction(ev -> openWithSystem(f));
-
-        VBox box = new VBox(14, filmIco, titre, sub, fname, openBtn);
+        VBox box = new VBox(14, ico, titre, sub, fname);
         box.setAlignment(Pos.CENTER);
         box.setMaxWidth(Double.MAX_VALUE);
         box.setMaxHeight(Double.MAX_VALUE);
-
         container.getChildren().add(box);
     }
 

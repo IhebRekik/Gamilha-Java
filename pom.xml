@@ -50,18 +50,16 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Media : MediaPlayer + MediaView (vidéo locale MP4, MKV…) -->
+        <!-- Media : MediaPlayer + MediaView (vidéo locale MP4, H.264…) -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
-        <!--
-            javafx-web (WebView) RETIRÉ :
-            Requiert jdk.jsobject qui est absent de certaines distributions JDK.
-            Le lecteur YouTube utilise à la place Desktop.browse() (navigateur natif).
-        -->
+        <!-- WebView : lecteur HTML5 intégré — lit tous les formats vidéo locaux
+             (MP4, MKV, AVI, WebM…) via <video src="file:///…"> sans VLC ni codec externe -->
+
 
         <!-- ══════════════════════════════════════════════════════════ -->
         <!--  Utilitaires                                              -->
@@ -72,6 +70,7 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.openjfx/javafx-web -->
 
         <dependency>
             <groupId>org.controlsfx</groupId>
