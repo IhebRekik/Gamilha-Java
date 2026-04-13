@@ -10,7 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -36,7 +35,7 @@ public class StreamFormController implements Initializable {
     // Champs présents UNIQUEMENT en mode édition (cachés en création)
     @FXML private TextField        urlField;
     @FXML private Spinner<Integer> viewersSpinner;
-    @FXML private VBox editOnlyBox;    // conteneur des champs édition
+    @FXML private VBox             editOnlyBox;    // conteneur des champs édition
 
     // Labels d'erreur
     @FXML private Label errTitle;
@@ -60,7 +59,7 @@ public class StreamFormController implements Initializable {
 
         if (viewersSpinner != null) {
             viewersSpinner.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999999, 0));
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 999999, 0));
             viewersSpinner.setEditable(true);
         }
 
@@ -104,7 +103,7 @@ public class StreamFormController implements Initializable {
 
         if (obsInfo != null && s.getStreamKey() != null) {
             obsInfo.setText("🔑 " + s.getStreamKey() + "\n📡 " +
-                (s.getRtmpServer() != null ? s.getRtmpServer() : "N/A"));
+                    (s.getRtmpServer() != null ? s.getRtmpServer() : "N/A"));
             obsInfo.setVisible(true); obsInfo.setManaged(true);
         }
     }
@@ -138,7 +137,7 @@ public class StreamFormController implements Initializable {
                 s.setUserId(1);
                 service.create(s);
                 AlertUtil.showSuccess("✅ Stream lancé !",
-                    "« " + s.getTitle() + " » est créé.\n🔑 Clé : " + s.getStreamKey());
+                        "« " + s.getTitle() + " » est créé.\n🔑 Clé : " + s.getStreamKey());
                 StreamShowController c = MainApp.loadSceneWithController("StreamShow.fxml");
                 if (c != null) c.setStream(s);
             } else {

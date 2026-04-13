@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.StreamPredictionController"
+            stylesheets="@../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Retour" onAction="#onBack" styleClass="btn-secondary"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" styleClass="page-header">
+                <padding><Insets top="14" right="24" bottom="10" left="24"/></padding>
+                <Label text="🤖 Prévision de streams" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="20">
+            <padding><Insets topRightBottomLeft="28"/></padding>
+
+            <!-- Cards de résumé -->
+            <HBox spacing="16">
+                <VBox styleClass="form-card" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6">
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                    <Label text="Prévision mois prochain" styleClass="field-lbl"/>
+                    <Label fx:id="lblPrediction" text="—"
+                           style="-fx-font-size:32px;-fx-font-weight:bold;-fx-text-fill:#8b5cf6;"/>
+                </VBox>
+                <VBox styleClass="form-card" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6">
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                    <Label text="Mois cible" styleClass="field-lbl"/>
+                    <Label fx:id="lblNextMonth" text="—"
+                           style="-fx-font-size:18px;-fx-text-fill:#e2e8f0;"/>
+                </VBox>
+                <VBox styleClass="form-card" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6">
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                    <Label text="Moyenne mensuelle" styleClass="field-lbl"/>
+                    <Label fx:id="lblAverage" text="—" styleClass="show-desc"/>
+                </VBox>
+                <VBox styleClass="form-card" HBox.hgrow="ALWAYS" alignment="CENTER" spacing="6">
+                    <padding><Insets topRightBottomLeft="16"/></padding>
+                    <Label text="Tendance" styleClass="field-lbl"/>
+                    <Label fx:id="lblTrend" text="—"
+                           style="-fx-font-size:16px;-fx-text-fill:#4ade80;"/>
+                </VBox>
+            </HBox>
+
+            <!-- Graphique BarChart -->
+            <BarChart fx:id="barChart" VBox.vgrow="ALWAYS"
+                      style="-fx-background-color:#1a1a26;-fx-border-color:#2a2a40;-fx-border-radius:12;">
+                <xAxis><CategoryAxis fx:id="xAxis" label="Mois"/></xAxis>
+                <yAxis><NumberAxis   fx:id="yAxis" label="Streams" minorTickCount="1"/></yAxis>
+            </BarChart>
+        </VBox>
+    </center>
+</BorderPane>

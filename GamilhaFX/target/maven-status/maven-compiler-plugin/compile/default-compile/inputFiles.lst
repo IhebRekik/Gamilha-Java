@@ -9,11 +9,15 @@ C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\cont
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\controller\DonationShowController.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\controller\StreamFormController.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\controller\StreamListController.java
+C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\controller\StreamPredictionController.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\controller\StreamShowController.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\entity\Donation.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\entity\Stream.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\MainApp.java
+C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\service\AblyService.java
+C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\service\ApiVideoService.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\service\DonationService.java
+C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\service\StreamPredictionService.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\service\StreamService.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\util\AlertUtil.java
 C:\Users\Drconsole\Desktop\GamilhaFX_v2\GamilhaFX\src\main\java\com\gamilha\util\DatabaseConnection.java
