@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.UserPostController"
+            style="-fx-background-color:#13131f;">
+
+    <!-- ══ HEADER ═════════════════════════════════════════════════════════ -->
+    <top>
+        <VBox style="-fx-background-color:#1a1a2e;-fx-border-color:#3a3a5c;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="16" right="24" bottom="16" left="24"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label fx:id="welcomeLabel" text="Bonjour 👋"
+                       style="-fx-font-size:19;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="＋  Nouveau Post" onAction="#onNewPost"
+                        style="-fx-background-color:#3b82f6;-fx-text-fill:white;
+                               -fx-background-radius:8;-fx-padding:8 18;
+                               -fx-font-size:13;-fx-cursor:hand;"/>
+                <Button text="🔄" onAction="#onRefresh"
+                        style="-fx-background-color:#374151;-fx-text-fill:#c9d1d9;
+                               -fx-background-radius:8;-fx-padding:8 12;-fx-cursor:hand;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ══ FIL DE POSTS ═══════════════════════════════════════════════════ -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <content>
+                <VBox alignment="TOP_CENTER">
+                    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+                    <VBox fx:id="feedBox" spacing="20" maxWidth="680" alignment="CENTER"/>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

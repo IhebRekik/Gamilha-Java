@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.UserPostController"
+            style="-fx-background-color:#111827;">
+
+    <!-- ══ HEADER SOCIAL ══════════════════════════════════════════════════ -->
+    <top>
+        <VBox style="-fx-background-color:#0f1020;
+                     -fx-border-color:#2a2b4a;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="14" right="24" bottom="14" left="24"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label fx:id="welcomeLabel" text="Social"
+                           style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                    <Label text="Connectez-vous avec la communauté esports"
+                           style="-fx-text-fill:#8b949e;-fx-font-size:12;"/>
+                </VBox>
+                <Button text="＋  Publier" onAction="#onNewPost"
+                        style="-fx-background-color:#c84cff;-fx-text-fill:white;
+                               -fx-background-radius:20;-fx-padding:8 22;
+                               -fx-font-size:13;-fx-font-weight:bold;-fx-cursor:hand;"/>
+                <Button text="🔄" onAction="#onRefresh"
+                        style="-fx-background-color:#1f1f3a;-fx-text-fill:#c9d1d9;
+                               -fx-background-radius:8;-fx-padding:8 12;-fx-cursor:hand;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ══ LAYOUT 2 COLONNES ═══════════════════════════════════════════════ -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <content>
+                <HBox spacing="24" alignment="TOP_CENTER">
+                    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+                    <!-- ── FEED — colonne gauche ──────────────────────────── -->
+                    <VBox fx:id="feedBox"
+                          spacing="20"
+                          prefWidth="660"
+                          minWidth="380"
+                          style="-fx-background-color:transparent;"/>
+
+                    <!-- ── SIDEBAR — colonne droite ───────────────────────── -->
+                    <VBox spacing="16" prefWidth="310" minWidth="240">
+
+                        <!-- Suggestions d'amis -->
+                        <VBox spacing="10"
+                              style="-fx-background-color:#1c1c2e;
+                                     -fx-background-radius:12;
+                                     -fx-border-radius:12;
+                                     -fx-border-color:#2a2b4a;
+                                     -fx-border-width:1;
+                                     -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.3),8,0,0,3);">
+                            <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+
+                            <Label text="👤  Suggestions d'amis"
+                                   style="-fx-font-weight:bold;-fx-text-fill:#e6edf3;-fx-font-size:14;"/>
+                            <Separator style="-fx-background-color:#2a2b4a;"/>
+                            <VBox fx:id="suggestionsBox" spacing="8"/>
+                        </VBox>
+
+                        <!-- Amis en ligne -->
+                        <VBox spacing="10"
+                              style="-fx-background-color:#1c1c2e;
+                                     -fx-background-radius:12;
+                                     -fx-border-radius:12;
+                                     -fx-border-color:#2a2b4a;
+                                     -fx-border-width:1;
+                                     -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.3),8,0,0,3);">
+                            <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
+
+                            <Label text="🟢  Amis en ligne"
+                                   style="-fx-font-weight:bold;-fx-text-fill:#4caf50;-fx-font-size:14;"/>
+                            <Separator style="-fx-background-color:#2a2b4a;"/>
+                            <VBox fx:id="amisBox" spacing="8"/>
+                        </VBox>
+
+                    </VBox>
+                </HBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

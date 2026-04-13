@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.PostFormController"
+            style="-fx-background-color:#13131f;">
+
+    <top>
+        <VBox style="-fx-background-color:#1a1a2e;-fx-border-color:#3a3a5c;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="14" right="20" bottom="14" left="20"/></padding>
+            <Label text="✏  Formulaire Post"
+                   style="-fx-font-size:17;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <content>
+                <VBox spacing="14">
+                    <padding><Insets top="22" right="26" bottom="22" left="26"/></padding>
+
+                    <!-- Auteur -->
+                    <VBox spacing="5">
+                        <Label text="Auteur"
+                               style="-fx-text-fill:#8b949e;-fx-font-size:12;-fx-font-weight:bold;"/>
+                        <ComboBox fx:id="userCombo" maxWidth="Infinity"
+                                  style="-fx-background-color:#252535;-fx-background-radius:8;
+                                         -fx-border-color:#3a3a5c;-fx-border-radius:8;"/>
+                    </VBox>
+
+                    <!-- Contenu -->
+                    <VBox spacing="5">
+                        <Label text="Contenu  (min. 12 caractères)"
+                               style="-fx-text-fill:#8b949e;-fx-font-size:12;-fx-font-weight:bold;"/>
+                        <TextArea fx:id="contentArea"
+                                  promptText="Écrivez le contenu du post…"
+                                  wrapText="true" prefHeight="110"
+                                  style="-fx-background-color:#252535;-fx-text-fill:#e6edf3;
+                                         -fx-prompt-text-fill:#6e7681;-fx-font-size:13;
+                                         -fx-border-color:#3a3a5c;-fx-border-radius:8;
+                                         -fx-background-radius:8;"/>
+                    </VBox>
+
+                    <!-- URL Média -->
+                    <VBox spacing="5">
+                        <Label text="URL Média  (optionnel)"
+                               style="-fx-text-fill:#8b949e;-fx-font-size:12;-fx-font-weight:bold;"/>
+                        <TextField fx:id="mediaurlField"
+                                   promptText="https://youtube.com/…"
+                                   style="-fx-background-color:#252535;-fx-text-fill:#e6edf3;
+                                          -fx-prompt-text-fill:#6e7681;-fx-background-radius:8;
+                                          -fx-border-color:#3a3a5c;-fx-border-radius:8;
+                                          -fx-padding:8 12;-fx-font-size:13;"/>
+                    </VBox>
+
+                    <!-- Image -->
+                    <VBox spacing="7">
+                        <Label text="Image"
+                               style="-fx-text-fill:#8b949e;-fx-font-size:12;-fx-font-weight:bold;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Button text="📁  Choisir une image" onAction="#onChooseImage"
+                                    style="-fx-background-color:#374151;-fx-text-fill:#c9d1d9;
+                                           -fx-background-radius:8;-fx-padding:6 14;-fx-cursor:hand;"/>
+                            <Label fx:id="imageNameLabel" text="Aucune image sélectionnée"
+                                   style="-fx-text-fill:#8b949e;-fx-font-size:12;"/>
+                        </HBox>
+                        <ImageView fx:id="imagePreview"
+                                   fitWidth="476" fitHeight="150"
+                                   preserveRatio="true"
+                                   style="-fx-border-color:#3a3a5c;-fx-border-radius:8;"/>
+                    </VBox>
+
+                    <!-- Erreur -->
+                    <Label fx:id="errorLabel" text=""
+                           wrapText="true"
+                           style="-fx-text-fill:#ef4444;-fx-font-size:12;"/>
+
+                    <!-- Boutons -->
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Button text="Annuler" onAction="#onCancel"
+                                style="-fx-background-color:#374151;-fx-text-fill:#c9d1d9;
+                                       -fx-background-radius:8;-fx-padding:8 20;-fx-cursor:hand;"/>
+                        <Button fx:id="btnSave" text="Enregistrer" onAction="#onSave"
+                                style="-fx-background-color:#3b82f6;-fx-text-fill:white;
+                                       -fx-background-radius:8;-fx-padding:8 20;
+                                       -fx-font-weight:bold;-fx-cursor:hand;"/>
+                    </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

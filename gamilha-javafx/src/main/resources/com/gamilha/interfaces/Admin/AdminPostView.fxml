@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controller.AdminPostController"
+            style="-fx-background-color:#111827;">
+
+    <!-- ══ HEADER ══════════════════════════════════════════════════════ -->
+    <top>
+        <VBox style="-fx-background-color:#0d0d1a;
+                     -fx-border-color:#1f1f3a;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="14" right="20" bottom="14" left="20"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label text="🌐  Social — Tous les Posts"
+                           style="-fx-font-size:18;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                    <Label text="Gérez et modérez tous les posts de la communauté"
+                           style="-fx-text-fill:#8b949e;-fx-font-size:11;"/>
+                </VBox>
+                <Label fx:id="totalLabel" text="0 post(s)"
+                       style="-fx-text-fill:#8b949e;-fx-font-size:13;"/>
+                <Button text="＋  Nouveau" onAction="#onNewPost"
+                        style="-fx-background-color:#c84cff;-fx-text-fill:white;
+                               -fx-background-radius:8;-fx-padding:7 16;
+                               -fx-font-size:13;-fx-font-weight:bold;-fx-cursor:hand;"/>
+                <Button text="🔄" onAction="#onRefresh"
+                        style="-fx-background-color:#1f1f3a;-fx-text-fill:#c9d1d9;
+                               -fx-background-radius:8;-fx-padding:7 11;-fx-cursor:hand;"/>
+            </HBox>
+
+            <!-- Recherche + tri -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets top="12"/></VBox.margin>
+                <Label text="🔍" style="-fx-font-size:13;-fx-text-fill:#8b949e;"/>
+                <TextField fx:id="searchField"
+                           promptText="Rechercher par contenu ou auteur…"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-background-color:#1f1f3a;-fx-text-fill:#e6edf3;
+                                  -fx-prompt-text-fill:#6e7681;-fx-background-radius:8;
+                                  -fx-border-color:#2a2b4a;-fx-border-radius:8;
+                                  -fx-padding:7 12;-fx-font-size:13;"/>
+                <Label text="Trier :" style="-fx-text-fill:#8b949e;-fx-font-size:13;"/>
+                <ComboBox fx:id="sortCombo" prefWidth="160"
+                          style="-fx-background-color:#1f1f3a;-fx-background-radius:8;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ══ CARDS ════════════════════════════════════════════════════════ -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <content>
+                <FlowPane fx:id="cardsPane" hgap="18" vgap="18"
+                          style="-fx-background-color:transparent;"/>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>
