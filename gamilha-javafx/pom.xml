@@ -109,7 +109,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.gamilha/com.gamilha.MainApp</mainClass>
+                            <mainClass>com.gamilha/com.gamilha.MainFX</mainClass>
                         </configuration>
                     </execution>
                 </executions>

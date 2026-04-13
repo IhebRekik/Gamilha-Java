@@ -1,6 +1,5 @@
 package com.gamilha;
 
-import com.gamilha.controller.NavBarUserController;
 import com.gamilha.model.User;
 import com.gamilha.service.SessionContext;
 import com.gamilha.service.UserService;
@@ -20,14 +19,14 @@ import java.io.InputStream;
  *
  * Lancement : mvn clean javafx:run
  */
-public class MainApp extends Application {
+public class MainFX extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
 
         // ── Simuler l'utilisateur connecté ──────────────────────────────
         UserService userService = new UserService();
-        User currentUser = userService.findById(2); // ← Remplace par ton ID
+        User currentUser = userService.findById(1); // ← Remplace par ton ID
         SessionContext.setCurrentUser(currentUser);
         // ────────────────────────────────────────────────────────────────
 
