@@ -1,0 +1,176 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Gamilha — Thème sombre global
+   ══════════════════════════════════════════════════════════════════════ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-base: #0f1020;
+    -fx-background: #111827;
+}
+
+/* ── ScrollPane transparent ─────────────────────────────────────────── */
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: #0d0d1a;
+}
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #3a3a5c;
+    -fx-background-radius: 4;
+}
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #c84cff;
+}
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TEXT FIELD — fond sombre, texte blanc
+   ══════════════════════════════════════════════════════════════════════ */
+.text-field {
+    -fx-background-color: #1a1a30;
+    -fx-control-inner-background: #1a1a30;
+    -fx-text-fill: #e6edf3;
+    -fx-prompt-text-fill: #4b5563;
+    -fx-background-radius: 8;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 8;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+}
+.text-field:focused {
+    -fx-border-color: #c84cff;
+    -fx-background-color: #1e1e3a;
+    -fx-control-inner-background: #1e1e3a;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TEXT AREA — fond sombre, texte blanc (correction principale)
+   ══════════════════════════════════════════════════════════════════════ */
+.text-area {
+    -fx-background-color: #1a1a30;
+    -fx-control-inner-background: #1a1a30;
+    -fx-text-fill: #e6edf3;
+    -fx-prompt-text-fill: #4b5563;
+    -fx-background-radius: 8;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 8;
+    -fx-font-size: 13px;
+}
+.text-area .content {
+    -fx-background-color: #1a1a30;
+    -fx-background-radius: 8;
+    /* IMPORTANT : c'est cette propriété qui fixe la couleur d'arrière-plan du texte */
+    -fx-control-inner-background: #1a1a30;
+}
+.text-area:focused {
+    -fx-border-color: #c84cff;
+}
+.text-area:focused .content {
+    -fx-background-color: #1e1e3a;
+    -fx-control-inner-background: #1e1e3a;
+}
+/* Sélection de texte */
+.text-area .selection {
+    -fx-fill: rgba(200, 76, 255, 0.35);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   COMBO BOX
+   ══════════════════════════════════════════════════════════════════════ */
+.combo-box {
+    -fx-background-color: #1a1a30;
+    -fx-control-inner-background: #1a1a30;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.combo-box .list-cell,
+.combo-box-popup .list-cell {
+    -fx-background-color: #1a1a30;
+    -fx-text-fill: #e6edf3;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #1a1a30;
+    -fx-border-color: #3a3a5c;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #2a2b4a;
+}
+.combo-box .arrow-button { -fx-background-color: transparent; }
+.combo-box .arrow         { -fx-background-color: #8b949e; }
+.combo-box .list-cell     { -fx-text-fill: #e6edf3; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   BOUTONS
+   ══════════════════════════════════════════════════════════════════════ */
+.button:hover   { -fx-opacity: 0.88; }
+.button:pressed { -fx-opacity: 0.72; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   LABELS
+   ══════════════════════════════════════════════════════════════════════ */
+.label { -fx-text-fill: #c9d1d9; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   SEPARATOR
+   ══════════════════════════════════════════════════════════════════════ */
+.separator .line {
+    -fx-border-color: #2a2b4a;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ALERTS / DIALOGS
+   ══════════════════════════════════════════════════════════════════════ */
+.dialog-pane                         { -fx-background-color: #1c1c2e; }
+.dialog-pane .header-panel           { -fx-background-color: #252535; }
+.dialog-pane .content.label,
+.dialog-pane .header-panel .label    { -fx-text-fill: #e6edf3; }
+.dialog-pane .button-bar .button {
+    -fx-background-color: #252535;
+    -fx-text-fill: #c9d1d9;
+    -fx-background-radius: 6;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CONTEXT MENU (menu ⋮)
+   ══════════════════════════════════════════════════════════════════════ */
+.context-menu {
+    -fx-background-color: #1f1f3a;
+    -fx-border-color: #3a3a5c;
+    -fx-border-width: 1;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0, 0, 4);
+}
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e6edf3;
+}
+.menu-item:focused,
+.menu-item:hover {
+    -fx-background-color: #2a2b4a;
+    -fx-background-radius: 6;
+}
+.menu-item .label { -fx-text-fill: #e6edf3; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   TOOLTIP
+   ══════════════════════════════════════════════════════════════════════ */
+.tooltip {
+    -fx-background-color: #1f1f3a;
+    -fx-text-fill: #e6edf3;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+}

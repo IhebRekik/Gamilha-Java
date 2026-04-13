@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.NavBarUserController"
+            prefWidth="1280" prefHeight="780"
+            style="-fx-background-color:#111827;">
+
+    <!-- ══ TOPBAR ════════════════════════════════════════════════════════ -->
+    <top>
+        <VBox style="-fx-background-color:linear-gradient(to right,#0a0a18,#12122a);
+                     -fx-border-color:#2a2b4a;-fx-border-width:0 0 1 0;">
+
+            <!-- ── Ligne principale ──────────────────────────────────────── -->
+            <HBox spacing="4" alignment="CENTER_LEFT" style="-fx-padding:8 20;">
+
+                <!-- LOGO IMAGE + texte -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <HBox.margin>
+                        <Insets right="14"/>
+                    </HBox.margin>
+
+                    <ImageView fx:id="logoImage"
+                               fitHeight="38"
+                               fitWidth="38"
+                               preserveRatio="true"
+                               smooth="true"/>
+
+                    <Label text="Gamilha"
+                           style="-fx-text-fill:#c84cff;
+                  -fx-font-size:20;
+                  -fx-font-weight:bold;"/>
+                </HBox>
+
+                <!-- MENU PRINCIPAL -->
+                <Button fx:id="btnAccueil"
+                        text="🏠 Accueil" onAction="#goAccueil"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+                <Button fx:id="btnEvenements"
+                        text="📅 Événements" onAction="#goEvenements"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+                <Button fx:id="btnEquipes"
+                        text="👥 Équipes" onAction="#goEquipe"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+                <Button fx:id="btnCoaching"
+                        text="🎯 Coaching" onAction="#goCoaching"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+                <Button fx:id="btnAI"
+                        text="🤖 Gamilha AI" onAction="#goAI"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+
+                <!-- ██ RÉSEAUX — redirige selon le rôle ██ -->
+                <Button fx:id="btnReseaux"
+                        text="🌐 Réseaux" onAction="#goReseaux"
+                        style="-fx-background-color:transparent;-fx-text-fill:#c84cff;
+                               -fx-font-size:13;-fx-font-weight:bold;-fx-cursor:hand;
+                               -fx-border-color:#c84cff;-fx-border-width:0 0 2 0;
+                               -fx-padding:6 10;"/>
+
+                <Button fx:id="btnStreams"
+                        text="📡 Streams" onAction="#goStreams"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+                <Button fx:id="btnAbonnements"
+                        text="💎 Abonnements" onAction="#goAbonnement"
+                        style="-fx-background-color:transparent;-fx-text-fill:white;
+                               -fx-font-size:13;-fx-cursor:hand;-fx-padding:6 10;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Label fx:id="welcomeLabel"
+                       style="-fx-text-fill:#c9d1d9;-fx-font-size:13;"/>
+                <Button text="🚪" onAction="#logout"
+                        style="-fx-background-color:transparent;-fx-text-fill:#ff4d4d;
+                               -fx-font-size:15;-fx-cursor:hand;-fx-padding:6 8;"/>
+            </HBox>
+
+            <!-- ── Sous-menu Social (masqué pour les admins) ─────────────── -->
+            <HBox fx:id="subMenuSocial"
+                  spacing="2" alignment="CENTER_LEFT"
+                  style="-fx-background-color:#09091a;
+                         -fx-padding:4 20 4 88;
+                         -fx-border-color:#1a1b3a;-fx-border-width:1 0 0 0;">
+
+                <Label text="Réseaux :"
+                       style="-fx-text-fill:#4b5563;-fx-font-size:11;-fx-padding:0 6 0 0;"/>
+
+                <!-- Fil d'actualité -->
+                <Button fx:id="btnFilActualite"
+                        text="🏠 Fil d'actualité" onAction="#goFilActualite"
+                        style="-fx-background-color:transparent;-fx-text-fill:#9ca3af;
+                               -fx-font-size:12;-fx-cursor:hand;-fx-padding:4 12;"/>
+
+                <Label text="|" style="-fx-text-fill:#374151;"/>
+
+                <!-- Mes Posts -->
+                <Button fx:id="btnMesPosts"
+                        text="📝 Mes Posts" onAction="#goMesPosts"
+                        style="-fx-background-color:transparent;-fx-text-fill:#9ca3af;
+                               -fx-font-size:12;-fx-cursor:hand;-fx-padding:4 12;"/>
+
+                <Label text="|" style="-fx-text-fill:#374151;"/>
+
+                <!-- Mes Commentaires -->
+                <Button fx:id="btnMesCommentaires"
+                        text="💬 Mes Commentaires" onAction="#goMesCommentaires"
+                        style="-fx-background-color:transparent;-fx-text-fill:#9ca3af;
+                               -fx-font-size:12;-fx-cursor:hand;-fx-padding:4 12;"/>
+
+                <Label text="|" style="-fx-text-fill:#374151;"/>
+
+                <!-- Amis -->
+                <Button fx:id="btnAmis"
+                        text="👤 Amis" onAction="#goAmis"
+                        style="-fx-background-color:transparent;-fx-text-fill:#9ca3af;
+                               -fx-font-size:12;-fx-cursor:hand;-fx-padding:4 12;"/>
+
+            </HBox>
+
+        </VBox>
+    </top>
+
+    <!-- ══ CONTENU ════════════════════════════════════════════════════════ -->
+    <center>
+        <BorderPane fx:id="contentArea" style="-fx-background-color:#111827;"/>
+    </center>
+
+</BorderPane>
