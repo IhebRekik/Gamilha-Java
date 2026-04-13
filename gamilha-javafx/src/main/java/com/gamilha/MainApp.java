@@ -27,7 +27,7 @@ public class MainApp extends Application {
 
         // ── Simuler l'utilisateur connecté ──────────────────────────────
         UserService userService = new UserService();
-        User currentUser = userService.findById(1); // ← Remplace par ton ID
+        User currentUser = userService.findById(2); // ← Remplace par ton ID
         SessionContext.setCurrentUser(currentUser);
         // ────────────────────────────────────────────────────────────────
 
