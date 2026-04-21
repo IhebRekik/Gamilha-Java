@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.UserDetailController"
+      spacing="25"
+      alignment="TOP_CENTER"
+      styleClass="content-area">
+
+    <padding>
+        <Insets top="35" right="35" bottom="35" left="35"/>
+    </padding>
+
+    <children>
+
+        <!-- bouton retour -->
+        <HBox maxWidth="900"
+              alignment="CENTER_LEFT">
+
+            <Button text="← Retour à la liste"
+                    onAction="#backToList"
+                    style="-fx-font-size:14px;
+                           -fx-background-color:#1a1e2e;
+                           -fx-text-fill:#c084fc;
+                           -fx-background-radius:8;
+                           -fx-padding:8 16;"/>
+
+        </HBox>
+
+
+        <!-- carte utilisateur -->
+        <VBox maxWidth="900"
+              spacing="25"
+              styleClass="card">
+
+            <padding>
+                <Insets top="35" right="35" bottom="35" left="35"/>
+            </padding>
+
+
+            <HBox spacing="35"
+                  alignment="CENTER_LEFT">
+
+                <!-- avatar -->
+                <ImageView fx:id="avatarView"
+                           fitWidth="130"
+                           fitHeight="130"
+                           preserveRatio="true"/>
+
+
+                <!-- infos -->
+                <VBox spacing="12">
+
+                    <Label fx:id="nameLabel"
+                           style="-fx-font-size:26px;
+                                  -fx-font-weight:bold;
+                                  -fx-text-fill:white;"/>
+
+
+                    <Label fx:id="emailLabel"
+                           style="-fx-font-size:16px;
+                                  -fx-text-fill:#94a3b8;"/>
+
+
+                    <Label fx:id="roleLabel"
+                           style="-fx-font-size:15px;
+                                  -fx-text-fill:#c084fc;"/>
+
+
+                    <Label fx:id="statusLabel"
+                           style="-fx-font-size:15px;
+                                  -fx-text-fill:white;"/>
+
+
+                    <Label fx:id="createdAtLabel"
+                           style="-fx-font-size:13px;
+                                  -fx-text-fill:#64748b;"/>
+
+                </VBox>
+
+            </HBox>
+
+        </VBox>
+
+
+
+        <!-- boutons -->
+        <HBox spacing="15"
+              alignment="CENTER_RIGHT"
+              maxWidth="900">
+
+            <Button text="Modifier"
+                    fx:id="editBtn"
+                    onAction="#editUser"
+                    styleClass="button-primary"/>
+
+
+            <Button text="Retour"
+                    onAction="#backToList"
+                    style="-fx-background-color:#374151;
+                           -fx-text-fill:white;
+                           -fx-background-radius:999;
+                           -fx-padding:10 24;"/>
+
+        </HBox>
+
+
+    </children>
+
+</VBox>

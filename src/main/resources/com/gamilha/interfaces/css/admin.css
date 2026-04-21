@@ -1,0 +1,73 @@
+.root{
+    -fx-background-color:#1f232a;
+}
+
+/* table */
+.table-view{
+    -fx-background-color:#2a2f36;
+    -fx-border-color:transparent;
+}
+
+.table-view .column-header{
+    -fx-background-color:#2a2f36;
+}
+
+.table-view .column-header-background{
+    -fx-background-color:#2a2f36;
+}
+
+.table-view .column-header .label{
+    -fx-text-fill:white;
+    -fx-font-weight:bold;
+}
+
+.table-row-cell{
+    -fx-background-color:#2a2f36;
+    -fx-text-fill:white;
+}
+
+.table-row-cell:filled:selected{
+    -fx-background-color:#323844;
+}
+
+.table-cell{
+    -fx-text-fill:white;
+}
+
+/* bouton edit */
+.btn-edit{
+    -fx-background-color:#f59e0b;
+    -fx-text-fill:white;
+}
+
+/* bouton delete */
+.btn-delete{
+    -fx-background-color:#ef4444;
+    -fx-text-fill:white;
+}
+
+/* bouton view */
+.btn-view{
+    -fx-background-color:#06b6d4;
+    -fx-text-fill:white;
+}
+
+/* bouton add */
+.btn-add{
+    -fx-background-color:#22c55e;
+    -fx-text-fill:white;
+    -fx-font-weight:bold;
+}
+
+/* champ recherche */
+.search-field{
+    -fx-background-color:#3a4049;
+    -fx-text-fill:white;
+}
+.table-view .column-header-background{
+    -fx-background-color:#2a2f36;
+}
+
+.table-view .column-header{
+    -fx-border-color:transparent transparent #3b4250 transparent;
+}
