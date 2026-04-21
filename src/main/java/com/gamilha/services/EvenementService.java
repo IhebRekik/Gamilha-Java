@@ -108,6 +108,42 @@ public class EvenementService implements ICrud<Evenement> {
         return list;
     }
 
+    public List<EquipeParticipation> findParticipationsByUser(Integer userId) {
+        if (userId == null) {
+            return List.of();
+        }
+
+        String sql = "SELECT e.idEvenement, e.nom, e.dateDebut, e.dateFin, eq.idEquipe, eq.nomEquipe " +
+                "FROM evenement e " +
+                "INNER JOIN evenement_equipe ee ON ee.idEvenement = e.idEvenement " +
+                "INNER JOIN equipe eq ON eq.idEquipe = ee.idEquipe " +
+                "INNER JOIN equipe_user eu ON eu.equipe_id = eq.idEquipe " +
+                "WHERE eu.user_id = ? " +
+                "ORDER BY e.dateDebut ASC, e.idEvenement ASC";
+
+        List<EquipeParticipation> participations = new ArrayList<>();
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Date start = rs.getDate("dateDebut");
+                    Date end = rs.getDate("dateFin");
+                    participations.add(new EquipeParticipation(
+                            rs.getInt("idEvenement"),
+                            rs.getString("nom"),
+                            start == null ? null : start.toLocalDate(),
+                            end == null ? null : end.toLocalDate(),
+                            rs.getInt("idEquipe"),
+                            rs.getString("nomEquipe")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur chargement participations equipes: " + e.getMessage(), e);
+        }
+        return participations;
+    }
+
     /**
      * Met à jour un événement existant en base après validation.
      * Ne met pas à jour created_by_id ni created_at (champs immuables).
@@ -417,5 +453,31 @@ public class EvenementService implements ICrud<Evenement> {
         evenement.setCreatedAt(createdAt == null ? null : createdAt.toLocalDateTime());
 
         return evenement;
+    }
+
+    public static class EquipeParticipation {
+        private final Integer evenementId;
+        private final String evenementNom;
+        private final LocalDate dateDebut;
+        private final LocalDate dateFin;
+        private final Integer equipeId;
+        private final String equipeNom;
+
+        public EquipeParticipation(Integer evenementId, String evenementNom, LocalDate dateDebut, LocalDate dateFin,
+                                   Integer equipeId, String equipeNom) {
+            this.evenementId = evenementId;
+            this.evenementNom = evenementNom;
+            this.dateDebut = dateDebut;
+            this.dateFin = dateFin;
+            this.equipeId = equipeId;
+            this.equipeNom = equipeNom;
+        }
+
+        public Integer getEvenementId() { return evenementId; }
+        public String getEvenementNom() { return evenementNom; }
+        public LocalDate getDateDebut() { return dateDebut; }
+        public LocalDate getDateFin() { return dateFin; }
+        public Integer getEquipeId() { return equipeId; }
+        public String getEquipeNom() { return equipeNom; }
     }
 }

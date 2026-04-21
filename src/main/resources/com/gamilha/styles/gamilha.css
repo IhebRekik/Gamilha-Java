@@ -574,3 +574,38 @@
 .match-card-link:hover {
     -fx-border-color: rgba(244, 198, 76, 0.65);
 }
+
+/* CalendarFX - participations equipes */
+.participation-calendar .search-field,
+.participation-calendar .search-field .text-field,
+.participation-calendar .search-field .text-field .text,
+.participation-calendar .search-result-cell,
+.participation-calendar .search-result-cell .label,
+.participation-calendar .search-result-cell .text {
+    -fx-text-fill: #ffffff;
+    -fx-fill: #ffffff;
+}
+
+.participation-calendar .month-page,
+.participation-calendar .week-page,
+.participation-calendar .day-page {
+    -fx-background-color: #ffffff;
+}
+
+.participation-calendar .date-cell,
+.participation-calendar .day-view,
+.participation-calendar .week-view,
+.participation-calendar .month-sheet-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d7dbe8;
+}
+
+.participation-calendar .date-cell .label,
+.participation-calendar .day-of-week-label,
+.participation-calendar .month-page .label,
+.participation-calendar .week-page .label,
+.participation-calendar .day-page .label,
+.participation-calendar .text {
+    -fx-text-fill: #2f3a4f;
+    -fx-fill: #2f3a4f;
+}

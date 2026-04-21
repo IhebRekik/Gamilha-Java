@@ -155,13 +155,13 @@ public class EquipeService implements ICrud<Equipe> {
             }
 
             try (PreparedStatement ps = cnx.prepareStatement(
-                    "UPDATE gamematch SET equipea_id = NULL WHERE equipea_id = ?")) {
+                    "UPDATE `match` SET equipea_id = NULL WHERE equipea_id = ?")) {
                 ps.setInt(1, equipeId);
                 ps.executeUpdate();
             }
 
             try (PreparedStatement ps = cnx.prepareStatement(
-                    "UPDATE gamematch SET equipeb_id = NULL WHERE equipeb_id = ?")) {
+                    "UPDATE `match` SET equipeb_id = NULL WHERE equipeb_id = ?")) {
                 ps.setInt(1, equipeId);
                 ps.executeUpdate();
             }

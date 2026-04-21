@@ -5,6 +5,7 @@ import com.gamilha.controllers.bracket.BracketFormController;
 import com.gamilha.controllers.bracket.BracketListController;
 import com.gamilha.controllers.equipe.EquipeFormController;
 import com.gamilha.controllers.equipe.EquipeListController;
+import com.gamilha.controllers.equipe.EquipeParticipationCalendarController;
 import com.gamilha.controllers.evenement.EvenementFormController;
 import com.gamilha.controllers.evenement.EvenementListController;
 import com.gamilha.controllers.gamematch.GameMatchFormController;
@@ -68,6 +69,7 @@ public class DashboardController {
     private final EvenementFormController evForm = new EvenementFormController();
     private final EquipeListController    eqList = new EquipeListController();
     private final EquipeFormController    eqForm = new EquipeFormController();
+    private final EquipeParticipationCalendarController eqCalendar = new EquipeParticipationCalendarController();
     private final BracketListController   brList = new BracketListController();
     private final BracketFormController   brForm = new BracketFormController();
     private final GameMatchListController maList = new GameMatchListController();
@@ -144,6 +146,7 @@ public class DashboardController {
     private void wireSubControllers() {
         evList.setNav(this::navigateTo); evList.setFormController(evForm); evForm.setNav(this::navigateTo);
         eqList.setNav(this::navigateTo); eqList.setFormController(eqForm); eqForm.setNav(this::navigateTo);
+        eqCalendar.setNav(this::navigateTo);
         brList.setNav(this::navigateTo); brList.setFormController(brForm); brForm.setNav(this::navigateTo);
         maList.setNav(this::navigateTo); maList.setFormController(maForm); maForm.setNav(this::navigateTo);
     }
@@ -218,6 +221,7 @@ public class DashboardController {
             case "evenements_form" -> evForm.build();
             case "equipes_list"    -> eqList.build();
             case "equipes_form"    -> eqForm.build();
+            case "equipes_calendar" -> eqCalendar.build();
             case "brackets_list"   -> brList.build();
             case "brackets_form"   -> brForm.build();
             case "matchs_list"     -> maList.build();
@@ -341,6 +345,7 @@ public class DashboardController {
         return switch (pageKey) {
             case "evenements_form" -> "evenements_list";
             case "equipes_form" -> "equipes_list";
+            case "equipes_calendar" -> "equipes_list";
             case "brackets_form" -> "brackets_list";
             case "matchs_form" -> "matchs_list";
             default -> pageKey;

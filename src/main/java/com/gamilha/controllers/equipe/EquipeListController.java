@@ -41,10 +41,12 @@ public class EquipeListController extends BaseController {
         Button refresh = new Button("Actualiser");
         Button allBtn = new Button("Tous");
         Button mineBtn = new Button("Mes Equipes");
+        Button calendarBtn = new Button("Calendrier participations");
         final boolean[] onlyMine = {false};
 
         allBtn.setOnAction(e -> { onlyMine[0] = false; setActiveBtn(allBtn, mineBtn, false); refresh.fire(); });
         mineBtn.setOnAction(e -> { onlyMine[0] = true; setActiveBtn(allBtn, mineBtn, true); refresh.fire(); });
+        calendarBtn.setOnAction(e -> nav.navigateTo("equipes_calendar"));
         add.setOnAction(e -> { if (formController != null) formController.prepareForCreate(); nav.navigateTo("equipes_form"); });
 
         setActiveBtn(allBtn, mineBtn, false);
@@ -99,7 +101,7 @@ public class EquipeListController extends BaseController {
         refresh.setOnAction(e -> fillRef[0].run());
         fillRef[0].run();
 
-        root.getChildren().addAll(new HBox(8, add, refresh, allBtn, mineBtn), pageScroller(grid));
+        root.getChildren().addAll(new HBox(8, add, refresh, allBtn, mineBtn, calendarBtn), pageScroller(grid));
         return root;
     }
 
