@@ -113,7 +113,7 @@ public class EvenementService implements ICrud<Evenement> {
             return List.of();
         }
 
-        String sql = "SELECT e.idEvenement, e.nom, e.dateDebut, e.dateFin, eq.idEquipe, eq.nomEquipe " +
+        String sql = "SELECT e.idEvenement, e.nom, e.dateDebut, e.dateFin, e.typeEvenement, e.jeu, e.statut, eq.idEquipe, eq.nomEquipe " +
                 "FROM evenement e " +
                 "INNER JOIN evenement_equipe ee ON ee.idEvenement = e.idEvenement " +
                 "INNER JOIN equipe eq ON eq.idEquipe = ee.idEquipe " +
@@ -133,6 +133,9 @@ public class EvenementService implements ICrud<Evenement> {
                             rs.getString("nom"),
                             start == null ? null : start.toLocalDate(),
                             end == null ? null : end.toLocalDate(),
+                            rs.getString("typeEvenement"),
+                            rs.getString("jeu"),
+                            rs.getString("statut"),
                             rs.getInt("idEquipe"),
                             rs.getString("nomEquipe")
                     ));
@@ -460,15 +463,22 @@ public class EvenementService implements ICrud<Evenement> {
         private final String evenementNom;
         private final LocalDate dateDebut;
         private final LocalDate dateFin;
+        private final String typeEvenement;
+        private final String jeu;
+        private final String statut;
         private final Integer equipeId;
         private final String equipeNom;
 
         public EquipeParticipation(Integer evenementId, String evenementNom, LocalDate dateDebut, LocalDate dateFin,
+                                   String typeEvenement, String jeu, String statut,
                                    Integer equipeId, String equipeNom) {
             this.evenementId = evenementId;
             this.evenementNom = evenementNom;
             this.dateDebut = dateDebut;
             this.dateFin = dateFin;
+            this.typeEvenement = typeEvenement;
+            this.jeu = jeu;
+            this.statut = statut;
             this.equipeId = equipeId;
             this.equipeNom = equipeNom;
         }
@@ -477,6 +487,9 @@ public class EvenementService implements ICrud<Evenement> {
         public String getEvenementNom() { return evenementNom; }
         public LocalDate getDateDebut() { return dateDebut; }
         public LocalDate getDateFin() { return dateFin; }
+        public String getTypeEvenement() { return typeEvenement; }
+        public String getJeu() { return jeu; }
+        public String getStatut() { return statut; }
         public Integer getEquipeId() { return equipeId; }
         public String getEquipeNom() { return equipeNom; }
     }

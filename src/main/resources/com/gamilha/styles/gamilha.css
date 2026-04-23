@@ -609,3 +609,31 @@
     -fx-text-fill: #2f3a4f;
     -fx-fill: #2f3a4f;
 }
+
+.qr-invitation-card {
+    -fx-background-color: linear-gradient(to bottom right, rgba(18, 26, 43, 0.98), rgba(26, 16, 44, 0.98));
+    -fx-border-color: rgba(139, 92, 246, 0.30);
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+}
+
+.qr-invitation-card .label,
+.qr-invitation-card .text,
+.qr-invitation-card .entity-card-title,
+.qr-invitation-card .entity-card-line,
+.qr-invitation-card .section-title {
+    -fx-text-fill: #ffffff;
+    -fx-fill: #ffffff;
+}
+
+.qr-image-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: rgba(139, 92, 246, 0.30);
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+}
+
+.qr-invitation-scroll,
+.qr-invitation-scroll > .viewport {
+    -fx-background-color: transparent;
+}

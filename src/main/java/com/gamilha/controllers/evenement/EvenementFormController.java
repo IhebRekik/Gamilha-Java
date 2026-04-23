@@ -9,11 +9,18 @@ import com.gamilha.services.EvenementService;
 import com.gamilha.services.GameMatchService;
 import com.gamilha.utils.SessionContext;
 import javafx.collections.FXCollections;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import org.vosk.Model;
+import org.vosk.Recognizer;
 
+import javax.sound.sampled.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -45,6 +52,13 @@ public class EvenementFormController extends BaseController {
     private VBox evEquipeChecks;
     private final Map<Integer, CheckBox> evEquipeCheckById = new LinkedHashMap<>();
     private ComboBox<String> evBracketType;
+    private Button voiceDescriptionBtn;
+    private boolean speechListening = false;
+    private volatile boolean stopSpeechRequested = false;
+    private Thread speechThread;
+    private Model speechModel;
+    private static final String MIC_ICON = "\uD83C\uDFA4";
+    private static final String STOP_ICON = "\u23F9";
 
     public void setNav(NavigationCallback nav) { this.nav = nav; }
 
@@ -62,6 +76,7 @@ public class EvenementFormController extends BaseController {
 
         evNom = new TextField();
         evDescription = new TextArea();
+        evDescription.setPrefRowCount(4);
         evJeu = new TextField();
         evType = new ComboBox<>(FXCollections.observableArrayList("online", "offline"));
         evDateDebut = new DatePicker();
@@ -80,9 +95,16 @@ public class EvenementFormController extends BaseController {
         evBracketType = new ComboBox<>(FXCollections.observableArrayList("single elimination", "double elimination"));
         evBracketType.setValue("single elimination");
 
+        voiceDescriptionBtn = new Button(MIC_ICON);
+        voiceDescriptionBtn.setTooltip(new Tooltip("Activer la saisie vocale dans la description"));
+        voiceDescriptionBtn.setOnAction(e -> toggleVoiceTypingForDescription());
+        HBox descriptionRow = new HBox(8, evDescription, voiceDescriptionBtn);
+        HBox.setHgrow(evDescription, Priority.ALWAYS);
+        descriptionRow.setFillHeight(true);
+
         GridPane form = formGrid();
         addFormRow(form, 0, "Nom", evNom);
-        addFormRow(form, 1, "Description", evDescription);
+        addFormRow(form, 1, "Description", descriptionRow);
         addFormRow(form, 2, "Jeu", evJeu);
         addFormRow(form, 3, "Type", evType);
         addFormRow(form, 4, "Date debut", evDateDebut);
@@ -275,5 +297,114 @@ public class EvenementFormController extends BaseController {
         try { return dialog.showAndWait(); }
         catch (Exception ex) { error(ex.getMessage()); return Optional.empty(); }
     }
+
+    private void toggleVoiceTypingForDescription() {
+        if (speechListening) {
+            stopSpeechRequested = true;
+            speechListening = false;
+            if (voiceDescriptionBtn != null) voiceDescriptionBtn.setText(MIC_ICON);
+            return;
+        }
+
+        try {
+            Model model = ensureSpeechModel();
+            if (model == null) {
+                error("Modele vocal introuvable. Place le modele dans models/vosk-model-small-fr-0.22 ou definis VOSK_MODEL_PATH.");
+                return;
+            }
+            stopSpeechRequested = false;
+            speechListening = true;
+            if (voiceDescriptionBtn != null) voiceDescriptionBtn.setText(STOP_ICON);
+            evDescription.requestFocus();
+            speechThread = new Thread(() -> runSpeechRecognition(model), "voice-description-thread");
+            speechThread.setDaemon(true);
+            speechThread.start();
+        } catch (Exception ex) {
+            speechListening = false;
+            if (voiceDescriptionBtn != null) voiceDescriptionBtn.setText(MIC_ICON);
+            error("Impossible d'activer la saisie vocale: " + ex.getMessage());
+        }
+    }
+
+    private Model ensureSpeechModel() {
+        if (speechModel != null) return speechModel;
+        String fromEnv = System.getenv("VOSK_MODEL_PATH");
+        String fromProp = System.getProperty("gamilha.vosk.model");
+        List<String> candidates = new ArrayList<>();
+        if (fromEnv != null && !fromEnv.isBlank()) candidates.add(fromEnv);
+        if (fromProp != null && !fromProp.isBlank()) candidates.add(fromProp);
+        candidates.add("models/vosk-model-small-fr-0.22");
+        candidates.add("models/vosk-model-fr-0.22");
+        for (String candidate : candidates) {
+            Path path = Path.of(candidate);
+            if (!Files.exists(path)) continue;
+            try {
+                speechModel = new Model(path.toAbsolutePath().toString());
+                return speechModel;
+            } catch (IOException ignored) {
+                // Essaye le prochain chemin candidat.
+            }
+        }
+        return null;
+    }
+
+    private void runSpeechRecognition(Model model) {
+        AudioFormat format = new AudioFormat(16000.0f, 16, 1, true, false);
+        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+        try (Recognizer recognizer = new Recognizer(model, 16000.0f)) {
+            if (!AudioSystem.isLineSupported(info)) {
+                raiseSpeechError("Microphone non supporte.");
+                return;
+            }
+            TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
+            line.open(format);
+            line.start();
+            byte[] buffer = new byte[4096];
+            while (!stopSpeechRequested) {
+                int n = line.read(buffer, 0, buffer.length);
+                if (n <= 0) continue;
+                if (recognizer.acceptWaveForm(buffer, n)) {
+                    appendRecognizedText(extractTextFromVoskJson(recognizer.getResult()));
+                }
+            }
+            line.stop();
+            line.close();
+            appendRecognizedText(extractTextFromVoskJson(recognizer.getFinalResult()));
+        } catch (Exception ex) {
+            raiseSpeechError(ex.getMessage());
+        } finally {
+            Platform.runLater(() -> {
+                speechListening = false;
+                stopSpeechRequested = false;
+                if (voiceDescriptionBtn != null) voiceDescriptionBtn.setText(MIC_ICON);
+            });
+        }
+    }
+
+    private void appendRecognizedText(String text) {
+        if (text == null || text.isBlank()) return;
+        Platform.runLater(() -> {
+            if (evDescription == null) return;
+            String current = evDescription.getText();
+            evDescription.setText((current == null || current.isBlank()) ? text : current + " " + text);
+        });
+    }
+
+    private void raiseSpeechError(String message) {
+        Platform.runLater(() -> error("Erreur API vocale: " + nullSafe(message)));
+    }
+
+    private String extractTextFromVoskJson(String json) {
+        if (json == null || json.isBlank()) return "";
+        String marker = "\"text\"";
+        int keyIdx = json.indexOf(marker);
+        if (keyIdx < 0) return "";
+        int colonIdx = json.indexOf(':', keyIdx);
+        int firstQuote = json.indexOf('"', colonIdx + 1);
+        int secondQuote = json.indexOf('"', firstQuote + 1);
+        if (colonIdx < 0 || firstQuote < 0 || secondQuote < 0) return "";
+        return json.substring(firstQuote + 1, secondQuote).trim();
+    }
+
 }
 

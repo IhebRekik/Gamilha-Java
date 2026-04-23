@@ -26,6 +26,8 @@ module com.gamilha {
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
     requires com.calendarfx.view;
+    requires com.google.zxing;
+    requires vosk;
 
     // ── Opens (pour FXML) ─────────────────────────
     opens com.gamilha to javafx.fxml;
