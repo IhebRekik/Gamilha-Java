@@ -218,10 +218,11 @@ public class EvenementListController extends BaseController {
                 .collect(Collectors.toList());
 
         Node bracketVisual = buildBracketVisual(brackets, matchs);
+        Node similarEventsSection = buildSimilarEventsSection(evenement);
 
         root.getChildren().add(back);
         if (imageNode != null) root.getChildren().add(imageNode);
-        root.getChildren().addAll(meta, textBlock, bracketVisual);
+        root.getChildren().addAll(meta, textBlock, bracketVisual, similarEventsSection);
         return pageScroller(root);
     }
 
@@ -290,6 +291,61 @@ public class EvenementListController extends BaseController {
             section.getChildren().add(board);
         }
         return section;
+    }
+
+    private Node buildSimilarEventsSection(Evenement source) {
+        VBox section = new VBox(10);
+        section.getStyleClass().add("details-section");
+
+        Label title = new Label("Evenements similaires");
+        title.getStyleClass().add("entity-card-title");
+        section.getChildren().add(title);
+
+        List<Evenement> similarEvents = evenementService.findSimilarByDescription(source, 4);
+        if (similarEvents.isEmpty()) {
+            Label empty = new Label("aucun evenement similaire");
+            empty.getStyleClass().add("entity-card-line");
+            section.getChildren().add(empty);
+            return section;
+        }
+
+        for (Evenement e : similarEvents) {
+            VBox card = new VBox(6);
+            card.getStyleClass().addAll("entity-card", "event-card");
+            card.setOnMouseClicked(ev -> showDetails(e));
+
+            Node img = createEventImageNode(e.getImage());
+            if (img != null) {
+                HBox imgRow = new HBox(img);
+                imgRow.setAlignment(Pos.CENTER);
+                imgRow.setMaxWidth(Double.MAX_VALUE);
+                imgRow.setMouseTransparent(true);
+                card.getChildren().add(imgRow);
+            }
+
+            Label name = new Label(nullSafe(e.getNom()));
+            name.getStyleClass().add("entity-card-title");
+            Label game = new Label("Jeu: " + nullSafe(e.getJeu()));
+            game.getStyleClass().add("entity-card-line");
+            Label desc = new Label(buildPreview(e.getDescription()));
+            desc.getStyleClass().add("entity-card-line");
+            desc.setWrapText(true);
+
+            Button details = new Button("Voir details");
+            details.setOnAction(ev -> showDetails(e));
+
+            card.getChildren().addAll(name, game, desc, details);
+            section.getChildren().add(card);
+        }
+        return section;
+    }
+
+    private String buildPreview(String description) {
+        String safe = nullSafe(description).trim();
+        if (safe.length() <= 120) {
+            return safe;
+        }
+        return safe.substring(0, 117) + "...";
     }
 
     private Node buildTreeLayout(List<GameMatch> bracketMatches) {

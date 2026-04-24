@@ -7,11 +7,18 @@ import com.gamilha.tools.DBconnexion;
 import com.gamilha.validation.InputValidator;
 
 import java.sql.*;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Service CRUD pour l'entité {@link Evenement}.
@@ -338,6 +345,38 @@ public class EvenementService implements ICrud<Evenement> {
     }
 
     /**
+     * Retourne les événements dont la description est la plus proche d'un événement source.
+     *
+     * L'algorithme applique une similarité cosinus sur un modèle "bag of words"
+     * léger (tokenisation + suppression d'accents + TF normalisée).
+     */
+    public List<Evenement> findSimilarByDescription(Evenement source, int limit) {
+        if (source == null || source.getIdEvenement() == null || limit <= 0) {
+            return List.of();
+        }
+
+        List<String> sourceTokens = tokenize(source.getDescription());
+        if (sourceTokens.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Double> sourceTf = termFrequency(sourceTokens);
+        double sourceNorm = vectorNorm(sourceTf);
+        if (sourceNorm == 0.0) {
+            return List.of();
+        }
+
+        return findAll().stream()
+                .filter(e -> e.getIdEvenement() != null && !e.getIdEvenement().equals(source.getIdEvenement()))
+                .map(candidate -> new ScoredEvenement(candidate, similarityScore(sourceTf, sourceNorm, candidate.getDescription())))
+                .filter(scored -> scored.score > 0.15d)
+                .sorted(Comparator.comparingDouble((ScoredEvenement s) -> s.score).reversed())
+                .limit(limit)
+                .map(scored -> scored.evenement)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Génère automatiquement un bracket et tous les matchs pour un événement.
      *
      * Algorithme :
@@ -456,6 +495,95 @@ public class EvenementService implements ICrud<Evenement> {
         evenement.setCreatedAt(createdAt == null ? null : createdAt.toLocalDateTime());
 
         return evenement;
+    }
+
+    private double similarityScore(Map<String, Double> sourceTf, double sourceNorm, String candidateDescription) {
+        List<String> candidateTokens = tokenize(candidateDescription);
+        if (candidateTokens.isEmpty()) {
+            return 0.0;
+        }
+        Map<String, Double> candidateTf = termFrequency(candidateTokens);
+        double candidateNorm = vectorNorm(candidateTf);
+        if (candidateNorm == 0.0) {
+            return 0.0;
+        }
+
+        double dot = 0.0;
+        for (Map.Entry<String, Double> entry : sourceTf.entrySet()) {
+            Double candidateValue = candidateTf.get(entry.getKey());
+            if (candidateValue != null) {
+                dot += entry.getValue() * candidateValue;
+            }
+        }
+        return dot / (sourceNorm * candidateNorm);
+    }
+
+    private List<String> tokenize(String text) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        if (normalized.isBlank()) {
+            return List.of();
+        }
+
+        String[] raw = normalized.split(" ");
+        Set<String> stopWords = stopWords();
+        List<String> tokens = new ArrayList<>();
+        for (String token : raw) {
+            if (token.length() < 3 || stopWords.contains(token)) {
+                continue;
+            }
+            tokens.add(token);
+        }
+        return tokens;
+    }
+
+    private Map<String, Double> termFrequency(List<String> tokens) {
+        Map<String, Integer> counts = new HashMap<>();
+        for (String token : tokens) {
+            counts.put(token, counts.getOrDefault(token, 0) + 1);
+        }
+
+        Map<String, Double> tf = new HashMap<>();
+        double size = tokens.size();
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            tf.put(entry.getKey(), entry.getValue() / size);
+        }
+        return tf;
+    }
+
+    private double vectorNorm(Map<String, Double> vector) {
+        double sum = 0.0;
+        for (double value : vector.values()) {
+            sum += value * value;
+        }
+        return Math.sqrt(sum);
+    }
+
+    private Set<String> stopWords() {
+        return new HashSet<>(List.of(
+                "les", "des", "une", "dans", "avec", "pour", "sur", "par", "est", "sont",
+                "qui", "que", "quoi", "dont", "vos", "nos", "ses", "leur", "this", "that",
+                "the", "and", "or", "mais", "donc", "car", "sans", "entre", "avant", "apres",
+                "event", "events", "evenement", "evenements", "tournoi", "match", "game"
+        ));
+    }
+
+    private static class ScoredEvenement {
+        private final Evenement evenement;
+        private final double score;
+
+        private ScoredEvenement(Evenement evenement, double score) {
+            this.evenement = evenement;
+            this.score = score;
+        }
     }
 
     public static class EquipeParticipation {
