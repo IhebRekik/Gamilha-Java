@@ -2,6 +2,7 @@ package com.gamilha.services;
 
 import com.gamilha.entity.Equipe;
 import com.gamilha.utils.ConnectionManager;
+
 import com.gamilha.validation.InputValidator;
 
 import java.sql.Connection;
@@ -14,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EquipeService implements ICrud<Equipe> {
+
     private final Connection cnx = ConnectionManager.getConnection();
+
 
     @Override
     public void ajouterEntite(Equipe equipe) {
@@ -126,12 +129,67 @@ public class EquipeService implements ICrud<Equipe> {
 
     @Override
     public void supprimerEntite(Equipe equipe) {
-        String sql = "DELETE FROM equipe WHERE idEquipe = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, equipe.getIdEquipe());
-            ps.executeUpdate();
+
+        if (equipe == null || equipe.getIdEquipe() == null) {
+            throw new RuntimeException("Suppression equipe impossible: identifiant manquant.");
+        }
+
+        final int equipeId = equipe.getIdEquipe();
+        boolean previousAutoCommit;
+        try {
+            previousAutoCommit = cnx.getAutoCommit();
         } catch (SQLException e) {
+            throw new RuntimeException("Erreur suppression equipe: lecture auto-commit impossible.", e);
+        }
+
+        try {
+            cnx.setAutoCommit(false);
+
+            // Detacher toutes les references qui bloquent le DELETE.
+            try (PreparedStatement ps = cnx.prepareStatement(
+                    "DELETE FROM equipe_user WHERE equipe_id = ?")) {
+                ps.setInt(1, equipeId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = cnx.prepareStatement(
+                    "DELETE FROM evenement_equipe WHERE idEquipe = ?")) {
+                ps.setInt(1, equipeId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = cnx.prepareStatement(
+                    "UPDATE `match` SET equipea_id = NULL WHERE equipea_id = ?")) {
+                ps.setInt(1, equipeId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = cnx.prepareStatement(
+                    "UPDATE `match` SET equipeb_id = NULL WHERE equipeb_id = ?")) {
+                ps.setInt(1, equipeId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = cnx.prepareStatement(
+                    "DELETE FROM equipe WHERE idEquipe = ?")) {
+                ps.setInt(1, equipeId);
+                ps.executeUpdate();
+            }
+
+            cnx.commit();
+        } catch (SQLException e) {
+            try {
+                cnx.rollback();
+            } catch (SQLException rollbackEx) {
+                e.addSuppressed(rollbackEx);
+            }
             throw new RuntimeException("Erreur suppression equipe: " + e.getMessage(), e);
+        } finally {
+            try {
+                cnx.setAutoCommit(previousAutoCommit);
+            } catch (SQLException ignored) {
+            }
+
         }
     }
 

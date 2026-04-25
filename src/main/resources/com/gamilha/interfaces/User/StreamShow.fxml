@@ -228,5 +228,4 @@
             <Label text="Gamilha — E-Sport &amp; Tournois" styleClass="footer-text"/>
         </HBox>
     </bottom>
-
 </BorderPane>

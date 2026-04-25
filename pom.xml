@@ -12,6 +12,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <!-- ================= VERSIONS ================= -->
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
@@ -21,6 +22,7 @@
     </properties>
 
     <!-- ================= DEPENDENCIES ================= -->
+
     <dependencies>
         <!-- Emoji library -->
         <dependency>
@@ -30,6 +32,7 @@
         </dependency>
 
         <!-- MySQL Connector -->
+
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -44,20 +47,21 @@
         </dependency>
 
         <!-- Stripe (payment processing) -->
+
         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
             <version>24.10.0</version>
         </dependency>
 
-        <!-- VLC (video playback) -->
+
         <dependency>
             <groupId>uk.co.caprica</groupId>
             <artifactId>vlcj</artifactId>
             <version>4.8.2</version>
         </dependency>
 
-        <!-- JavaFX Core -->
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -69,11 +73,13 @@
             <version>${javafx.version}</version>
         </dependency>
         <dependency>
+
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
         <dependency>
+
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>${javafx.version}</version>
@@ -84,14 +90,14 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Security (BCrypt for password hashing) -->
+
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
 
-        <!-- Email (Jakarta Mail) -->
+
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
@@ -103,7 +109,7 @@
             <version>2.0.1</version>
         </dependency>
 
-        <!-- UI Libraries -->
+
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
@@ -125,7 +131,23 @@
             <version>0.4.0</version>
         </dependency>
 
-        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>com.calendarfx</groupId>
+            <artifactId>view</artifactId>
+            <version>11.12.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alphacephei</groupId>
+            <artifactId>vosk</artifactId>
+            <version>0.3.45</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -144,12 +166,22 @@
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <version>1.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
-    <!-- ================= BUILD PLUGINS ================= -->
+    <!-- ================= BUILD ================= -->
+
     <build>
         <plugins>
-            <!-- JavaFX Maven Plugin (for mvn clean compile javafx:compile) -->
+
+            <!-- JavaFX — point d'entrée unique : MainApp -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -159,19 +191,20 @@
                 </configuration>
             </plugin>
 
-            <!-- Java Compiler -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
+
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 
-            <!-- JUnit Test Runner -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -197,6 +230,7 @@
         </plugins>
 
         <!-- Resources -->
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -204,4 +238,6 @@
         </resources>
     </build>
 
+
 </project>
+

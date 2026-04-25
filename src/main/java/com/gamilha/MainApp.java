@@ -1,6 +1,6 @@
 package com.gamilha;
 
-import com.gamilha.entity.User;
+import com.gamilha.entity.Use;
 import com.gamilha.utils.NavigationContext;
 import com.gamilha.utils.ConnectionManager;
 import com.gamilha.utils.SessionContext;
@@ -8,7 +8,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
+import javafx.scene.layout.StackPane;
+
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -36,6 +37,9 @@ public class MainApp extends Application {
     // FXML de démarrage (login de Gamilha-Java)
     private static final String LOGIN_FXML = "/com/gamilha/interfaces/login-view.fxml";
 
+    // Largeur/hauteur par défaut pour les vues avec NavBar
+    private static final int DEFAULT_W = 1400;
+    private static final int DEFAULT_H = 900;
 
 
     // ── Démarrage ────────────────────────────────────────────────────────
@@ -49,6 +53,7 @@ public class MainApp extends Application {
         primaryStage.getIcons().add(
                 new Image(getClass().getResourceAsStream("/com/gamilha/images/gamilha.png"))
         );
+
         showLogin();
         primaryStage.show();
     }
@@ -56,6 +61,7 @@ public class MainApp extends Application {
     @Override
     public void stop() {
         NavigationContext.clear();
+
         SessionContext.clear();
     }
 
@@ -79,6 +85,8 @@ public class MainApp extends Application {
             primaryStage.setScene(scene);
         } catch (Exception e) {
             e.printStackTrace();
+            showStartupError(e);
+>>>>>>> event
         }
     }
 
@@ -111,11 +119,11 @@ public class MainApp extends Application {
             }
             FXMLLoader loader = new FXMLLoader(url);
             Parent root = loader.load();
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root, DEFAULT_W, DEFAULT_H);
             applyCSS(scene);
+            primaryStage.setResizable(true);
             primaryStage.setMaximized(true);
             primaryStage.setScene(scene);
-            primaryStage.setResizable(true);
             primaryStage.setTitle("Gamilha – " + SessionContext.getCurrentUser().getName());
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,8 +145,8 @@ public class MainApp extends Application {
             URL url = MainApp.class.getResource(path);
             if (url == null) throw new RuntimeException("FXML introuvable : " + path);
             Parent root = FXMLLoader.load(url);
-            Scene scene = new Scene(root);
 
+            Scene scene = new Scene(root, DEFAULT_W, DEFAULT_H);
             applyCSS(scene);
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
@@ -160,7 +168,9 @@ public class MainApp extends Application {
             if (url == null) throw new RuntimeException("FXML introuvable : " + path);
             FXMLLoader loader = new FXMLLoader(url);
             Parent root = loader.load();
-            Scene scene = new Scene(root);
+
+            Scene scene = new Scene(root, DEFAULT_W, DEFAULT_H);
+
             applyCSS(scene);
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
@@ -181,7 +191,8 @@ public class MainApp extends Application {
             URL url = MainApp.class.getResource(path);
             if (url == null) throw new RuntimeException("FXML introuvable : " + path);
             Parent root = FXMLLoader.load(url);
-            Scene scene = new Scene(root);
+
+            Scene scene = new Scene(root, DEFAULT_W, DEFAULT_H);
             applyCSS(scene);
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
@@ -198,7 +209,8 @@ public class MainApp extends Application {
             if (url == null) throw new RuntimeException("FXML introuvable : " + path);
             FXMLLoader loader = new FXMLLoader(url);
             Parent root = loader.load();
-            Scene scene = new Scene(root);
+
+            Scene scene = new Scene(root, DEFAULT_W, DEFAULT_H);
             applyCSS(scene);
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
@@ -228,6 +240,23 @@ public class MainApp extends Application {
             scene.getStylesheets().add(external);
         }
     }
+
+
+    private static void showStartupError(Exception e) {
+        String message = e.getMessage() == null ? e.toString() : e.getMessage();
+        Label errorLabel = new Label(
+                "Impossible de charger l'ecran de connexion.\n\n" +
+                "Cause: " + message + "\n\n" +
+                "Verifiez la base de donnees et les chemins FXML."
+        );
+        errorLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 14px;");
+        StackPane root = new StackPane(errorLabel);
+        root.setStyle("-fx-background-color: #1e1e1e; -fx-padding: 24;");
+        primaryStage.setScene(new Scene(root, 700, 520));
+        primaryStage.setResizable(false);
+        primaryStage.setMaximized(false);
+    }
+
 
     // ── Lancement ─────────────────────────────────────────────────────────
 

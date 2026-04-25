@@ -28,6 +28,7 @@ public class BracketListController extends BaseController {
 
     public Node build() {
         VBox root = pageScaffold("🥇 Liste des 🥇 Brackets", "");
+
         boolean admin = SessionContext.getCurrentUser() != null && SessionContext.getCurrentUser().isAdmin();
 
         Button add = new Button("Ajouter Bracket");

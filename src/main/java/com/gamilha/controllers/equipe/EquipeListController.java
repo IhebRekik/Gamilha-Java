@@ -14,6 +14,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.List;
 import java.util.Map;
@@ -41,10 +42,15 @@ public class EquipeListController extends BaseController {
         Button refresh = new Button("Actualiser");
         Button allBtn = new Button("Tous");
         Button mineBtn = new Button("Mes Equipes");
+
+        Button calendarBtn = new Button("Calendrier participations");
+
         final boolean[] onlyMine = {false};
 
         allBtn.setOnAction(e -> { onlyMine[0] = false; setActiveBtn(allBtn, mineBtn, false); refresh.fire(); });
         mineBtn.setOnAction(e -> { onlyMine[0] = true; setActiveBtn(allBtn, mineBtn, true); refresh.fire(); });
+
+        calendarBtn.setOnAction(e -> nav.navigateTo("equipes_calendar"));
         add.setOnAction(e -> { if (formController != null) formController.prepareForCreate(); nav.navigateTo("equipes_form"); });
 
         setActiveBtn(allBtn, mineBtn, false);
@@ -99,9 +105,11 @@ public class EquipeListController extends BaseController {
         refresh.setOnAction(e -> fillRef[0].run());
         fillRef[0].run();
 
-        root.getChildren().addAll(new HBox(8, add, refresh, allBtn, mineBtn), pageScroller(grid));
+
+        root.getChildren().addAll(new HBox(8, add, refresh, allBtn, mineBtn, calendarBtn), pageScroller(grid));
         return root;
     }
+
 
     public Node buildDetailsPage(Equipe equipe) {
         VBox root = detailsPageScaffold("Equipe: " + nullSafe(equipe.getNomEquipe()), "");
@@ -148,6 +156,7 @@ public class EquipeListController extends BaseController {
         return pageScroller(root);
     }
 
+
     private void setActiveBtn(Button a, Button b, boolean mineActive) {
         a.getStyleClass().remove("nav-item-active");
         b.getStyleClass().remove("nav-item-active");
@@ -158,7 +167,11 @@ public class EquipeListController extends BaseController {
         return imageCoverInFrame(url, 120, 120, "team-logo-frame");
     }
 
+
+    /** Logo sur la fiche dÃ©tail (cadre un peu plus petit). */
+
     private Node createTeamLogoDetailsNode(String url) {
         return imageCoverInFrame(url, 96, 96, "team-logo-frame");
     }
 }
+

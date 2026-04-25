@@ -3,15 +3,27 @@ package com.gamilha.services;
 import com.gamilha.entity.Evenement;
 import com.gamilha.entity.Bracket;
 import com.gamilha.entity.GameMatch;
+
 import com.gamilha.utils.ConnectionManager;
 import com.gamilha.validation.InputValidator;
 
 import java.sql.*;
+
+import java.text.Normalizer;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 /**
  * Service CRUD pour l'entité {@link Evenement}.
@@ -23,7 +35,9 @@ import java.util.List;
  */
 public class EvenementService implements ICrud<Evenement> {
 
+
     private final Connection cnx = ConnectionManager.getConnection();
+
 
     /**
      * Insère un nouvel événement en base après validation.
@@ -107,6 +121,47 @@ public class EvenementService implements ICrud<Evenement> {
         }
         return list;
     }
+
+
+    public List<EquipeParticipation> findParticipationsByUser(Integer userId) {
+        if (userId == null) {
+            return List.of();
+        }
+
+        String sql = "SELECT e.idEvenement, e.nom, e.dateDebut, e.dateFin, e.typeEvenement, e.jeu, e.statut, eq.idEquipe, eq.nomEquipe " +
+                "FROM evenement e " +
+                "INNER JOIN evenement_equipe ee ON ee.idEvenement = e.idEvenement " +
+                "INNER JOIN equipe eq ON eq.idEquipe = ee.idEquipe " +
+                "INNER JOIN equipe_user eu ON eu.equipe_id = eq.idEquipe " +
+                "WHERE eu.user_id = ? " +
+                "ORDER BY e.dateDebut ASC, e.idEvenement ASC";
+
+        List<EquipeParticipation> participations = new ArrayList<>();
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Date start = rs.getDate("dateDebut");
+                    Date end = rs.getDate("dateFin");
+                    participations.add(new EquipeParticipation(
+                            rs.getInt("idEvenement"),
+                            rs.getString("nom"),
+                            start == null ? null : start.toLocalDate(),
+                            end == null ? null : end.toLocalDate(),
+                            rs.getString("typeEvenement"),
+                            rs.getString("jeu"),
+                            rs.getString("statut"),
+                            rs.getInt("idEquipe"),
+                            rs.getString("nomEquipe")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur chargement participations equipes: " + e.getMessage(), e);
+        }
+        return participations;
+    }
+
 
     /**
      * Met à jour un événement existant en base après validation.
@@ -299,6 +354,40 @@ public class EvenementService implements ICrud<Evenement> {
     }
 
     /**
+
+     * Retourne les événements dont la description est la plus proche d'un événement source.
+     *
+     * L'algorithme applique une similarité cosinus sur un modèle "bag of words"
+     * léger (tokenisation + suppression d'accents + TF normalisée).
+     */
+    public List<Evenement> findSimilarByDescription(Evenement source, int limit) {
+        if (source == null || source.getIdEvenement() == null || limit <= 0) {
+            return List.of();
+        }
+
+        List<String> sourceTokens = tokenize(source.getDescription());
+        if (sourceTokens.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Double> sourceTf = termFrequency(sourceTokens);
+        double sourceNorm = vectorNorm(sourceTf);
+        if (sourceNorm == 0.0) {
+            return List.of();
+        }
+
+        return findAll().stream()
+                .filter(e -> e.getIdEvenement() != null && !e.getIdEvenement().equals(source.getIdEvenement()))
+                .map(candidate -> new ScoredEvenement(candidate, similarityScore(sourceTf, sourceNorm, candidate.getDescription())))
+                .filter(scored -> scored.score > 0.15d)
+                .sorted(Comparator.comparingDouble((ScoredEvenement s) -> s.score).reversed())
+                .limit(limit)
+                .map(scored -> scored.evenement)
+                .collect(Collectors.toList());
+    }
+
+    /**
+>>>>>>> event
      * Génère automatiquement un bracket et tous les matchs pour un événement.
      *
      * Algorithme :
@@ -418,4 +507,131 @@ public class EvenementService implements ICrud<Evenement> {
 
         return evenement;
     }
+
+
+    private double similarityScore(Map<String, Double> sourceTf, double sourceNorm, String candidateDescription) {
+        List<String> candidateTokens = tokenize(candidateDescription);
+        if (candidateTokens.isEmpty()) {
+            return 0.0;
+        }
+        Map<String, Double> candidateTf = termFrequency(candidateTokens);
+        double candidateNorm = vectorNorm(candidateTf);
+        if (candidateNorm == 0.0) {
+            return 0.0;
+        }
+
+        double dot = 0.0;
+        for (Map.Entry<String, Double> entry : sourceTf.entrySet()) {
+            Double candidateValue = candidateTf.get(entry.getKey());
+            if (candidateValue != null) {
+                dot += entry.getValue() * candidateValue;
+            }
+        }
+        return dot / (sourceNorm * candidateNorm);
+    }
+
+    private List<String> tokenize(String text) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        if (normalized.isBlank()) {
+            return List.of();
+        }
+
+        String[] raw = normalized.split(" ");
+        Set<String> stopWords = stopWords();
+        List<String> tokens = new ArrayList<>();
+        for (String token : raw) {
+            if (token.length() < 3 || stopWords.contains(token)) {
+                continue;
+            }
+            tokens.add(token);
+        }
+        return tokens;
+    }
+
+    private Map<String, Double> termFrequency(List<String> tokens) {
+        Map<String, Integer> counts = new HashMap<>();
+        for (String token : tokens) {
+            counts.put(token, counts.getOrDefault(token, 0) + 1);
+        }
+
+        Map<String, Double> tf = new HashMap<>();
+        double size = tokens.size();
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            tf.put(entry.getKey(), entry.getValue() / size);
+        }
+        return tf;
+    }
+
+    private double vectorNorm(Map<String, Double> vector) {
+        double sum = 0.0;
+        for (double value : vector.values()) {
+            sum += value * value;
+        }
+        return Math.sqrt(sum);
+    }
+
+    private Set<String> stopWords() {
+        return new HashSet<>(List.of(
+                "les", "des", "une", "dans", "avec", "pour", "sur", "par", "est", "sont",
+                "qui", "que", "quoi", "dont", "vos", "nos", "ses", "leur", "this", "that",
+                "the", "and", "or", "mais", "donc", "car", "sans", "entre", "avant", "apres",
+                "event", "events", "evenement", "evenements", "tournoi", "match", "game"
+        ));
+    }
+
+    private static class ScoredEvenement {
+        private final Evenement evenement;
+        private final double score;
+
+        private ScoredEvenement(Evenement evenement, double score) {
+            this.evenement = evenement;
+            this.score = score;
+        }
+    }
+
+    public static class EquipeParticipation {
+        private final Integer evenementId;
+        private final String evenementNom;
+        private final LocalDate dateDebut;
+        private final LocalDate dateFin;
+        private final String typeEvenement;
+        private final String jeu;
+        private final String statut;
+        private final Integer equipeId;
+        private final String equipeNom;
+
+        public EquipeParticipation(Integer evenementId, String evenementNom, LocalDate dateDebut, LocalDate dateFin,
+                                   String typeEvenement, String jeu, String statut,
+                                   Integer equipeId, String equipeNom) {
+            this.evenementId = evenementId;
+            this.evenementNom = evenementNom;
+            this.dateDebut = dateDebut;
+            this.dateFin = dateFin;
+            this.typeEvenement = typeEvenement;
+            this.jeu = jeu;
+            this.statut = statut;
+            this.equipeId = equipeId;
+            this.equipeNom = equipeNom;
+        }
+
+        public Integer getEvenementId() { return evenementId; }
+        public String getEvenementNom() { return evenementNom; }
+        public LocalDate getDateDebut() { return dateDebut; }
+        public LocalDate getDateFin() { return dateFin; }
+        public String getTypeEvenement() { return typeEvenement; }
+        public String getJeu() { return jeu; }
+        public String getStatut() { return statut; }
+        public Integer getEquipeId() { return equipeId; }
+        public String getEquipeNom() { return equipeNom; }
+    }
+
 }

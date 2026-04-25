@@ -6,6 +6,7 @@ import com.gamilha.entity.User;
 import com.gamilha.entity.Bracket;
 import com.gamilha.entity.Evenement;
 import com.gamilha.entity.GameMatch;
+
 import com.gamilha.services.AbonnementServices;
 import com.gamilha.services.BracketService;
 import com.gamilha.services.EvenementService;
@@ -14,6 +15,7 @@ import com.gamilha.utils.SessionContext;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+<<<<<<< HEAD
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -24,6 +26,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -48,6 +53,7 @@ public class EvenementListController extends BaseController {
     public void setNav(NavigationCallback nav) { this.nav = nav; }
     public void setFormController(EvenementFormController formController) { this.formController = formController; }
 
+
     public Node build() {
         VBox root = pageScaffold("Liste des Evenements", "");
         User currentUser = SessionContext.getCurrentUser();
@@ -71,6 +77,7 @@ public class EvenementListController extends BaseController {
         Button allBtn = new Button("Tous");
         Button mineBtn = new Button("Mes Evenements");
         final boolean[] onlyMine = {false};
+
         boolean hasAccess = AbonnementServices.getAbonementActiveUser()
                 .stream()
                 .anyMatch(a ->
@@ -81,6 +88,8 @@ public class EvenementListController extends BaseController {
         mineBtn.setOnAction(e -> { onlyMine[0] = true; setActiveBtn(allBtn, mineBtn, true); refresh.fire(); });
         add.setOnAction(e -> { if (formController != null) formController.prepareForCreate(); nav.navigateTo("evenements_form"); });
         add.setDisable(!hasAccess);
+
+
         HBox toolbar = new HBox(8, search, filterType, filterStatut, refresh, allBtn, mineBtn, add);
         toolbar.getStyleClass().add("list-toolbar");
         toolbar.setAlignment(Pos.CENTER);
@@ -117,7 +126,12 @@ public class EvenementListController extends BaseController {
 
             grid.getChildren().clear();
             for (Evenement e : data) {
-                VBox card = new VBox();
+
+                VBox card = entityCard(e.getNom(),
+                        "Jeu: " + nullSafe(e.getJeu()),
+                        "Type: " + nullSafe(e.getTypeEvenement()),
+                        "Dates: " + formatDate(e.getDateDebut()) + " -> " + formatDate(e.getDateFin()),
+                        "Statut: " + nullSafe(e.getStatut()));
                 card.getStyleClass().add("event-card");
 
                 Node img = createEventImageNode(e.getImage());
@@ -126,6 +140,7 @@ public class EvenementListController extends BaseController {
                     imgRow.setAlignment(Pos.CENTER);
                     imgRow.setMaxWidth(Double.MAX_VALUE);
                     imgRow.setMouseTransparent(true);
+<<<<<<< HEAD
                     imgRow.setStyle("-fx-padding: 10 10 0 10;");
                     card.getChildren().add(imgRow);
                 }
@@ -152,6 +167,11 @@ public class EvenementListController extends BaseController {
                 Label status = new Label("Statut: " + nullSafe(e.getStatut()));
                 status.getStyleClass().add("event-card-info");
                 status.setWrapText(true);
+
+
+                    card.getChildren().add(0, imgRow);
+                }
+
 
                 card.setPickOnBounds(true);
                 card.setOnMouseClicked(ev -> {
@@ -184,8 +204,11 @@ public class EvenementListController extends BaseController {
                     actions.getChildren().addAll(edit, del);
                 }
 
+
                 body.getChildren().addAll(title, game, type, dates, status, actions);
                 card.getChildren().add(body);
+                card.getChildren().add(actions);
+
                 grid.getChildren().add(card);
             }
         };
@@ -199,6 +222,8 @@ public class EvenementListController extends BaseController {
         root.getChildren().addAll(toolbar, pageScroller(grid));
         return root;
     }
+
+    /** Builds the full details page for an evenement and returns it. */
 
     public Node buildDetailsPage(Evenement evenement) {
         VBox root = detailsPageScaffold("Evenement: " + nullSafe(evenement.getNom()), "");
@@ -258,6 +283,7 @@ public class EvenementListController extends BaseController {
         return pageScroller(root);
     }
 
+
     private void showDetails(Evenement e) {
         if (e == null || e.getIdEvenement() == null) {
             error("Evenement invalide: impossible d'ouvrir les details.");
@@ -280,15 +306,26 @@ public class EvenementListController extends BaseController {
         return imageCoverInFrame(url, 240, 130, "event-image-frame");
     }
 
+
+    /** Image sur la fiche dÃ©tail : remplit le cadre (mÃªme largeur que le contenu formulaire). */
+
     private Node createDetailsHeroImageNode(String url) {
         return imageCoverInFrame(url, 748, 200, "details-hero-image");
     }
+
 
     private Node buildBracketVisual(List<Bracket> brackets, List<GameMatch> matchs) {
         VBox section = new VBox(10);
         section.getStyleClass().add("details-section");
 
         Label title = new Label("Bracket & Matchs");
+
+
+    private Node buildBracketVisual(List<Bracket> brackets, List<GameMatch> matchs) {
+        VBox section = new VBox(10);
+        section.getStyleClass().add("details-section");
+        Label title = new Label("Bracket Design");
+
         title.getStyleClass().add("entity-card-title");
         section.getChildren().add(title);
 
@@ -302,6 +339,7 @@ public class EvenementListController extends BaseController {
         for (Bracket bracket : brackets) {
             List<GameMatch> bm = matchs.stream()
                     .filter(m -> m.getBracketId() != null && m.getBracketId().equals(bracket.getIdBracket()))
+
                     .sorted((a, b) -> Integer.compare(
                             a.getTour() == null ? 0 : a.getTour(),
                             b.getTour() == null ? 0 : b.getTour()))
@@ -312,6 +350,7 @@ public class EvenementListController extends BaseController {
             bt.getStyleClass().add("entity-card-title");
             section.getChildren().add(bt);
 
+
             if (bm.isEmpty()) {
                 Label none = new Label("Aucun match pour ce bracket.");
                 none.getStyleClass().add("entity-card-line");
@@ -319,18 +358,21 @@ public class EvenementListController extends BaseController {
                 continue;
             }
 
-            ScrollPane board = new ScrollPane(buildTreeLayout(bm));
-            board.setFitToHeight(true);
-            board.setFitToWidth(false);
+
+            Node treeLayout = buildTreeLayout(bm);
+            ScrollPane board = new ScrollPane(new HBox(treeLayout));
+            board.getStyleClass().add("bracket-board");
+            board.setFitToHeight(true); board.setFitToWidth(false);
             board.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
             board.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-            board.getStyleClass().add("bracket-board");
-            board.setPrefViewportHeight(220);
+            board.setMinHeight(250);
+
             section.getChildren().add(board);
         }
         return section;
     }
 
+<<<<<<< HEAD
     private Node buildTreeLayout(List<GameMatch> bracketMatches) {
         Map<Integer, List<GameMatch>> byRound = bracketMatches.stream()
                 .collect(Collectors.groupingBy(
@@ -427,6 +469,7 @@ public class EvenementListController extends BaseController {
     }
 
     private Node buildSimilarEventsSection(Evenement current) {
+
         VBox section = new VBox(10);
         section.getStyleClass().add("details-section");
 
@@ -434,35 +477,147 @@ public class EvenementListController extends BaseController {
         title.getStyleClass().add("entity-card-title");
         section.getChildren().add(title);
 
-        List<Evenement> similar = evenementService.findAll().stream()
-                .filter(ev -> ev.getIdEvenement() != null && !ev.getIdEvenement().equals(current.getIdEvenement()))
-                .filter(ev -> {
-                    boolean sameGame = !nullSafe(current.getJeu()).isBlank()
-                            && nullSafe(current.getJeu()).equalsIgnoreCase(nullSafe(ev.getJeu()));
-                    boolean sameType = !nullSafe(current.getTypeEvenement()).isBlank()
-                            && nullSafe(current.getTypeEvenement()).equalsIgnoreCase(nullSafe(ev.getTypeEvenement()));
-                    return sameGame || sameType;
-                })
-                .limit(3)
-                .collect(Collectors.toList());
 
-        if (similar.isEmpty()) {
-            Label none = new Label("Aucun evenement similaire trouve.");
-            none.getStyleClass().add("entity-card-line");
-            section.getChildren().add(none);
+        List<Evenement> similarEvents = evenementService.findSimilarByDescription(source, 4);
+        if (similarEvents.isEmpty()) {
+            Label empty = new Label("aucun evenement similaire");
+            empty.getStyleClass().add("entity-card-line");
+            section.getChildren().add(empty);
             return section;
         }
 
-        VBox list = new VBox(8);
-        for (Evenement ev : similar) {
-            Button btn = new Button(nullSafe(ev.getNom()) + " • " + nullSafe(ev.getJeu())
-                    + " • " + nullSafe(ev.getTypeEvenement()));
-            btn.getStyleClass().add("button-link");
-            btn.setOnAction(e -> showDetails(ev));
-            list.getChildren().add(btn);
+        for (Evenement e : similarEvents) {
+            VBox card = new VBox(6);
+            card.getStyleClass().addAll("entity-card", "event-card");
+            card.setOnMouseClicked(ev -> showDetails(e));
+
+            Node img = createEventImageNode(e.getImage());
+            if (img != null) {
+                HBox imgRow = new HBox(img);
+                imgRow.setAlignment(Pos.CENTER);
+                imgRow.setMaxWidth(Double.MAX_VALUE);
+                imgRow.setMouseTransparent(true);
+                card.getChildren().add(imgRow);
+            }
+
+            Label name = new Label(nullSafe(e.getNom()));
+            name.getStyleClass().add("entity-card-title");
+            Label game = new Label("Jeu: " + nullSafe(e.getJeu()));
+            game.getStyleClass().add("entity-card-line");
+            Label desc = new Label(buildPreview(e.getDescription()));
+            desc.getStyleClass().add("entity-card-line");
+            desc.setWrapText(true);
+
+            Button details = new Button("Voir details");
+            details.setOnAction(ev -> showDetails(e));
+
+            card.getChildren().addAll(name, game, desc, details);
+            section.getChildren().add(card);
         }
-        section.getChildren().add(list);
         return section;
     }
 
+    private String buildPreview(String description) {
+        String safe = nullSafe(description).trim();
+        if (safe.length() <= 120) {
+            return safe;
+        }
+        return safe.substring(0, 117) + "...";
+    }
+
+    private Node buildTreeLayout(List<GameMatch> bracketMatches) {
+        Map<Integer, List<GameMatch>> byRound = bracketMatches.stream()
+                .collect(Collectors.groupingBy(m -> m.getTour() == null ? 0 : m.getTour(),
+                        TreeMap::new, Collectors.toList()));
+        List<Integer> rounds = new ArrayList<>(byRound.keySet());
+        if (rounds.size() >= 2
+                && byRound.get(rounds.get(0)).size() >= 2
+                && byRound.get(rounds.get(1)).size() >= 1) {
+            return buildSimpleKnockoutTree(byRound, rounds.get(0), rounds.get(1));
+        }
+        return buildRoundColumnsFallback(byRound);
+    }
+
+    private Node buildSimpleKnockoutTree(Map<Integer, List<GameMatch>> byRound, int semiRound, int finalRound) {
+        List<GameMatch> semis = byRound.get(semiRound).stream()
+                .sorted(Comparator.comparing(m -> m.getDateMatch() == null ? LocalDateTime.MIN : m.getDateMatch()))
+                .collect(Collectors.toList());
+        List<GameMatch> finals = byRound.get(finalRound).stream()
+                .sorted(Comparator.comparing(m -> m.getDateMatch() == null ? LocalDateTime.MIN : m.getDateMatch()))
+                .collect(Collectors.toList());
+
+        GameMatch semi1 = semis.get(0), semi2 = semis.get(1), finalMatch = finals.get(0);
+
+        VBox leftCol = new VBox(34);
+        leftCol.getStyleClass().add("round-column");
+        Label leftTitle = new Label("Tour " + semiRound);
+        leftTitle.getStyleClass().add("round-title");
+        leftCol.getChildren().addAll(leftTitle, matchCardNode(semi1), matchCardNode(semi2));
+
+        Pane connector = createConnectorPane();
+
+        VBox rightCol = new VBox(18);
+        rightCol.getStyleClass().addAll("round-column", "final-round-column");
+        Label rightTitle = new Label("Tour " + finalRound);
+        rightTitle.getStyleClass().add("round-title");
+        StackPane finalSlot = new StackPane(matchCardNode(finalMatch));
+        finalSlot.getStyleClass().add("final-slot");
+        StackPane.setAlignment(matchCardNode(finalMatch), Pos.CENTER);
+        VBox.setVgrow(finalSlot, Priority.ALWAYS);
+        rightCol.getChildren().addAll(rightTitle, finalSlot);
+
+        HBox tree = new HBox(18, leftCol, connector, rightCol);
+        tree.getStyleClass().add("bracket-tree");
+        return tree;
+    }
+
+    private Pane createConnectorPane() {
+        Pane p = new Pane();
+        p.getStyleClass().add("tree-connector-col");
+        p.setPrefWidth(110); p.setMinWidth(110); p.setPrefHeight(260);
+        double topY = 68, bottomY = 198, joinX = 56, finalY = (topY + bottomY) / 2.0;
+        for (Line line : new Line[]{
+                new Line(8, topY, joinX, topY), new Line(8, bottomY, joinX, bottomY),
+                new Line(joinX, topY, joinX, bottomY), new Line(joinX, finalY, 102, finalY)}) {
+            line.getStyleClass().add("tree-line");
+            line.setStroke(Color.web("#f4c64c"));
+            line.setStrokeWidth(2.2);
+            p.getChildren().add(line);
+        }
+        return p;
+    }
+
+    private Node buildRoundColumnsFallback(Map<Integer, List<GameMatch>> byRound) {
+        HBox cols = new HBox(14);
+        cols.getStyleClass().add("bracket-tree");
+        for (Map.Entry<Integer, List<GameMatch>> entry : byRound.entrySet()) {
+            VBox col = new VBox(10);
+            col.getStyleClass().add("round-column");
+            Label t = new Label("Tour " + entry.getKey());
+            t.getStyleClass().add("round-title");
+            col.getChildren().add(t);
+            entry.getValue().forEach(m -> col.getChildren().add(matchCardNode(m)));
+            cols.getChildren().add(col);
+        }
+        return cols;
+    }
+
+    private VBox matchCardNode(GameMatch m) {
+        VBox card = new VBox(6);
+        card.getStyleClass().add("bracket-match");
+        card.setPrefHeight(96); card.setMinHeight(96);
+        Label teamA = new Label("A: " + nullSafe(m.getEquipeANom())); teamA.getStyleClass().add("entity-card-line");
+        Label teamB = new Label("B: " + nullSafe(m.getEquipeBNom())); teamB.getStyleClass().add("entity-card-line");
+        Label score = new Label("Score: " + str(m.getScoreEquipeA()) + " - " + str(m.getScoreEquipeB())); score.getStyleClass().add("entity-card-line");
+        Label status = new Label("Statut: " + nullSafe(m.getStatut())); status.getStyleClass().add("entity-card-line");
+        card.getChildren().addAll(teamA, teamB, score, status);
+        User user = SessionContext.getCurrentUser();
+        if (user != null && (user.isAdmin() || canEditMatch(m))) {
+            card.getStyleClass().add("match-card-link");
+            card.setOnMouseClicked(e -> nav.navigateTo("matchs_form_edit:" + m.getIdMatch()));
+        }
+        return card;
+    }
 }
+
+

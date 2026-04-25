@@ -11,6 +11,7 @@ import java.util.List;
 public class BracketService implements ICrud<Bracket> {
     private final Connection cnx = ConnectionManager.getConnection();
 
+
     @Override
     public void ajouterEntite(Bracket bracket) {
         InputValidator.validateBracket(bracket);

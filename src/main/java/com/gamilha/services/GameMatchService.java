@@ -1,15 +1,19 @@
 package com.gamilha.services;
 
 import com.gamilha.entity.GameMatch;
+
 import com.gamilha.utils.ConnectionManager;
 import com.gamilha.validation.InputValidator;
 
 import java.sql.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameMatchService implements ICrud<GameMatch> {
+
     private final Connection cnx = ConnectionManager.getConnection();
+
 
     @Override
     public void ajouterEntite(GameMatch match) {

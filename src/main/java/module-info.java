@@ -25,9 +25,9 @@ module com.gamilha {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
-    requires ably.java;
-    requires java.net.http;
-    requires emoji.java;
+    requires com.calendarfx.view;
+    requires com.google.zxing;
+    requires vosk;
 
     // ── Opens (pour FXML) ─────────────────────────
     opens com.gamilha to javafx.fxml;
@@ -37,6 +37,11 @@ module com.gamilha {
     opens com.gamilha.controllers.admin to javafx.fxml;
     opens com.gamilha.controllers.coaching to javafx.fxml;
     opens com.gamilha.controllers.inscriptions to javafx.fxml;
+    opens com.gamilha.controllers.bracket to javafx.fxml;
+    opens com.gamilha.controllers.equipe to javafx.fxml;
+    opens com.gamilha.controllers.evenement to javafx.fxml;
+    opens com.gamilha.controllers.gamematch to javafx.fxml;
+    opens com.gamilha.controllers.shared to javafx.fxml;
 
     // ── Exports ─────────────────────────────────────────
     exports com.gamilha;
@@ -49,4 +54,4 @@ module com.gamilha {
     exports com.gamilha.controllers.admin;
     exports com.gamilha.controllers.coaching;
     exports com.gamilha.controllers.inscriptions;
-}
+
