@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="18"
+      style="-fx-background-color:#0a0f1e;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.coaching.CoachingVideoController">
+
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <HBox spacing="14" alignment="CENTER_LEFT">
+
+        <Button text="← Playlists"
+                onAction="#handleRetourPlaylist"
+                style="-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;
+                       -fx-background-radius:7;-fx-padding:9 16;-fx-font-size:13;"/>
+
+        <VBox spacing="2">
+            <Label text="🎬 Vidéos de Coaching"
+                   style="-fx-text-fill:white;-fx-font-size:24;-fx-font-weight:bold;"/>
+            <Label fx:id="lblPlaylistBadge"
+                   text=""
+                   visible="false" managed="false"
+                   style="-fx-text-fill:#c084fc;-fx-font-size:12;-fx-background-color:#2d1b69;
+                          -fx-background-radius:6;-fx-padding:3 12;"/>
+        </VBox>
+
+        <Pane HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnAdd"
+                text="➕ Nouvelle Vidéo"
+                onAction="#handleAdd"
+                style="-fx-background-color:linear-gradient(to right,#0284c7,#0c4a6e);
+                       -fx-text-fill:white;-fx-font-weight:bold;-fx-font-size:13;
+                       -fx-background-radius:9;-fx-padding:10 22;
+                       -fx-effect:dropshadow(gaussian,rgba(2,132,199,0.5),10,0,0,3);"/>
+    </HBox>
+
+    <!-- ═══ BARRE DE RECHERCHE / FILTRES ═══════════════════════════════════ -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+
+        <StackPane HBox.hgrow="ALWAYS">
+            <TextField fx:id="searchInput"
+                       promptText="   🔍  Rechercher une vidéo..."
+                       style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                              -fx-prompt-text-fill:#475569;-fx-background-radius:8;
+                              -fx-padding:10 14;-fx-font-size:13;-fx-border-color:#334155;
+                              -fx-border-radius:8;-fx-border-width:1;"/>
+        </StackPane>
+
+        <ComboBox fx:id="filterNiveau"
+                  promptText="Niveau"
+                  prefWidth="140"
+                  style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                         -fx-background-radius:8;-fx-padding:4;"/>
+
+        <ComboBox fx:id="filterPremium"
+                  promptText="Type"
+                  prefWidth="140"
+                  style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                         -fx-background-radius:8;-fx-padding:4;"/>
+    </HBox>
+
+    <!-- ═══ GRILLE DE CARDS ═════════════════════════════════════════════════ -->
+    <ScrollPane VBox.vgrow="ALWAYS"
+                fitToWidth="true"
+                style="-fx-background-color:transparent;-fx-background:#0a0f1e;
+                       -fx-border-color:transparent;-fx-padding:0;">
+
+        <FlowPane fx:id="cardsPane"
+                  hgap="20" vgap="20"
+                  style="-fx-background-color:#0a0f1e;-fx-padding:4;">
+        </FlowPane>
+
+    </ScrollPane>
+
+</VBox>

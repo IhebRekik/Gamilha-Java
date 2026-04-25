@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20"
+      style="-fx-background-color:#0f172a;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.inscriptions.InscriptionAdminController">
+
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+
+    <HBox alignment="CENTER_LEFT">
+
+        <Label text="Gestion des inscriptions"
+               style="-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;"/>
+
+        <Pane HBox.hgrow="ALWAYS"/>
+
+
+    </HBox>
+
+    <HBox spacing="50" >
+
+
+
+        <ComboBox fx:id="filterType"
+                  promptText="Type abonnement"/>
+
+        <ComboBox fx:id="sortDate"
+                  promptText="Trier par date"/>
+
+        <DatePicker fx:id="dateDebutPicker"
+                    promptText="Date début"/>
+
+        <DatePicker fx:id="dateFinPicker"
+                    promptText="Date fin"/>
+
+    </HBox>
+
+
+    <ScrollPane fitToWidth="true"
+                hbarPolicy="NEVER"
+                style="-fx-background:#020617;">
+
+        <GridPane fx:id="tableGrid"
+                  maxWidth="Infinity"
+                  style="-fx-background-color:#020617;"
+                  hgap="0"
+                  vgap="0"/>
+
+    </ScrollPane>
+
+</VBox>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.web.WebView?>
+
+<VBox spacing="25"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.admin.DashboardController"
+      style="-fx-background-color:#0f172a; -fx-padding:30;">
+
+    <!-- HEADER -->
+    <VBox spacing="5" alignment="CENTER">
+        <Label text="Dashboard Administrateur"
+               style="-fx-text-fill:white; -fx-font-size:28; -fx-font-weight:bold;"/>
+        <Label text="Vue d’ensemble de la plateforme en temps réel"
+               style="-fx-text-fill:#94a3b8;"/>
+    </VBox>
+
+    <!-- KPI -->
+    <HBox spacing="20" alignment="CENTER">
+
+        <VBox style="-fx-background-color:#1e293b;-fx-padding:20;-fx-background-radius:12;">
+            <Label fx:id="usersCount" style="-fx-text-fill:#22c55e; -fx-font-size:20; -fx-font-weight:bold;"/>
+            <Label text="Utilisateurs"/>
+        </VBox>
+
+        <VBox style="-fx-background-color:#1e293b;-fx-padding:20;-fx-background-radius:12;">
+            <Label fx:id="userGrowth"/>
+            <Label text="Evolution Utilisateurs"/>
+        </VBox>
+
+        <VBox style="-fx-background-color:#1e293b;-fx-padding:20;-fx-background-radius:12;">
+            <Label fx:id="tournoisGrowth"/>
+            <Label text="Evolution Tournois"/>
+        </VBox>
+
+        <VBox style="-fx-background-color:#1e293b;-fx-padding:20;-fx-background-radius:12;">
+            <Label fx:id="streamsGrowth"/>
+            <Label text="Evolution Streams"/>
+        </VBox>
+
+        <VBox style="-fx-background-color:#1e293b;-fx-padding:20;-fx-background-radius:12;">
+            <Label fx:id="revenueGrowth"/>
+            <Label text="Evolution Revenus"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- CHARTS -->
+    <GridPane hgap="20" vgap="20">
+
+        <WebView fx:id="chartUsers" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <WebView fx:id="chartRevenue" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <WebView fx:id="chartGames" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <WebView fx:id="chartPie" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+    </GridPane>
+
+</VBox>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.AdminCommentaireController"
+            style="-fx-background-color:#13131f;">
+
+    <top>
+        <VBox style="-fx-background-color:#1a1a2e;-fx-border-color:#3a3a5c;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="💬  Gestion des Commentaires"
+                       style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="totalLabel" text="0 commentaire(s)"
+                       style="-fx-text-fill:#8b949e;-fx-font-size:13;"/>
+                <Button text="🔄  Rafraîchir" onAction="#onRefresh"
+                        style="-fx-background-color:#374151;-fx-text-fill:#c9d1d9;
+                               -fx-background-radius:8;-fx-padding:7 14;
+                               -fx-font-size:13;-fx-cursor:hand;"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets top="12"/></VBox.margin>
+                <Label text="🔍" style="-fx-font-size:14;-fx-text-fill:#8b949e;"/>
+                <TextField fx:id="searchField"
+                           promptText="Rechercher par texte ou auteur…"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-background-color:#252535;-fx-text-fill:#e6edf3;
+                                  -fx-prompt-text-fill:#6e7681;-fx-background-radius:8;
+                                  -fx-border-color:#3a3a5c;-fx-border-radius:8;
+                                  -fx-padding:8 12;-fx-font-size:13;"/>
+                <Label text="Trier :" style="-fx-text-fill:#8b949e;-fx-font-size:13;"/>
+                <ComboBox fx:id="sortCombo" prefWidth="155"
+                          style="-fx-background-color:#252535;-fx-background-radius:8;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+            <content>
+                <FlowPane fx:id="cardsPane" hgap="16" vgap="16"
+                          style="-fx-background-color:transparent;"/>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

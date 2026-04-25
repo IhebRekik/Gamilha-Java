@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="25"
+      style="-fx-background-color:#0f172a;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.abonnement.ShowAbonnementController">
+
+    <padding>
+        <Insets top="30" right="40" bottom="30" left="40"/>
+    </padding>
+
+
+    <HBox spacing="15" alignment="CENTER_LEFT">
+
+        <Button fx:id="btnRetour"
+                text="←"
+                style="
+                -fx-background-color:#1e293b;
+                -fx-text-fill:white;
+                -fx-font-size:16;
+                -fx-background-radius:8;
+                -fx-padding:6 12 6 12;
+                "/>
+
+        <Label text="Détails de l'Abonnement"
+               style="
+               -fx-text-fill:white;
+               -fx-font-size:24;
+               -fx-font-weight:bold;
+               "/>
+
+    </HBox>
+
+
+
+    <VBox spacing="20"
+          style="
+          -fx-background-color:#020617;
+          -fx-padding:30;
+          -fx-background-radius:16;
+          -fx-border-radius:16;
+          -fx-border-color:#1e40af;
+          ">
+
+
+        <GridPane hgap="60" vgap="20">
+
+            <columnConstraints>
+                <ColumnConstraints prefWidth="150"/>
+                <ColumnConstraints prefWidth="350"/>
+            </columnConstraints>
+
+
+            <Label text="ID"
+                   style="-fx-text-fill:#94a3b8; -fx-font-size:14;"/>
+
+            <Label fx:id="idLabel"
+                   GridPane.columnIndex="1"
+                   style="-fx-text-fill:white; -fx-font-size:15;"/>
+
+
+
+            <Label text="Type"
+                   GridPane.rowIndex="1"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="typeLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="1"
+                   style="-fx-text-fill:white;"/>
+
+
+
+            <Label text="Prix"
+                   GridPane.rowIndex="2"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="prixLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="2"
+                   style="-fx-text-fill:white;"/>
+
+
+
+            <Label text="Options"
+                   GridPane.rowIndex="3"
+                   style="-fx-text-fill:#94a3b8;"/>
+
+            <Label fx:id="optionsLabel"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="3"
+                   style="-fx-text-fill:white;"/>
+
+        </GridPane>
+
+
+
+        <HBox spacing="15"
+              alignment="CENTER_RIGHT">
+
+            <Button fx:id="btnModifier"
+                    text="Modifier"
+                    style="
+                    -fx-background-color:#facc15;
+                    -fx-text-fill:black;
+                    -fx-background-radius:8;
+                    -fx-padding:8 18 8 18;
+                    "/>
+
+
+            <Button fx:id="btnSupprimer"
+                    text="Supprimer définitivement"
+                    style="
+                    -fx-background-color:transparent;
+                    -fx-text-fill:#ef4444;
+                    -fx-border-color:#ef4444;
+                    -fx-border-radius:8;
+                    -fx-padding:8 18 8 18;
+                    "/>
+
+        </HBox>
+
+    </VBox>
+
+</VBox>

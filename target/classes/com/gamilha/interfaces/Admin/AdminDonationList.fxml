@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.admin.AdminDonationListController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA — ADMIN" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Retour streams" onAction="#onBack"    styleClass="btn-secondary"/>
+                <Button text="↺ Actualiser"      onAction="#onRefresh" styleClass="btn-secondary"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="page-header">
+                <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="lblTitle" text="💰 Donations" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblTotal" text="Total : 0,00 €" styleClass="total-badge"/>
+            </HBox>
+            <HBox spacing="10" styleClass="search-bar">
+                <padding><Insets top="0" right="24" bottom="14" left="24"/></padding>
+                <TextField fx:id="searchField" promptText="🔍  Donateur ou montant…"
+                           styleClass="field-dark" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="sortFilter" prefWidth="200" styleClass="combo-dark"/>
+            </HBox>
+            <HBox styleClass="count-bar">
+                <padding><Insets top="0" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="countLabel" text="" styleClass="count-label"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <FlowPane fx:id="donationGrid" hgap="16" vgap="16" styleClass="stream-flow">
+                <padding><Insets topRightBottomLeft="24"/></padding>
+            </FlowPane>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer">
+            <padding><Insets topRightBottomLeft="10"/></padding>
+            <Label text="Gamilha Admin — Donations" styleClass="footer-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>

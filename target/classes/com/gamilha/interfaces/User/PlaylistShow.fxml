@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20"
+      style="-fx-background-color:#0a0f1e;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.coaching.PlaylistController">
+
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Button fx:id="btnRetour" text="← Retour"
+                style="-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;
+                       -fx-background-radius:7;-fx-padding:9 16;-fx-font-size:13;"/>
+        <Label text="📋 Détails de la Playlist"
+               style="-fx-text-fill:white;-fx-font-size:21;-fx-font-weight:bold;"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnModifier" text="✏️ Modifier"
+                style="-fx-background-color:#d97706;-fx-text-fill:white;
+                       -fx-font-weight:bold;-fx-background-radius:8;-fx-padding:9 20;"/>
+        <Button fx:id="btnSupprimer" text="🗑 Supprimer"
+                style="-fx-background-color:#dc2626;-fx-text-fill:white;
+                       -fx-font-weight:bold;-fx-background-radius:8;-fx-padding:9 20;"/>
+    </HBox>
+
+    <!-- ═══ IMAGE DE LA PLAYLIST ════════════════════════════════════════════ -->
+    <StackPane style="-fx-background-color:linear-gradient(to bottom right,#4c1d95,#1e3a8a);
+                      -fx-background-radius:12;" prefHeight="240">
+        <ImageView fx:id="imgPlaylist"
+                   fitWidth="1100" fitHeight="240"
+                   preserveRatio="false"
+                   visible="false" managed="false"/>
+        <Label text="🎓"
+               style="-fx-font-size:64;-fx-text-fill:rgba(255,255,255,0.15);"/>
+    </StackPane>
+
+    <!-- ═══ FICHE INFOS ══════════════════════════════════════════════════════ -->
+    <VBox spacing="16"
+          style="-fx-background-color:#1e293b;-fx-background-radius:12;-fx-padding:22;
+                 -fx-border-color:#334155;-fx-border-radius:12;-fx-border-width:1;">
+
+        <!-- Titre -->
+        <Label fx:id="lblTitre" text=""
+               style="-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;"
+               wrapText="true"/>
+
+        <Separator style="-fx-background-color:#334155;"/>
+
+        <HBox spacing="40">
+
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="DESCRIPTION" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
+                <Label fx:id="lblDescShow" text="" wrapText="true"
+                       style="-fx-text-fill:#cbd5e1;-fx-font-size:13;"/>
+            </VBox>
+
+            <VBox spacing="5" minWidth="130">
+                <Label text="NIVEAU" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
+                <Label fx:id="lblNiveauShow" text=""
+                       style="-fx-text-fill:#c084fc;-fx-font-size:14;-fx-font-weight:bold;"/>
+            </VBox>
+
+            <VBox spacing="5" minWidth="130">
+                <Label text="CATÉGORIE" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
+                <Label fx:id="lblCategorieShow" text=""
+                       style="-fx-text-fill:#38bdf8;-fx-font-size:14;"/>
+            </VBox>
+
+            <VBox spacing="5" minWidth="150">
+                <Label text="CRÉÉ LE" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
+                <Label fx:id="lblDate" text=""
+                       style="-fx-text-fill:#64748b;-fx-font-size:13;"/>
+            </VBox>
+
+        </HBox>
+    </VBox>
+
+    <!-- ═══ VIDÉOS DE LA PLAYLIST ═══════════════════════════════════════════ -->
+    <VBox spacing="14" VBox.vgrow="ALWAYS">
+
+        <Label text="🎬 Vidéos de cette playlist"
+               style="-fx-text-fill:#c084fc;-fx-font-size:17;-fx-font-weight:bold;"/>
+
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                    style="-fx-background-color:transparent;-fx-background:#0a0f1e;-fx-border-color:transparent;">
+
+            <FlowPane fx:id="videosPane"
+                      hgap="18" vgap="18"
+                      style="-fx-background-color:#0a0f1e;-fx-padding:2;">
+            </FlowPane>
+
+        </ScrollPane>
+    </VBox>
+
+</VBox>

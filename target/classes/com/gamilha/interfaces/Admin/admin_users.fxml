@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.AdminUsersController"
+      spacing="20"
+      styleClass="content-area">
+
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <children>
+
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <Label text="Gestion des Utilisateurs" styleClass="title"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="+ Créer un utilisateur"
+                    onAction="#openNewUserForm"
+                    styleClass="button-primary"/>
+        </HBox>
+
+        <HBox spacing="12" alignment="CENTER_LEFT">
+
+            <TextField fx:id="searchField"
+                       promptText="Rechercher (nom, email...)"
+                       HBox.hgrow="ALWAYS"/>
+
+            <ComboBox fx:id="roleFilter" prefWidth="160"/>
+
+            <ComboBox fx:id="statusFilter" prefWidth="160"/>
+
+            <ComboBox fx:id="sortFilter" prefWidth="180"/>
+
+            <Button text="⟳"
+                    onAction="#handleRefresh"
+                    styleClass="button-primary"/>
+
+        </HBox>
+
+        <TableView fx:id="usersTable"
+                   prefHeight="500"
+                   styleClass="table-view">
+
+            <columns>
+
+                <TableColumn fx:id="colAvatar" text="Avatar" prefWidth="70"/>
+
+                <TableColumn fx:id="colName" text="Nom" prefWidth="200"/>
+
+                <TableColumn fx:id="colEmail" text="Email" prefWidth="300"/>
+
+                <TableColumn fx:id="colRoles" text="Rôle(s)" prefWidth="140"/>
+
+                <TableColumn fx:id="colActive" text="Statut" prefWidth="120"/>
+
+                <TableColumn fx:id="colActions" text="Actions" prefWidth="200"/>
+
+            </columns>
+
+        </TableView>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+
+            <Label fx:id="paginationInfo"/>
+
+            <Pane HBox.hgrow="ALWAYS"/>
+
+            <Button fx:id="btnFirst"
+                    text="«"
+                    onAction="#goToFirstPage"/>
+
+            <Button fx:id="btnPrev"
+                    text="‹"
+                    onAction="#goToPrevPage"/>
+
+            <HBox fx:id="pageNumbers"
+                  spacing="6"
+                  alignment="CENTER"/>
+
+            <Button fx:id="btnNext"
+                    text="›"
+                    onAction="#goToNextPage"/>
+
+            <Button fx:id="btnLast"
+                    text="»"
+                    onAction="#goToLastPage"/>
+
+        </HBox>
+
+    </children>
+
+</VBox>
