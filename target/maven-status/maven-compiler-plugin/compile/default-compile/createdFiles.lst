@@ -1,6 +1,5 @@
 com\gamilha\services\PostService.class
 com\gamilha\services\GameMatchService.class
-com\gamilha\HelloApplication.class
 com\gamilha\controllers\StreamShowController$1.class
 com\gamilha\services\UserService.class
 com\gamilha\controllers\AddUserController.class

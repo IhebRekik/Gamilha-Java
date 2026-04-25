@@ -34,7 +34,6 @@
     -fx-padding: 0;
 }
 
-<<<<<<< HEAD
 /* ── LABELS ──────────────────────────────────────────────────────────────── */
 .label { -fx-text-fill: #e6e6e6; }
 .error-label { -fx-text-fill: #ff6b6b; -fx-font-size: 12px; }
@@ -248,7 +247,7 @@
     -fx-background-color: linear-gradient(to bottom right,rgba(20,28,54,0.99),rgba(16,22,46,0.99));
     -fx-border-color: rgba(139,92,246,0.40);
     -fx-border-radius: 14; -fx-background-radius: 14;
-    -fx-padding: 0; -fx-spacing: 0;
+    -fx-padding: 0 0 16 0; -fx-spacing: 0;
     -fx-effect: dropshadow(gaussian,rgba(100,60,255,0.18),16,0.2,0,4);
     -fx-min-width: 270; -fx-pref-width: 310;
 }
@@ -482,7 +481,7 @@
     -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 6 12;
 }
 .page-btn:hover { -fx-background-color: #8b5cf6; }
-=======
+
 /* ══════════════════════════════════════════════════════════════════════
    TEXT FIELD — fond sombre, texte blanc
    ══════════════════════════════════════════════════════════════════════ */
@@ -1093,7 +1092,6 @@
     -fx-border-color: rgba(139, 92, 246, 0.25);
     -fx-border-radius: 12;
     -fx-background-radius: 12;
-<<<<<<< HEAD
 -fx-padding: 10;
     -fx-max-width: 760;
 }
@@ -1121,9 +1119,6 @@
 
 .details-members-scroll > .viewport {
     -fx-background-color: transparent;
-=======
--fx-padding: 12;
->>>>>>> origin/gestion_ListVd
 }
 
 .bracket-board {
@@ -1284,4 +1279,4 @@
 .table-view .column-header{
     -fx-border-color:transparent transparent #3b4250 transparent;
 }
->>>>>>> event
+

@@ -1,11 +1,11 @@
 package com.gamilha.controllers;
 
 
+import com.gamilha.MainApp;
 import com.gamilha.controllers.bracket.BracketFormController;
 import com.gamilha.controllers.bracket.BracketListController;
 import com.gamilha.controllers.equipe.EquipeFormController;
 import com.gamilha.controllers.equipe.EquipeListController;
-
 import com.gamilha.controllers.equipe.EquipeParticipationCalendarController;
 import com.gamilha.controllers.evenement.EvenementFormController;
 import com.gamilha.controllers.evenement.EvenementListController;
@@ -20,50 +20,17 @@ import com.gamilha.services.EvenementService;
 import com.gamilha.services.GameMatchService;
 import com.gamilha.utils.SessionContext;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-
-public class DashboardController {
-
-    @FXML private Label titleLabel;
-    @FXML private Label subtitleLabel;
-    @FXML private VBox headerBox;
-    @FXML private VBox sideNav;
-    @FXML private HBox topNav;
-    @FXML private StackPane pageContainer;
-
-    private final EvenementService evenementService = new EvenementService();
-    private final EquipeService equipeService = new EquipeService();
-    private final GameMatchService matchService = new GameMatchService();
-
-    private final EvenementListController evList = new EvenementListController();
-    private final EvenementFormController evForm = new EvenementFormController();
-    private final EquipeListController eqList = new EquipeListController();
-    private final EquipeFormController eqForm = new EquipeFormController();
-    private final BracketListController brList = new BracketListController();
-    private final BracketFormController brForm = new BracketFormController();
-    private final GameMatchListController maList = new GameMatchListController();
-    private final GameMatchFormController maForm = new GameMatchFormController();
-
-    private Button activeNavButton;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 /**
@@ -93,8 +60,8 @@ public class DashboardController {
     // ─── Services ─────────────────────────────────────────────────────────────
 
     private final EvenementService evenementService = new EvenementService();
-    private final EquipeService equipeService       = new EquipeService();
-    private final GameMatchService matchService     = new GameMatchService();
+    private final EquipeService equipeService = new EquipeService();
+    private final GameMatchService matchService = new GameMatchService();
 
     // ─── Sous-contrôleurs (un par entité × liste/formulaire) ─────────────────
 
@@ -178,15 +145,12 @@ public class DashboardController {
     }
 
     public Label getSubtitleLabel() {
-
-
         return subtitleLabel;
     }
 
     public VBox getHeaderBox() {
         return headerBox;
     }
-
 
     private void wireSubControllers() {
         evList.setNav(this::navigateTo);
@@ -196,6 +160,7 @@ public class DashboardController {
         eqList.setNav(this::navigateTo);
         eqList.setFormController(eqForm);
         eqForm.setNav(this::navigateTo);
+        eqCalendar.setNav(this::navigateTo);
 
         brList.setNav(this::navigateTo);
         brList.setFormController(brForm);
@@ -277,6 +242,7 @@ public class DashboardController {
             case "evenements_form" -> evForm.build();
             case "equipes_list" -> eqList.build();
             case "equipes_form" -> eqForm.build();
+            case "equipes_calendar" -> eqCalendar.build();
             case "brackets_list" -> brList.build();
             case "brackets_form" -> brForm.build();
             case "matchs_list" -> maList.build();
@@ -308,9 +274,10 @@ public class DashboardController {
 
         Button evBtn = createNavButton("🗂", "Evenements - Liste", "evenements_list");
         Button eqBtn = createNavButton("👥", "Equipes - Liste",    "equipes_list");
+        Button calBtn = createNavButton("📅", "Calendrier Equipes", "equipes_calendar");
         Button brBtn = createNavButton("📚", "Brackets - Liste",   "brackets_list");
         Button maBtn = createNavButton("🎮", "Matchs - Liste",     "matchs_list");
-        sideNav.getChildren().addAll(evBtn, eqBtn, brBtn, maBtn);
+        sideNav.getChildren().addAll(evBtn, eqBtn, calBtn, brBtn, maBtn);
 
         navigateTo("evenements_list"); // Page d'accueil par défaut
     }
@@ -408,18 +375,6 @@ public class DashboardController {
         };
     }
 
-    @FXML
-    private void onLogout() {
-        SessionContext.clear();
-        com.gamilha.MainApp.showLogin();
-    /**
-     * Détermine si le texte d'un bouton de navigation correspond à une clé de page.
-     * Les clés liste ET formulaire pointent vers le même bouton (même section).
-     *
-     * @param btnText texte du bouton
-     * @param pageKey clé de navigation
-     * @return true si correspondance
-     */
     // ─── Déconnexion ──────────────────────────────────────────────────────────
 
     /**
@@ -430,10 +385,10 @@ public class DashboardController {
     private void onLogout() {
         SessionContext.clear(); // Supprime l'utilisateur en session
         try {
-            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("login-view.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root, 460, 420);
-            scene.getStylesheets().add(HelloApplication.class.getResource("styles/gamilha.css").toExternalForm());
+            scene.getStylesheets().add(MainApp.class.getResource("styles/gamilha.css").toExternalForm());
             Stage stage = (Stage) titleLabel.getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("Gamilha - Login");

@@ -90,7 +90,7 @@ public class EvenementService implements ICrud<Evenement> {
      * @return liste complète des événements
      */
     public List<Evenement> findAll() {
-        String sql = "SELECT idEvenement, nom, description, jeu, typeEvenement, dateDebut, dateFin, statut, regles, image, created_by_id, created_at FROM evenement ORDER BY idEvenement DESC";
+        String sql = "SELECT DISTINCT idEvenement, nom, description, jeu, typeEvenement, dateDebut, dateFin, statut, regles, image, created_by_id, created_at FROM evenement ORDER BY idEvenement DESC";
         List<Evenement> list = new ArrayList<>();
         try (Statement st = cnx.createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) list.add(map(rs));
@@ -331,7 +331,7 @@ public class EvenementService implements ICrud<Evenement> {
             default -> "idEvenement";
         };
 
-        String sql = "SELECT idEvenement, nom, description, jeu, typeEvenement, dateDebut, dateFin, statut, regles, image, created_by_id, created_at "
+        String sql = "SELECT DISTINCT idEvenement, nom, description, jeu, typeEvenement, dateDebut, dateFin, statut, regles, image, created_by_id, created_at "
                 + "FROM evenement WHERE (? = '' OR LOWER(nom) LIKE ? OR LOWER(jeu) LIKE ? OR LOWER(typeEvenement) LIKE ? OR LOWER(statut) LIKE ?) "
                 + "ORDER BY " + safeSortBy + " " + order;
 
@@ -387,7 +387,6 @@ public class EvenementService implements ICrud<Evenement> {
     }
 
     /**
->>>>>>> event
      * Génère automatiquement un bracket et tous les matchs pour un événement.
      *
      * Algorithme :

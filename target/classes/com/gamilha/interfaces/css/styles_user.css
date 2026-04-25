@@ -247,7 +247,7 @@
     -fx-background-color: linear-gradient(to bottom right,rgba(20,28,54,0.99),rgba(16,22,46,0.99));
     -fx-border-color: rgba(139,92,246,0.40);
     -fx-border-radius: 14; -fx-background-radius: 14;
-    -fx-padding: 0; -fx-spacing: 0;
+    -fx-padding: 0 0 16 0; -fx-spacing: 0;
     -fx-effect: dropshadow(gaussian,rgba(100,60,255,0.18),16,0.2,0,4);
     -fx-min-width: 270; -fx-pref-width: 310;
 }

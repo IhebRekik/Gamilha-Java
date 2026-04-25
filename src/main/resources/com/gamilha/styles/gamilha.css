@@ -355,7 +355,8 @@
 }
 
 .card-actions {
-    -fx-padding: 8 0 0 0;
+    -fx-padding: 16 0 0 0;
+    -fx-alignment: CENTER;
 }
 
 .card-actions .button {

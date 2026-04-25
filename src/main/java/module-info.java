@@ -1,10 +1,11 @@
 module com.gamilha {
 
-    // ── Java SE ─────────────────────────────────────────
+    // Java SE
     requires java.desktop;
     requires java.sql;
+    requires java.net.http;
 
-    // ── JavaFX ─────────────────────────────────────────
+    // JavaFX
     requires javafx.base;
     requires javafx.controls;
     requires javafx.fxml;
@@ -12,15 +13,17 @@ module com.gamilha {
     requires javafx.media;
     requires javafx.web;
 
-    // ── Bibliothèques tierces ─────────────────────────
+    // Third-party libraries
     requires jbcrypt;
     requires uk.co.caprica.vlcj;
     requires stripe.java;
     requires mysql.connector.j;
     requires jakarta.mail;
     requires jakarta.activation;
+    requires emoji.java;
+    requires ably.java;
 
-    // autres libs UI
+    // Additional UI libraries
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
@@ -28,8 +31,9 @@ module com.gamilha {
     requires com.calendarfx.view;
     requires com.google.zxing;
     requires vosk;
+    requires org.slf4j;
 
-    // ── Opens (pour FXML) ─────────────────────────
+    // Opens for FXML
     opens com.gamilha to javafx.fxml;
     opens com.gamilha.controllers to javafx.fxml;
     opens com.gamilha.controllers.Messages to javafx.fxml;
@@ -43,7 +47,7 @@ module com.gamilha {
     opens com.gamilha.controllers.gamematch to javafx.fxml;
     opens com.gamilha.controllers.shared to javafx.fxml;
 
-    // ── Exports ─────────────────────────────────────────
+    // Exports
     exports com.gamilha;
     exports com.gamilha.entity;
     exports com.gamilha.services;
@@ -55,3 +59,4 @@ module com.gamilha {
     exports com.gamilha.controllers.coaching;
     exports com.gamilha.controllers.inscriptions;
 
+}

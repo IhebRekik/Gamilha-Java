@@ -113,11 +113,9 @@ public class EditAbonnementController {
 
         if (optStream.isSelected()) list.add("stream");
         if (optCoaching.isSelected()) list.add("coaching");
-<<<<<<< HEAD
         if (optEvent.isSelected()) list.add("evenement");
-=======
+
         if (optEvent.isSelected()) list.add("event");
->>>>>>> event
         if (optAI.isSelected()) list.add("ai");
 
         return list;

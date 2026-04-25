@@ -244,14 +244,14 @@
 .card-grid { -fx-hgap: 14; -fx-vgap: 14; -fx-padding: 4 4 8 4; -fx-background-color: transparent; }
 
 /* ── EVENEMENT CARDS ─────────────────────────────────────────────────────── */
-.event-card {
-    -fx-background-color: linear-gradient(to bottom right,rgba(20,28,54,0.99),rgba(16,22,46,0.99));
-    -fx-border-color: rgba(139,92,246,0.40);
-    -fx-border-radius: 14; -fx-background-radius: 14;
-    -fx-padding: 0; -fx-spacing: 0;
-    -fx-effect: dropshadow(gaussian,rgba(100,60,255,0.18),16,0.2,0,4);
-    -fx-min-width: 270; -fx-pref-width: 310;
-}
+ .event-card {
+     -fx-background-color: linear-gradient(to bottom right,rgba(20,28,54,0.99),rgba(16,22,46,0.99));
+     -fx-border-color: rgba(139,92,246,0.40);
+     -fx-border-radius: 14; -fx-background-radius: 14;
+     -fx-padding: 14; -fx-spacing: 0;
+     -fx-effect: dropshadow(gaussian,rgba(100,60,255,0.18),16,0.2,0,4);
+     -fx-min-width: 270; -fx-pref-width: 310;
+ }
 .event-card:hover {
     -fx-border-color: rgba(217,70,239,0.65);
     -fx-effect: dropshadow(gaussian,rgba(217,70,239,0.32),22,0.28,0,5);
@@ -261,8 +261,9 @@
     -fx-background-radius: 14 14 0 0;
     -fx-pref-height: 140; -fx-min-height: 140;
 }
-.event-card-body { -fx-padding: 14 14 10 14; -fx-spacing: 6; }
-.event-card-title { -fx-text-fill: #f2eaff; -fx-font-size: 16px; -fx-font-weight: 800; }
+ .event-card-body { -fx-padding: 14 14 10 14; -fx-spacing: 6; }
+ .event-card .card-actions { -fx-padding: 10 14 14 14 !important; }
+ .event-card-title { -fx-text-fill: #f2eaff; -fx-font-size: 16px; -fx-font-weight: 800; }
 .event-card-tag {
     -fx-background-color: rgba(139,92,246,0.22); -fx-text-fill: #c4a8ff;
     -fx-font-size: 11px; -fx-font-weight: 700;
@@ -471,7 +472,7 @@
     -fx-background-radius: 8; -fx-cursor: hand; -fx-padding: 6 12;
 }
 .page-btn:hover { -fx-background-color: #8b5cf6; }
-=======
+
 .root {
     -fx-font-family: "Segoe UI", "Arial";
 }
@@ -1054,4 +1055,3 @@
 .match-card-link:hover {
     -fx-border-color: rgba(244, 198, 76, 0.65);
 }
->>>>>>> event
