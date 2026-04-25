@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.UserProfileController"
+      spacing="16"
+      styleClass="content-area">
+
+    <padding>
+        <Insets top="22" right="22" bottom="22" left="22"/>
+    </padding>
+
+    <!-- Top bar -->
+    <HBox alignment="CENTER_LEFT" spacing="12" styleClass="topbar">
+        <Label text="Mon Profil" styleClass="page-title"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="⎋ Logout" onAction="#logout" styleClass="button-danger"/>
+    </HBox>
+
+    <!-- Profile header card -->
+    <HBox spacing="16" alignment="CENTER_LEFT" styleClass="profile-header card">
+        <padding>
+            <Insets top="18" right="18" bottom="18" left="18"/>
+        </padding>
+
+        <!-- Avatar -->
+        <StackPane minWidth="72" prefWidth="72" maxWidth="72" minHeight="72" prefHeight="72" maxHeight="72" styleClass="avatar">
+            <Circle radius="36" styleClass="avatar-ring"/>
+            <ImageView fx:id="profileImageView" fitWidth="72" fitHeight="72" preserveRatio="true" smooth="true"/>
+        </StackPane>
+
+        <!-- Identity (header) -->
+        <VBox spacing="6" HBox.hgrow="ALWAYS">
+            <Label fx:id="headerNameLabel" text="—" styleClass="profile-name"/>
+            <Label fx:id="headerEmailLabel" text="—" styleClass="profile-email"/>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <Label fx:id="headerRoleLabel" text="—" styleClass="pill pill-purple"/>
+                <Label fx:id="headerStatusLabel" text="—" styleClass="pill"/>
+            </HBox>
+        </VBox>
+
+
+    </HBox>
+
+    <!-- Content grid -->
+    <GridPane hgap="16" vgap="16">
+        <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="65"/>
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="35"/>
+        </columnConstraints>
+
+        <!-- Details -->
+        <VBox spacing="14" styleClass="card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Informations" styleClass="section-title"/>
+            <Separator />
+
+            <GridPane hgap="14" vgap="12" styleClass="kv-grid">
+                <columnConstraints>
+                    <ColumnConstraints prefWidth="140"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Nom" styleClass="muted" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Label fx:id="nameLabel" styleClass="kv-value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Email" styleClass="muted" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Label fx:id="emailLabel" styleClass="kv-link" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="Rôle" styleClass="muted" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Label fx:id="roleLabel" styleClass="kv-value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Statut" styleClass="muted" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label fx:id="statusLabel" styleClass="kv-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+
+            </GridPane>
+        </VBox>
+
+        <!-- Actions -->
+        <VBox spacing="12" styleClass="card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Actions" styleClass="section-title"/>
+            <Separator />
+
+            <Button text="Modifier mes infos" styleClass="button-primary button-block" onAction="#editUser"/>
+            <Button text="Supprimer mon compte" styleClass="button-danger button-block" onAction="#deleteUser"/>
+
+            <VBox spacing="6" styleClass="hint-box">
+                <Label text="Astuce" styleClass="hint-title"/>
+                <Label text="Modifie ton profil pour garder tes informations à jour." wrapText="true" styleClass="hint-text"/>
+            </VBox>
+        </VBox>
+
+    </GridPane>
+
+</VBox>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.NavBarUserController"
+            style="-fx-background-color:#0a0a0f;"
+            prefWidth="Infinity"
+            prefHeight="Infinity">
+
+    <top>
+        <VBox style="-fx-background-color:linear-gradient(to bottom,rgba(10,10,15,0.98),rgba(10,10,15,0.92));
+                     -fx-border-color:transparent transparent rgba(139,92,246,0.2) transparent;
+                     -fx-border-width:0 0 1 0;
+                     -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.4),8,0,0,2);">
+
+            <!-- ── BARRE PRINCIPALE ──────────────────────────── -->
+            <HBox alignment="CENTER_LEFT" spacing="2"
+                  style="-fx-padding:8 24;">
+
+                <!-- Logo -->
+                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding:0 18 0 0;">
+                    <ImageView fx:id="logoImage" fitHeight="36" fitWidth="36" preserveRatio="true"/>
+                    <Label text="Gamilha"
+                           style="-fx-font-size:20px;-fx-font-weight:800;
+                                  -fx-text-fill:linear-gradient(135deg,#8b5cf6,#c084fc);"/>
+                </HBox>
+
+                <!-- Liens nav — identiques Symfony dans l'ordre -->
+                <Button fx:id="btnAccueil"     text="🏠 Accueil"      onAction="#goAccueil"    styleClass="nav-link-btn"/>
+                <Button fx:id="btnEvenements"  text="📅 Événements"   onAction="#goEvenements" styleClass="nav-link-btn"/>
+                <Button fx:id="btnEquipes"     text="👥 Équipes"      onAction="#goEquipe"     styleClass="nav-link-btn"/>
+                <Button fx:id="btnCoaching"    text="🎯 Coaching"     onAction="#goCoaching"   styleClass="nav-link-btn"/>
+                <Button fx:id="btnAI"          text="🤖 Gamilha AI"   onAction="#goAI"         styleClass="nav-link-btn"/>
+                <Button fx:id="btnReseaux"     text="🌐 Réseaux"      onAction="#goReseaux"    styleClass="nav-link-btn"/>
+                <Button fx:id="btnStreams"     text="📡 Streams"      onAction="#goStreams"    styleClass="nav-link-btn"/>
+                <Button fx:id="btnAbonnements" text="💎 Abonnements"  onAction="#goAbonnement" styleClass="nav-link-btn"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Dropdown utilisateur — identique Symfony "test1 ▾" -->
+                <MenuButton fx:id="menuUser" text="👤  …"
+                            styleClass="nav-user-menu">
+                    <items>
+                        <MenuItem fx:id="miProfile"    text="👤  Mon profil"   onAction="#goProfile"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem fx:id="miLogout"     text="🚪  Déconnexion"  onAction="#logout"/>
+                    </items>
+                </MenuButton>
+
+            </HBox>
+
+            <!-- ── SOUS-MENU SOCIAL (visible quand Réseaux actif) ── -->
+            <HBox fx:id="subMenuSocial" spacing="2" alignment="CENTER_LEFT"
+                  style="-fx-background-color:rgba(9,9,26,0.95);
+                         -fx-padding:4 24 4 72;
+                         -fx-border-color:transparent transparent rgba(139,92,246,0.1) transparent;
+                         -fx-border-width:0 0 1 0;">
+                <Button fx:id="btnFilActualite"    text="🏠 Fil d'actualité"  onAction="#goFilActualite"   styleClass="nav-sub-btn"/>
+                <Button fx:id="btnMesPosts"        text="📝 Mes Posts"        onAction="#goMesPosts"       styleClass="nav-sub-btn"/>
+                <Button fx:id="btnMesCommentaires" text="💬 Mes Commentaires" onAction="#goMesCommentaires" styleClass="nav-sub-btn"/>
+                <Button fx:id="btnListAmis"        text="👥 Mes Amis"         onAction="#goListAmis"       styleClass="nav-sub-btn"/>
+            </HBox>
+
+        </VBox>
+    </top>
+
+    <!-- ── CONTENU ─────────────────────────────────────────────── -->
+    <center>
+        <BorderPane fx:id="contentArea" prefHeight="Infinity" prefWidth="Infinity" style="-fx-background-color:#0a0a0f;"/>
+    </center>
+
+</BorderPane>

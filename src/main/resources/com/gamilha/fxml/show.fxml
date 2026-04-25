@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.UserProfileController"
+      spacing="25" padding="25" styleClass="card">
+
+    <children>
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <!-- Avatar (commenté temporairement car tu n'as pas encore l'image) -->
+            <!--
+            <ImageView fx:id="avatarImage" fitWidth="100" fitHeight="100" preserveRatio="true">
+                <Image url="@../../images/default-avatar.png"/>
+            </ImageView>
+            -->
+
+            <!-- Avatar par défaut simple (icône) -->
+            <StackPane style="-fx-background-color: #4b5563; -fx-background-radius: 50; -fx-padding: 20;">
+                <Label text="👤" style="-fx-font-size: 50; -fx-text-fill: #c4c4c4;"/>
+            </StackPane>
+
+            <VBox spacing="5">
+                <Label fx:id="nameLabel" style="-fx-font-size: 26; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                <Label fx:id="emailLabel" style="-fx-text-fill: #a5b4fc; -fx-font-size: 15;"/>
+            </VBox>
+        </HBox>
+
+        <Separator/>
+
+        <GridPane hgap="20" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="60"/>
+            </columnConstraints>
+
+            <Label text="ID :" style="-fx-text-fill: #94a3b8;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label fx:id="idLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+            <Label text="Rôle :" style="-fx-text-fill: #94a3b8;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label fx:id="roleLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+            <Label text="Statut :" style="-fx-text-fill: #94a3b8;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="statusLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        </GridPane>
+
+        <HBox spacing="15" alignment="CENTER_RIGHT">
+            <Button text="Modifier" styleClass="button-primary" onAction="#editUser"/>
+            <Button text="Supprimer" styleClass="button-danger" onAction="#deleteUser"/>
+            <Button text="Retour à la liste" onAction="#backToList"/>
+        </HBox>
+    </children>
+</VBox>

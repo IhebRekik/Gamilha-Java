@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15"
+      style="-fx-background-color:#0f172a;"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.admin.HistoriquePaiementController">
+
+    <!-- 🔥 TITLE -->
+    <Label text="Historique des Paiements"
+           style="-fx-text-fill:white; -fx-font-size:22; -fx-font-weight:bold;"/>
+
+    <!-- 🔥 FILTER BAR -->
+    <HBox spacing="15">
+        <TextField fx:id="searchField"
+                   promptText="Rechercher par email..."
+                   onKeyReleased="#applyFilter"
+                   prefWidth="200"/>
+        <ComboBox fx:id="filterType" promptText="Type"  onAction="#applyFilter"/>
+
+        <ComboBox fx:id="sortMontant" promptText="Trier montant"  onAction="#applyFilter"/>
+
+        <DatePicker fx:id="dateDebut" onAction="#applyFilter"/>
+        <DatePicker fx:id="dateFin"  onAction="#applyFilter"/>
+
+
+    </HBox>
+
+    <!-- 🔥 TABLE -->
+    <GridPane fx:id="gridPane"
+              hgap="0"
+              vgap="0"
+              style="-fx-background-color:#020617; -fx-padding:10;"/>
+
+</VBox>
