@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.NavBarAdminController"
+            prefWidth="1280" prefHeight="780"
+            style="-fx-background-color:#0d1117;">
+
+    <!-- ══ SIDEBAR ══ -->
+    <left>
+        <VBox prefWidth="240" spacing="2" styleClass="admin-sidebar">
+
+            <!-- Logo -->
+            <VBox styleClass="admin-sidebar-logo" alignment="CENTER_LEFT">
+                <padding><Insets top="20" right="16" bottom="16" left="16"/></padding>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="🎮" style="-fx-font-size:26px;"/>
+                    <VBox spacing="1">
+                        <Label text="Gamilha" styleClass="admin-brand"/>
+                        <Label text="Administration" styleClass="admin-brand-sub"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Divider (Region instead of Rectangle for JavaFX 17 compat) -->
+            <Region prefHeight="1" style="-fx-background-color:#1f2937;" VBox.vgrow="NEVER"/>
+
+            <!-- Nav items -->
+            <VBox spacing="2" VBox.vgrow="ALWAYS">
+                <padding><Insets top="12" right="8" bottom="12" left="8"/></padding>
+
+                <!-- PRINCIPAL -->
+                <Label text="PRINCIPAL" styleClass="admin-section-label">
+                    <VBox.margin><Insets top="4" left="8" bottom="2"/></VBox.margin>
+                </Label>
+                <Button fx:id="btnDashboard"    text="📊  Dashboard"    prefWidth="224" onAction="#goDashboard"    styleClass="admin-nav-btn"/>
+                <Button fx:id="btnUtilisateurs" text="👥  Utilisateurs" prefWidth="224" onAction="#goUtilisateurs" styleClass="admin-nav-btn"/>
+
+                <!-- COMPÉTITIONS -->
+                <Label text="COMPÉTITIONS" styleClass="admin-section-label">
+                    <VBox.margin><Insets top="10" left="8" bottom="2"/></VBox.margin>
+                </Label>
+                <Button fx:id="btnEvenements" text="📅  Événements" prefWidth="224" onAction="#goEvenements" styleClass="admin-nav-btn"/>
+                <Button fx:id="btnMatchs"     text="🏆  Matchs"     prefWidth="224" onAction="#goMatchs"     styleClass="admin-nav-btn"/>
+                <Button fx:id="btnBrackets"   text="🧩  Brackets"   prefWidth="224" onAction="#goBrackets"   styleClass="admin-nav-btn"/>
+                <Button fx:id="btnEquipes"    text="👥  Équipes"    prefWidth="224" onAction="#goEquipe"     styleClass="admin-nav-btn"/>
+
+                <!-- CONTENU -->
+                <Label text="CONTENU" styleClass="admin-section-label">
+                    <VBox.margin><Insets top="10" left="8" bottom="2"/></VBox.margin>
+                </Label>
+                <Button fx:id="btnPlayList" text="🎓  Coaching"  prefWidth="224" onAction="#goPlayList" styleClass="admin-nav-btn"/>
+                <Button fx:id="btnCoaching" text="🎬  Vidéos"    prefWidth="224" onAction="#goCoaching" styleClass="admin-nav-btn"/>
+                <Button fx:id="btnSocial"   text="🌐  Social"    prefWidth="224" onAction="#goSocial"   styleClass="admin-nav-btn"/>
+                <VBox spacing="1" style="-fx-padding:0 0 0 14;">
+                    <Button fx:id="btnAdminPosts"        text="📝  Posts"        prefWidth="210" onAction="#goAdminPosts"        styleClass="admin-nav-sub-btn"/>
+                    <Button fx:id="btnAdminCommentaires" text="💬  Commentaires" prefWidth="210" onAction="#goAdminCommentaires" styleClass="admin-nav-sub-btn"/>
+                </VBox>
+                <Button fx:id="btnStreams" text="📡  Streams" prefWidth="224" onAction="#goStreams" styleClass="admin-nav-btn"/>
+
+                <!-- FINANCE -->
+                <Label text="FINANCE" styleClass="admin-section-label">
+                    <VBox.margin><Insets top="10" left="8" bottom="2"/></VBox.margin>
+                </Label>
+                <Button fx:id="btnDonations"    text="💰  Donations"    prefWidth="224" onAction="#goDonations"    styleClass="admin-nav-btn"/>
+                <Button fx:id="btnAbonnements"  text="💳  Abonnements"  prefWidth="224" onAction="#goAbonnement"   styleClass="admin-nav-btn"/>
+                <Button fx:id="btnInscriptions" text="📋  Inscriptions" prefWidth="224" onAction="#goInscriptions" styleClass="admin-nav-btn"/>
+                <Button fx:id="btnHistorique"   text="🧾  Historique"   prefWidth="224" onAction="#goHistorique"   styleClass="admin-nav-btn"/>
+
+                <!-- ANALYTICS -->
+                <Label text="ANALYTICS" styleClass="admin-section-label">
+                    <VBox.margin><Insets top="10" left="8" bottom="2"/></VBox.margin>
+                </Label>
+                <Button fx:id="btnPrediction" text="🤖  Prévision Streams" prefWidth="224" onAction="#goPrediction" styleClass="admin-nav-btn-purple"/>
+
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Footer sidebar -->
+            <Region prefHeight="1" style="-fx-background-color:#1f2937;" VBox.vgrow="NEVER"/>
+            <HBox alignment="CENTER_LEFT" spacing="10" styleClass="admin-sidebar-footer">
+                <padding><Insets top="12" right="12" bottom="14" left="12"/></padding>
+                <StackPane prefWidth="32" prefHeight="32"
+                           style="-fx-background-color:#374151;-fx-background-radius:16;">
+                    <Label text="👤" style="-fx-font-size:14px;"/>
+                </StackPane>
+                <VBox spacing="1">
+                    <Label fx:id="welcomeLabel" styleClass="admin-footer-name"/>
+                    <Label text="Administrateur" styleClass="admin-footer-role"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🚪" onAction="#logout" styleClass="admin-logout-btn"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <!-- ══ TOP BAR ══ -->
+    <top>
+        <HBox alignment="CENTER_RIGHT" styleClass="admin-topbar">
+            <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+            <Label text="Panel Admin — Gamilha" style="-fx-text-fill:#6b7280;-fx-font-size:12px;"/>
+        </HBox>
+    </top>
+
+    <!-- ══ CONTENT ══ -->
+    <center>
+        <BorderPane fx:id="contentArea" style="-fx-background-color:#0d1117;"/>
+    </center>
+
+</BorderPane>

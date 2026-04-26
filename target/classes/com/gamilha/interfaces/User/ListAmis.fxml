@@ -1,0 +1,46 @@
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<VBox spacing="20"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.Messages.ChatController"
+      style="-fx-background-color:#020617; -fx-padding:40;">
+
+    <TextField fx:id="searchField"
+               promptText="Rechercher par nom ou email..."
+               style="
+                    -fx-background-color:#1e293b;
+                    -fx-text-fill:white;
+                    -fx-padding:15;
+                    -fx-background-radius:8;
+                    -fx-prompt-text-fill:#94a3b8;
+               " />
+
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background:#020617;">
+
+        <GridPane fx:id="gridUsers"
+                  hgap="0"
+                  vgap="0"
+                  style="
+                        -fx-background-color:#0f172a;
+                        -fx-background-radius:10;
+                  ">
+
+            <columnConstraints>
+
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="40"/>
+                <ColumnConstraints percentWidth="20"/>
+
+            </columnConstraints>
+
+        </GridPane>
+
+    </ScrollPane>
+
+</VBox>

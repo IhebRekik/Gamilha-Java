@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.web.WebView?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.admin.AdminStreamShowController"
+            stylesheets="@../css/styles.css,@../css/gamilha.css"
+            prefWidth="1280" prefHeight="800">
+
+    <top>
+        <VBox style="-fx-background-color:#0d1117;-fx-border-color:transparent transparent #1f2937 transparent;-fx-border-width:0 0 1 0;">
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color:#111827;-fx-padding:12 20;">
+                <Label text="🎮 GAMILHA — ADMIN" style="-fx-text-fill:#c84cff;-fx-font-size:16px;-fx-font-weight:bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Retour"     onAction="#onBack"
+                        style="-fx-background-color:#1f2937;-fx-text-fill:#9ca3af;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:7 14;-fx-cursor:hand;"/>
+                <Button text="✏ Modifier"   onAction="#onEdit"
+                        style="-fx-background-color:#d97706;-fx-text-fill:white;-fx-font-weight:bold;-fx-background-radius:8;-fx-padding:7 14;-fx-cursor:hand;"/>
+                <Button text="💰 Donations" onAction="#onDonations"
+                        style="-fx-background-color:#8b5cf6;-fx-text-fill:white;-fx-font-weight:bold;-fx-background-radius:8;-fx-padding:7 14;-fx-cursor:hand;"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10"
+                  style="-fx-background-color:#0d1117;-fx-padding:10 20 8 20;">
+                <Label fx:id="lblTitle" text="" wrapText="true"
+                       style="-fx-font-size:20px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblStatus" text=""/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background-color:#0d1117;-fx-background:transparent;-fx-border-color:transparent;">
+            <VBox spacing="0" style="-fx-background-color:#0d1117;">
+
+                <!-- ── Player api.video (admin voit le live) ── -->
+                <VBox fx:id="playerBox" visible="false" managed="false"
+                      style="-fx-background-color:#000;">
+                    <WebView fx:id="playerView" prefHeight="460"
+                             style="-fx-background-color:#000;"/>
+                </VBox>
+
+                <!-- ── Offline screen ── -->
+                <VBox fx:id="offlineBox" alignment="CENTER" spacing="18"
+                      prefHeight="280" visible="true" managed="true"
+                      style="-fx-background-color:linear-gradient(to bottom right,#0a0014,#0a0a0a,#1a0a00);">
+                    <Label text="◈" style="-fx-font-size:70px;-fx-text-fill:#8b5cf6;-fx-opacity:0.4;"/>
+                    <HBox alignment="CENTER" spacing="12">
+                        <Label text="Live stream offline."
+                               style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;"/>
+                        <Label text="📷" style="-fx-font-size:20px;-fx-opacity:0.4;"/>
+                    </HBox>
+                    <Label text="Le streamer n'a pas encore démarré OBS."
+                           style="-fx-font-size:13px;-fx-text-fill:#4b5563;"/>
+                </VBox>
+
+                <!-- ── Thumbnail + infos ── -->
+                <HBox spacing="22" alignment="TOP_LEFT"
+                      style="-fx-padding:22 26 0 26;-fx-background-color:#0d1117;">
+                    <ImageView fx:id="imgThumb" fitWidth="460" fitHeight="260"
+                               preserveRatio="true"
+                               style="-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.5),16,0,0,3);"/>
+                    <VBox spacing="12" HBox.hgrow="ALWAYS"
+                          style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:18;">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label fx:id="lblGame" text=""
+                                   style="-fx-background-color:#1e3a5f;-fx-text-fill:#67e8f9;-fx-background-radius:20;-fx-padding:3 12;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                            <Label fx:id="lblViewers" text=""
+                                   style="-fx-background-color:#1f2937;-fx-text-fill:#94a3b8;-fx-background-radius:20;-fx-padding:3 12;-fx-font-size:12px;"/>
+                        </HBox>
+                        <Label fx:id="lblDesc" text="" wrapText="true"
+                               style="-fx-text-fill:#9ca3af;-fx-font-size:13px;-fx-line-spacing:2;"/>
+                        <Label fx:id="lblDate" text=""
+                               style="-fx-text-fill:#4b5563;-fx-font-size:12px;"/>
+                        <Hyperlink fx:id="lnkUrl" text=""
+                                   style="-fx-text-fill:#818cf8;-fx-font-size:12px;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- ── Bloc OBS — ADMIN VOIT TOUJOURS (modération) ── -->
+                <VBox fx:id="obsBox"
+                      style="-fx-background-color:#e0f7f7;-fx-border-color:#a5f3eb transparent transparent transparent;-fx-border-width:3 0 0 0;"
+                      visible="true" managed="true">
+                    <VBox.margin><Insets top="20" right="26" left="26"/></VBox.margin>
+                    <padding><Insets top="22" right="28" bottom="24" left="28"/></padding>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <VBox.margin><Insets bottom="14"/></VBox.margin>
+                        <Label text="⚙" style="-fx-font-size:22px;"/>
+                        <VBox spacing="1">
+                            <Label text="Configuration OBS (visible admin uniquement)"
+                                   style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#0f4c4c;"/>
+                            <Label text="Clé RTMP du streamer — accès modération"
+                                   style="-fx-font-size:11px;-fx-text-fill:#0e7490;"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="14">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color:#cffafe;-fx-border-color:#a5f3eb;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:12 14;">
+                            <Label text="SERVEUR RTMP" style="-fx-text-fill:#0e7490;-fx-font-size:10px;-fx-font-weight:bold;"/>
+                            <Label fx:id="lblRtmp" text=""
+                                   style="-fx-font-family:'Consolas','Courier New',monospace;-fx-font-size:13px;-fx-text-fill:#0f4c4c;-fx-font-weight:bold;"
+                                   wrapText="true"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color:#cffafe;-fx-border-color:#a5f3eb;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:12 14;">
+                            <Label text="CLÉ DE FLUX" style="-fx-text-fill:#0e7490;-fx-font-size:10px;-fx-font-weight:bold;"/>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Label fx:id="lblKey" text=""
+                                       style="-fx-font-family:'Consolas','Courier New',monospace;-fx-font-size:13px;-fx-text-fill:#0f4c4c;-fx-font-weight:bold;"
+                                       HBox.hgrow="ALWAYS" wrapText="true"/>
+                                <Button fx:id="btnCopyKey" text="📋" onAction="#onCopyKey"
+                                        style="-fx-background-color:#0891b2;-fx-text-fill:white;-fx-background-radius:6;-fx-cursor:hand;-fx-padding:4 10;"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- ── Donations ── -->
+                <VBox spacing="12"
+                      style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:20;">
+                    <VBox.margin><Insets top="20" right="26" bottom="26" left="26"/></VBox.margin>
+                    <HBox alignment="CENTER_LEFT" spacing="16">
+                        <Label text="📋 Donations reçues"
+                               style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblTotal" text="Total : 0,00 €"
+                               style="-fx-background-color:rgba(74,222,128,0.12);-fx-text-fill:#4ade80;-fx-font-weight:bold;-fx-border-color:rgba(74,222,128,0.25);-fx-border-radius:20;-fx-background-radius:20;-fx-padding:4 14;"/>
+                    </HBox>
+                    <FlowPane fx:id="donGrid" hgap="12" vgap="12">
+                        <padding><Insets top="4" bottom="4"/></padding>
+                    </FlowPane>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

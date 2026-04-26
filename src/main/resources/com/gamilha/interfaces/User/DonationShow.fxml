@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.DonationShowController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Retour"   onAction="#onBack" styleClass="btn-secondary"/>
+                <Button text="✏ Modifier" onAction="#onEdit" styleClass="btn-warning"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" styleClass="page-header">
+                <padding><Insets top="14" right="24" bottom="10" left="24"/></padding>
+                <Label text="Détail de la donation" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <StackPane>
+            <VBox spacing="24" prefWidth="520" styleClass="form-wrap show-wrap">
+                <padding><Insets top="30" right="40" bottom="40" left="40"/></padding>
+                <VBox alignment="CENTER" spacing="4">
+                    <Label fx:id="lblEmoji" text="🍩" styleClass="emoji-huge"/>
+                    <Label text="Donation enregistrée" styleClass="form-subtitle"/>
+                </VBox>
+                <VBox styleClass="detail-card">
+                    <HBox styleClass="detail-row">
+                        <Label text="Montant"  styleClass="detail-key" prefWidth="160"/>
+                        <Label fx:id="lblAmount" text="" styleClass="detail-amount"/>
+                    </HBox>
+                    <Region styleClass="detail-sep"/>
+                    <HBox styleClass="detail-row">
+                        <Label text="Donateur" styleClass="detail-key" prefWidth="160"/>
+                        <Label fx:id="lblDonor" text="" styleClass="detail-val"/>
+                    </HBox>
+                    <Region styleClass="detail-sep"/>
+                    <HBox styleClass="detail-row">
+                        <Label text="Date"     styleClass="detail-key" prefWidth="160"/>
+                        <Label fx:id="lblDate"  text="" styleClass="detail-val"/>
+                    </HBox>
+                    <Region styleClass="detail-sep"/>
+                    <HBox styleClass="detail-row">
+                        <Label text="Stream"   styleClass="detail-key" prefWidth="160"/>
+                        <Label fx:id="lblStream" text="" styleClass="detail-val" wrapText="true"/>
+                    </HBox>
+                </VBox>
+                <HBox spacing="12" alignment="CENTER">
+                    <Button text="← Retour" onAction="#onBack" styleClass="btn-secondary" prefWidth="180"/>
+                    <Button text="✏ Modifier" onAction="#onEdit" styleClass="btn-warning"  prefWidth="130"/>
+                </HBox>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="18"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.abonnement.EditAbonnementController"
+      style="-fx-background-color:#111827;">
+
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <Label text="Modifier Abonnement"
+           style="-fx-text-fill:white;
+                  -fx-font-size:20;
+                  -fx-font-weight:bold;" />
+
+
+    <GridPane hgap="20" vgap="15">
+
+        <Label text="Type"
+               style="-fx-text-fill:white;"
+               GridPane.rowIndex="0"/>
+
+        <TextField fx:id="typeField"
+                   GridPane.rowIndex="0"
+                   GridPane.columnIndex="1"
+                   style="-fx-background-color:#1f2937;
+                          -fx-text-fill:white;"/>
+
+
+        <Label text="Prix"
+               style="-fx-text-fill:white;"
+               GridPane.rowIndex="1"/>
+
+        <TextField fx:id="prixField"
+                   GridPane.rowIndex="1"
+                   GridPane.columnIndex="1"
+                   style="-fx-background-color:#1f2937;
+                          -fx-text-fill:white;"/>
+
+
+        <Label text="Durée"
+               style="-fx-text-fill:white;"
+               GridPane.rowIndex="2"/>
+
+        <TextField fx:id="dureeField"
+                   GridPane.rowIndex="2"
+                   GridPane.columnIndex="1"
+                   style="-fx-background-color:#1f2937;
+                          -fx-text-fill:white;"/>
+
+
+        <Label text="Avantages"
+               style="-fx-text-fill:white;"
+               GridPane.rowIndex="3"/>
+
+        <TextArea fx:id="avantagesArea"
+                  GridPane.rowIndex="3"
+                  GridPane.columnIndex="1"
+                  prefRowCount="3"
+                  style="-fx-background-color:#1f2937;
+                         -fx-text-fill:black;"/>
+
+
+        <Label text="Options"
+               style="-fx-text-fill:white;"
+               GridPane.rowIndex="4"/>
+
+        <VBox spacing="8"
+              GridPane.rowIndex="4"
+              GridPane.columnIndex="1">
+
+            <CheckBox fx:id="optStream"
+                      text="Stream"
+                      style="-fx-text-fill:white;"/>
+
+            <CheckBox fx:id="optCoaching"
+                      text="Coaching"
+                      style="-fx-text-fill:white;"/>
+
+            <CheckBox fx:id="optEvent"
+                      text="Event"
+                      style="-fx-text-fill:white;"/>
+
+            <CheckBox fx:id="optAI"
+                      text="AI"
+                      style="-fx-text-fill:white;"/>
+
+        </VBox>
+
+    </GridPane>
+
+
+    <Label fx:id="errorLabel"
+           style="-fx-text-fill:#ef4444;"/>
+
+
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Button text="← Retour"
+                onAction="#goBack"
+                style="
+                -fx-background-color:#374151;
+                -fx-text-fill:white;
+                -fx-font-weight:bold;
+            "/>
+
+        <Button text="Modifier"
+                onAction="#update"
+                style="
+                -fx-background-color:#f59e0b;
+                -fx-text-fill:white;
+                -fx-font-weight:bold;
+            "/>
+
+    </HBox>
+
+</VBox>

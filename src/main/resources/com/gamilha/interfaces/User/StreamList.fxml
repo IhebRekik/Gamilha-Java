@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.StreamListController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <!-- ══ NAVBAR ══ -->
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-header">
+                <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
+                <Label text="📡 Streams en direct" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="🤖 Prévision IA" onAction="#onPrediction" styleClass="btn-primary"/>
+                <Button text="↺" onAction="#onRefresh"   styleClass="btn-secondary"/>
+                <Button text="🔴 Lancer un Stream" onAction="#onNewStream" styleClass="btn-danger"/>
+            </HBox>
+
+            <HBox spacing="10" styleClass="search-bar">
+                <padding><Insets top="0" right="24" bottom="14" left="24"/></padding>
+                <TextField fx:id="searchField" promptText="🔍  Titre ou description…"
+                           styleClass="field-dark" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="gameFilter" prefWidth="160" styleClass="combo-dark"/>
+                <ComboBox fx:id="sortFilter" prefWidth="180" styleClass="combo-dark"/>
+            </HBox>
+            <HBox styleClass="count-bar">
+                <padding><Insets top="0" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="countLabel" text="Chargement…" styleClass="count-label"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <FlowPane fx:id="streamGrid" hgap="20" vgap="20" styleClass="stream-flow">
+                <padding><Insets topRightBottomLeft="24"/></padding>
+            </FlowPane>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer">
+            <padding><Insets topRightBottomLeft="10"/></padding>
+            <Label text="Gamilha — E-Sport &amp; Tournois" styleClass="footer-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>

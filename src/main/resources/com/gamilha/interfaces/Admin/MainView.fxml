@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.MainController"
+            prefWidth="1100" prefHeight="720"
+            style="-fx-background-color:#13131f;">
+
+    <!-- ══ SIDEBAR ════════════════════════════════════════════════════════ -->
+    <left>
+        <VBox prefWidth="205" spacing="4"
+              style="-fx-background-color:#1a1a2e;-fx-border-color:#3a3a5c;-fx-border-width:0 1 0 0;">
+            <padding><Insets top="24" right="12" bottom="20" left="12"/></padding>
+
+            <!-- Logo -->
+            <VBox alignment="CENTER" spacing="4">
+                <VBox.margin><Insets bottom="20"/></VBox.margin>
+                <Label text="🎮" style="-fx-font-size:38;"/>
+                <Label text="Gamilha"
+                       style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#58a6ff;"/>
+                <Label text="Admin Panel"
+                       style="-fx-font-size:11;-fx-text-fill:#8b949e;"/>
+            </VBox>
+
+            <Separator style="-fx-background-color:#3a3a5c;"/>
+
+            <!-- Navigation -->
+            <VBox spacing="4">
+                <VBox.margin><Insets top="12"/></VBox.margin>
+
+                <Button fx:id="btnPosts"
+                        text="📝  Posts"
+                        prefWidth="2000"
+                        onAction="#showPosts"
+                        style="-fx-background-color:#3b82f6;-fx-text-fill:white;
+                               -fx-background-radius:8;-fx-alignment:CENTER_LEFT;
+                               -fx-padding:10 14;-fx-font-size:13;-fx-cursor:hand;"/>
+
+                <Button fx:id="btnCommentaires"
+                        text="💬  Commentaires"
+                        prefWidth="2000"
+                        onAction="#showCommentaires"
+                        style="-fx-background-color:transparent;-fx-text-fill:#c9d1d9;
+                               -fx-background-radius:8;-fx-alignment:CENTER_LEFT;
+                               -fx-padding:10 14;-fx-font-size:13;-fx-cursor:hand;"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Separator style="-fx-background-color:#3a3a5c;"/>
+            <Label text="Gamilha © 2025"
+                   alignment="CENTER" prefWidth="2000"
+                   style="-fx-text-fill:#6e7681;-fx-font-size:11;">
+                <VBox.margin><Insets top="8"/></VBox.margin>
+            </Label>
+        </VBox>
+    </left>
+
+    <!-- ══ ZONE CENTRALE ══════════════════════════════════════════════════ -->
+    <center>
+        <StackPane fx:id="contentArea"/>
+    </center>
+
+</BorderPane>

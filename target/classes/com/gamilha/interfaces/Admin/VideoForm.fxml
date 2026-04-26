@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true"
+            style="-fx-background-color:#0a0f1e;-fx-background:#0a0f1e;-fx-border-color:transparent;"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.gamilha.controllers.coaching.CoachingVideoController">
+
+    <VBox spacing="22" prefWidth="800"
+          style="-fx-background-color:#0a0f1e;">
+        <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+        <!-- TITRE FORMULAIRE -->
+        <Label fx:id="lblFormTitle"
+               text="➕ Nouvelle Vidéo"
+               style="-fx-text-fill:#38bdf8;-fx-font-size:22;-fx-font-weight:bold;"/>
+
+        <!-- SOURCE VIDÉO — Toggle local / YouTube -->
+        <VBox spacing="12"
+              style="-fx-background-color:#1e293b;-fx-background-radius:10;-fx-padding:18;
+                     -fx-border-color:#334155;-fx-border-radius:10;-fx-border-width:1;">
+
+            <Label text="📹 Source de la vidéo"
+                   style="-fx-text-fill:#94a3b8;-fx-font-size:13;-fx-font-weight:bold;"/>
+
+            <!-- Boutons Toggle -->
+            <HBox spacing="10">
+                <Button fx:id="btnToggleUrl"
+                        text="🔗 URL YouTube"
+                        style="-fx-background-color:#0284c7;-fx-text-fill:white;-fx-font-weight:bold;-fx-background-radius:8;-fx-padding:8 20;"/>
+                <Button fx:id="btnToggleLocal"
+                        text="📁 Fichier local"
+                        style="-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;-fx-background-radius:8;-fx-padding:8 20;"/>
+            </HBox>
+
+            <!-- Section URL YouTube -->
+            <VBox fx:id="urlSection" spacing="8">
+                <TextField fx:id="txtUrl"
+                           promptText="https://www.youtube.com/watch?v=..."
+                           style="-fx-background-color:#0f172a;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:7;-fx-padding:11;
+                                  -fx-border-color:#334155;-fx-border-radius:7;-fx-border-width:1;"/>
+                <Label text="La vidéo YouTube sera lue directement dans l'application."
+                       style="-fx-text-fill:#475569;-fx-font-size:11;"/>
+            </VBox>
+
+            <!-- Section Fichier Local -->
+            <VBox fx:id="localSection" spacing="10" visible="false" managed="false">
+                <HBox spacing="14" alignment="CENTER_LEFT">
+                    <Button fx:id="btnChooseVideo"
+                            text="📂 Choisir un fichier vidéo"
+                            onAction="#handleChooseVideo"
+                            style="-fx-background-color:#0284c7;-fx-text-fill:white;
+                                   -fx-font-weight:bold;-fx-background-radius:7;-fx-padding:9 18;"/>
+                    <Label fx:id="lblVideoPath"
+                           text="Aucun fichier sélectionné"
+                           style="-fx-text-fill:#64748b;-fx-font-size:12;"/>
+                </HBox>
+                <Label text="Formats acceptés : MP4, AVI, MKV, MOV, WMV, WebM"
+                       style="-fx-text-fill:#475569;-fx-font-size:11;"/>
+            </VBox>
+        </VBox>
+
+        <!-- TITRE + NIVEAU + DURÉE -->
+        <HBox spacing="20">
+            <VBox spacing="7" HBox.hgrow="ALWAYS">
+                <Label text="Titre *" style="-fx-text-fill:#94a3b8;-fx-font-size:13;-fx-font-weight:bold;"/>
+                <TextField fx:id="txtTitre"
+                           promptText="Titre de la vidéo"
+                           style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:7;-fx-padding:11;
+                                  -fx-border-color:#334155;-fx-border-radius:7;-fx-border-width:1;"/>
+            </VBox>
+            <VBox spacing="7" minWidth="160">
+                <Label text="Niveau" style="-fx-text-fill:#94a3b8;-fx-font-size:13;-fx-font-weight:bold;"/>
+                <TextField fx:id="txtNiveau"
+                           promptText="Débutant / Avancé…"
+                           style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:7;-fx-padding:11;
+                                  -fx-border-color:#334155;-fx-border-radius:7;-fx-border-width:1;"/>
+            </VBox>
+            <VBox spacing="7" minWidth="160">
+                <Label text="Durée (secondes)" style="-fx-text-fill:#94a3b8;-fx-font-size:13;-fx-font-weight:bold;"/>
+                <TextField fx:id="txtDuration"
+                           promptText="Ex : 600 = 10 min"
+                           style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#475569;-fx-background-radius:7;-fx-padding:11;
+                                  -fx-border-color:#334155;-fx-border-radius:7;-fx-border-width:1;"/>
+            </VBox>
+        </HBox>
+
+        <!-- DESCRIPTION -->
+        <VBox spacing="7">
+            <Label text="Description" style="-fx-text-fill:#94a3b8;-fx-font-size:13;-fx-font-weight:bold;"/>
+            <TextArea fx:id="txtDescription"
+                      promptText="Décrivez le contenu de cette vidéo…"
+                      prefRowCount="3" wrapText="true"
+                      style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                             -fx-prompt-text-fill:#475569;-fx-background-radius:7;-fx-padding:10;
+                             -fx-border-color:#334155;-fx-border-radius:7;-fx-border-width:1;"/>
+        </VBox>
+
+        <!-- PLAYLIST + PREMIUM -->
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <VBox spacing="7" HBox.hgrow="ALWAYS">
+                <Label text="Playlist associée" style="-fx-text-fill:#94a3b8;-fx-font-size:13;-fx-font-weight:bold;"/>
+                <ComboBox fx:id="cbPlaylist" prefWidth="2000"
+                          style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:7;-fx-padding:4;"/>
+            </VBox>
+            <VBox spacing="7" alignment="CENTER_LEFT">
+                <Label text=" " style="-fx-font-size:13;"/>
+                <CheckBox fx:id="cbPremium"
+                          text="🔒  Contenu Premium"
+                          style="-fx-text-fill:#c084fc;-fx-font-size:13;-fx-font-weight:bold;"/>
+            </VBox>
+        </HBox>
+
+        <!-- ERREUR -->
+        <Label fx:id="lblErrorVideo" text=""
+               style="-fx-text-fill:#f87171;-fx-font-size:13;"/>
+
+        <!-- BOUTONS -->
+        <HBox spacing="14" alignment="CENTER_RIGHT">
+            <Button fx:id="btnCancelVideo" text="✖ Annuler"
+                    style="-fx-background-color:#374151;-fx-text-fill:white;
+                           -fx-background-radius:8;-fx-padding:11 26;-fx-font-size:13;"/>
+            <Button fx:id="btnSaveVideo" text="💾 Enregistrer"
+                    style="-fx-background-color:linear-gradient(to right,#0284c7,#0c4a6e);
+                           -fx-text-fill:white;-fx-font-weight:bold;
+                           -fx-background-radius:8;-fx-padding:11 26;-fx-font-size:13;"/>
+        </HBox>
+
+    </VBox>
+</ScrollPane>

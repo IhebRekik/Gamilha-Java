@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.BaseController">
+
+    <!-- Sidebar -->
+    <left>
+        <VBox styleClass="sidebar" spacing="8" prefWidth="280">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <StackPane styleClass="logo-badge-sm">
+                        <ImageView styleClass="logo-sm" fitWidth="34" fitHeight="34" preserveRatio="true" smooth="true">
+                            <image>
+                                <!-- base.fxml est dans /com/gamilha/fxml/ -> ../images/logo.jpg -->
+                                <Image url="@../images/logo.jpg"/>
+                            </image>
+                        </ImageView>
+                    </StackPane>
+                    <Label text="Gamilha Admin" styleClass="title"/>
+                </HBox>
+
+                <Separator/>
+
+                <Button text="📊 Dashboard"
+                        prefWidth="240"
+                        styleClass="nav-btn"
+                        onAction="#goToDashboard"/>
+
+                <Button text="👥 Utilisateurs"
+                        prefWidth="240"
+                        styleClass="nav-btn"
+                        onAction="#loadUsersList"/>
+
+                <Button text="📅 Événements"
+                        prefWidth="240"
+                        styleClass="nav-btn"/>
+
+                <Button text="🏆 Matchs"
+                        prefWidth="240"
+                        styleClass="nav-btn"/>
+
+                <Button text="👥 Équipes"
+                        prefWidth="240"
+                        styleClass="nav-btn"/>
+
+                <Button text="📺 Streams"
+                        prefWidth="240"
+                        styleClass="nav-btn"/>
+
+                <Button text="💰 Abonnements"
+                        prefWidth="240"
+                        styleClass="nav-btn"/>
+
+                <Separator/>
+
+                <Button text="🚪 Déconnexion"
+                        prefWidth="240"
+                        styleClass="nav-btn"
+                        style="-fx-text-fill: #ef4444;"
+                        onAction="#logout"/>
+
+            </children>
+        </VBox>
+    </left>
+
+    <!-- Contenu principal -->
+    <center>
+        <StackPane fx:id="contentArea"
+                   styleClass="content-area"/>
+    </center>
+
+</BorderPane>

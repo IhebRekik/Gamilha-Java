@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.BadgeController"
+            stylesheets="@../css/styles.css,@../css/gamilha.css"
+            fitToWidth="true"
+            style="-fx-background-color:#0d1117;-fx-background:transparent;-fx-border-color:transparent;">
+
+    <VBox spacing="0" style="-fx-background-color:#0d1117;">
+
+        <!-- ══ HEADER ══ -->
+        <HBox alignment="CENTER_LEFT" spacing="16"
+              style="-fx-background-color:#111827;-fx-border-color:transparent transparent #1f2937 transparent;-fx-border-width:0 0 1 0;-fx-padding:20 28;">
+            <VBox spacing="3">
+                <Label text="🏆 Mes Badges &amp; Récompenses"
+                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                <HBox spacing="6" alignment="CENTER_LEFT">
+                    <Label text="Compte de" style="-fx-font-size:13px;-fx-text-fill:#6b7280;"/>
+                    <Label fx:id="lblUsername" text=""
+                           style="-fx-font-size:13px;-fx-font-weight:bold;-fx-text-fill:#c84cff;"/>
+                </HBox>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="↺ Actualiser" onAction="#onRefresh"
+                    style="-fx-background-color:#1f2937;-fx-text-fill:#9ca3af;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;-fx-font-size:13px;"/>
+        </HBox>
+
+        <VBox spacing="20">
+            <padding><Insets topRightBottomLeft="24"/></padding>
+
+            <!-- ══ PROFIL NIVEAU + XP ══ -->
+            <HBox spacing="16">
+
+                <!-- Niveau + XP -->
+                <VBox spacing="12" HBox.hgrow="ALWAYS"
+                      style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:22;">
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <!-- Cercle niveau -->
+                        <StackPane prefWidth="72" prefHeight="72"
+                                   style="-fx-background-color:#1e1040;-fx-background-radius:36;-fx-border-color:#7c3aed;-fx-border-radius:36;-fx-border-width:3;-fx-effect:dropshadow(gaussian,rgba(139,92,246,0.4),14,0.3,0,0);">
+                            <VBox alignment="CENTER" spacing="0">
+                                <Label fx:id="lblLevel" text="Niveau 1"
+                                       style="-fx-font-size:11px;-fx-font-weight:bold;-fx-text-fill:#c4b5fd;"/>
+                            </VBox>
+                        </StackPane>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label fx:id="lblXP" text="0 XP"
+                                       style="-fx-font-size:26px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                                <Label text="/ 350 XP max"
+                                       style="-fx-font-size:13px;-fx-text-fill:#6b7280;"/>
+                            </HBox>
+                            <ProgressBar fx:id="xpBar" progress="0" prefWidth="400" prefHeight="12"
+                                         style="-fx-accent:#8b5cf6;-fx-background-color:#1f2937;-fx-background-radius:6;-fx-border-radius:6;"/>
+                            <HBox spacing="20">
+                                <Label fx:id="lblBadgeCount" text="0 / 15"
+                                       style="-fx-font-size:12px;-fx-text-fill:#4b5563;"/>
+                                <Label text="badges débloqués"
+                                       style="-fx-font-size:12px;-fx-text-fill:#4b5563;"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Rang global -->
+                <VBox spacing="6" alignment="CENTER"
+                      style="-fx-background-color:#111827;-fx-border-color:#fbbf24;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:22;-fx-effect:dropshadow(gaussian,rgba(251,191,36,0.2),12,0.2,0,2);"
+                      prefWidth="160">
+                    <Label text="🏅 CLASSEMENT" style="-fx-text-fill:#fbbf24;-fx-font-size:10px;-fx-font-weight:bold;"/>
+                    <Label fx:id="lblRank" text="#—"
+                           style="-fx-font-size:38px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                    <Label text="parmi les streamers"
+                           style="-fx-font-size:11px;-fx-text-fill:#4b5563;"/>
+                </VBox>
+
+            </HBox>
+
+            <!-- ══ KPI STATS ══ -->
+            <HBox spacing="12">
+
+                <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="4"
+                      style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:16;">
+                    <Label text="📡" style="-fx-font-size:22px;"/>
+                    <Label fx:id="lblStreams" text="—"
+                           style="-fx-font-size:24px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                    <Label text="Streams lancés" style="-fx-font-size:11px;-fx-text-fill:#6b7280;"/>
+                </VBox>
+
+                <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="4"
+                      style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:16;">
+                    <Label text="💸" style="-fx-font-size:22px;"/>
+                    <Label fx:id="lblDonated" text="—"
+                           style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#4ade80;"/>
+                    <Label text="Donations données" style="-fx-font-size:11px;-fx-text-fill:#6b7280;"/>
+                </VBox>
+
+                <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="4"
+                      style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:16;">
+                    <Label text="🎁" style="-fx-font-size:22px;"/>
+                    <Label fx:id="lblReceived" text="—"
+                           style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#c084fc;"/>
+                    <Label text="Donations reçues" style="-fx-font-size:11px;-fx-text-fill:#6b7280;"/>
+                </VBox>
+
+                <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="4"
+                      style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:16;">
+                    <Label text="👁" style="-fx-font-size:22px;"/>
+                    <Label fx:id="lblViewers" text="—"
+                           style="-fx-font-size:24px;-fx-font-weight:bold;-fx-text-fill:#67e8f9;"/>
+                    <Label text="Viewers cumulés" style="-fx-font-size:11px;-fx-text-fill:#6b7280;"/>
+                </VBox>
+
+            </HBox>
+
+            <!-- ══ BADGES DÉBLOQUÉS ══ -->
+            <VBox spacing="12"
+                  style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:20;">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="✅ Badges débloqués"
+                           style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                    <Label text="(brillent selon la rareté : bronze · argent · or · diamant)"
+                           style="-fx-font-size:11px;-fx-text-fill:#4b5563;"/>
+                </HBox>
+                <FlowPane fx:id="unlockedGrid" hgap="12" vgap="12">
+                    <padding><Insets top="4"/></padding>
+                </FlowPane>
+            </VBox>
+
+            <!-- ══ BADGES À DÉBLOQUER ══ -->
+            <VBox spacing="12"
+                  style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:20;">
+                <Label text="🔒 Badges à débloquer"
+                       style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+                <Label text="Chaque badge affiche ta progression avec une barre"
+                       style="-fx-font-size:11px;-fx-text-fill:#4b5563;"/>
+                <FlowPane fx:id="lockedGrid" hgap="12" vgap="12">
+                    <padding><Insets top="4"/></padding>
+                </FlowPane>
+            </VBox>
+
+        </VBox>
+    </VBox>
+</ScrollPane>

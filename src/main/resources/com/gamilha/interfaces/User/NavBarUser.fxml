@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.NavBarUserController"
+            prefWidth="1280" prefHeight="780"
+            style="-fx-background-color:#0d1117;">
+
+    <top>
+        <VBox styleClass="navbar-user-wrap">
+
+            <!-- ══ BARRE PRINCIPALE ══ -->
+            <HBox alignment="CENTER_LEFT" spacing="0"
+                  styleClass="navbar-user-main">
+
+                <!-- Logo -->
+                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="navbar-logo-box">
+                    <HBox.margin><Insets right="18"/></HBox.margin>
+                    <ImageView fx:id="logoImage" fitHeight="32" fitWidth="32"
+                               preserveRatio="true"/>
+                    <Label text="Gamilha" styleClass="navbar-logo-text"/>
+                </HBox>
+
+                <!-- Séparateur vertical -->
+                <Rectangle width="1" height="28" styleClass="navbar-sep-v"/>
+                <HBox.margin><Insets left="18" right="18"/></HBox.margin>
+
+                <!-- Liens principaux -->
+                <Button fx:id="btnAccueil"     text="🏠 Accueil"      onAction="#goAccueil"    styleClass="navbar-link"/>
+                <Button fx:id="btnEvenements"  text="📅 Événements"   onAction="#goEvenements" styleClass="navbar-link"/>
+                <Button fx:id="btnEquipes"     text="👥 Équipes"      onAction="#goEquipe"     styleClass="navbar-link"/>
+                <Button fx:id="btnCoaching"    text="🎓 PlayList"     onAction="#goCoaching"   styleClass="navbar-link"/>
+                <Button fx:id="btnAI"          text="🤖 Gamilha AI"   onAction="#goAI"         styleClass="navbar-link"/>
+                <Button fx:id="btnReseaux"     text="🌐 Réseaux"      onAction="#goReseaux"    styleClass="navbar-link"/>
+                <Button fx:id="btnStreams"     text="📡 Streams"      onAction="#goStreams"     styleClass="navbar-link"/>
+                <Button fx:id="btnAbonnements" text="💎 Abonnements"  onAction="#goAbonnement" styleClass="navbar-link"/>
+                <Button fx:id="btnBadges"      text="🏆 Badges"       onAction="#goBadges"     styleClass="navbar-link"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Avatar + nom user (cliquable → profil) -->
+                <HBox alignment="CENTER_LEFT" spacing="8" styleClass="navbar-user-pill">
+                    <StackPane prefWidth="30" prefHeight="30"
+                               style="-fx-background-color:#8b5cf6;-fx-background-radius:15;">
+                        <Label text="👤" style="-fx-font-size:14px;"/>
+                    </StackPane>
+                    <Label fx:id="welcomeLabel" styleClass="navbar-welcome"/>
+                    <Label text="▾" style="-fx-text-fill:#9ca3af;-fx-font-size:10px;"/>
+                </HBox>
+
+                <!-- Déconnexion -->
+                <Button text="🚪" onAction="#logout" styleClass="navbar-logout"/>
+            </HBox>
+
+            <!-- ══ SOUS-MENU SOCIAL ══ -->
+            <HBox fx:id="subMenuSocial" alignment="CENTER_LEFT" spacing="2"
+                  styleClass="navbar-user-sub">
+                <padding><Insets left="16" right="16"/></padding>
+                <Button fx:id="btnFilActualite"    text="🏠 Fil d'actualité"   onAction="#goFilActualite"    styleClass="navbar-sub-link"/>
+                <Button fx:id="btnMesPosts"        text="📝 Mes Posts"         onAction="#goMesPosts"        styleClass="navbar-sub-link"/>
+                <Button fx:id="btnMesCommentaires" text="💬 Mes Commentaires"  onAction="#goMesCommentaires" styleClass="navbar-sub-link"/>
+                <Button fx:id="btnAmis"            text="👤 Amis"              onAction="#goAmis"            styleClass="navbar-sub-link"/>
+            </HBox>
+
+        </VBox>
+    </top>
+
+    <!-- CONTENT AREA -->
+    <center>
+        <BorderPane fx:id="contentArea" style="-fx-background-color:#0d1117;"/>
+    </center>
+
+</BorderPane>

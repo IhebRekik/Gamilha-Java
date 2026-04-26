@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.admin.AdminStreamFormController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA — ADMIN" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Annuler" onAction="#onCancel" styleClass="btn-secondary"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" styleClass="page-header">
+                <padding><Insets top="14" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="pageTitle" text="✏ Modifier le Stream" styleClass="page-title"/>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <VBox spacing="18" prefWidth="700" styleClass="form-wrap">
+                <padding><Insets top="20" right="40" bottom="30" left="40"/></padding>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="INFORMATIONS" styleClass="section-lbl"/>
+                    <VBox spacing="3">
+                        <Label text="Titre *" styleClass="field-lbl"/>
+                        <TextField fx:id="titleField" promptText="Titre du stream" styleClass="field-dark"/>
+                        <Label fx:id="errTitle" styleClass="err-lbl" visible="false" managed="false"/>
+                    </VBox>
+                    <VBox spacing="3">
+                        <Label text="Description" styleClass="field-lbl"/>
+                        <TextArea fx:id="descArea" prefRowCount="3" wrapText="true"
+                                  promptText="Description…" styleClass="area-dark"/>
+                        <Label fx:id="errDesc" styleClass="err-lbl" visible="false" managed="false"/>
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="JEU *" styleClass="section-lbl"/>
+                    <VBox spacing="3">
+                        <Label text="Sélectionner un jeu" styleClass="field-lbl"/>
+                        <ComboBox fx:id="gameCombo" prefWidth="300" styleClass="combo-dark"/>
+                        <Label fx:id="errGame" styleClass="err-lbl" visible="false" managed="false"/>
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="PARAMÈTRES" styleClass="section-lbl"/>
+                    <VBox spacing="3">
+                        <Label text="URL du stream" styleClass="field-lbl"/>
+                        <TextField fx:id="urlField" promptText="https://…" styleClass="field-dark"/>
+                        <Label fx:id="errUrl" styleClass="err-lbl" visible="false" managed="false"/>
+                    </VBox>
+                    <HBox spacing="16">
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Viewers" styleClass="field-lbl"/>
+                            <Spinner fx:id="viewersSpinner" styleClass="spinner-dark"
+                                     editable="true" prefWidth="160"/>
+                        </VBox>
+                        <VBox spacing="3" HBox.hgrow="ALWAYS">
+                            <Label text="Statut" styleClass="field-lbl"/>
+                            <ComboBox fx:id="statusCombo" styleClass="combo-dark" prefWidth="160"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="10" styleClass="form-card">
+                    <Label text="MINIATURE" styleClass="section-lbl"/>
+                    <VBox spacing="3">
+                        <Label text="URL image" styleClass="field-lbl"/>
+                        <TextField fx:id="thumbField" promptText="https://…image.jpg" styleClass="field-dark"/>
+                    </VBox>
+                </VBox>
+
+                <Label fx:id="obsInfo" styleClass="obs-badge" visible="false" managed="false" wrapText="true"/>
+
+                <HBox spacing="12" alignment="CENTER_RIGHT">
+                    <Button text="Annuler" onAction="#onCancel" styleClass="btn-secondary" prefWidth="130"/>
+                    <Button fx:id="submitBtn" text="Enregistrer" onAction="#onSubmit" styleClass="btn-success" prefWidth="200"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

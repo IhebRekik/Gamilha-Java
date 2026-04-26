@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.admin.AdminDonationListController"
+      stylesheets="@../../css/style.css"
+      spacing="0"
+      style="-fx-background-color:#0d1117;">
+
+    <!-- ══ HEADER ══ -->
+    <HBox alignment="CENTER_LEFT" spacing="16"
+          style="-fx-background-color:#111827;-fx-border-color:transparent transparent #1f2937 transparent;-fx-border-width:0 0 1 0;-fx-padding:18 28;">
+        <VBox spacing="3">
+            <Label fx:id="lblTitle" text="💰 Donations"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+            <Label text="Gestion des donations — modification et suppression"
+                   style="-fx-font-size:12px;-fx-text-fill:#6b7280;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Bouton retour : remonte dans la NavBar admin vers AdminStreamList -->
+        <Button text="← Retour aux Streams" onAction="#onBack"
+                style="-fx-background-color:#1f2937;-fx-text-fill:#9ca3af;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;-fx-font-size:13px;"/>
+    </HBox>
+
+    <!-- ══ STATS BAR ══ -->
+    <HBox spacing="16" style="-fx-padding:14 28 0 28;">
+        <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="4"
+              style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:14;">
+            <Label text="💰 TOTAL DONATIONS" style="-fx-text-fill:#6b7280;-fx-font-size:10px;-fx-font-weight:bold;"/>
+            <Label fx:id="lblTotal" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#4ade80;"/>
+        </VBox>
+        <VBox HBox.hgrow="ALWAYS" alignment="CENTER" spacing="4"
+              style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:14;">
+            <Label text="📋 NOMBRE" style="-fx-text-fill:#6b7280;-fx-font-size:10px;-fx-font-weight:bold;"/>
+            <Label fx:id="countLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
+        </VBox>
+    </HBox>
+
+    <!-- ══ FILTRES ══ -->
+    <HBox spacing="10" style="-fx-padding:14 28 10 28;">
+        <TextField fx:id="searchField" promptText="🔍  Donateur ou montant…"
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-color:#111827;-fx-text-fill:#f9fafb;-fx-prompt-text-fill:#4b5563;-fx-border-color:#1f2937;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:8 12;"/>
+        <ComboBox fx:id="sortFilter" prefWidth="200"
+                  style="-fx-background-color:#111827;-fx-border-color:#1f2937;-fx-border-radius:8;-fx-background-radius:8;"/>
+    </HBox>
+
+    <!-- ══ TABLEAU ══ -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-border-color:transparent;-fx-background:transparent;">
+        <VBox style="-fx-padding:0 24 24 24;">
+            <VBox fx:id="donationRows"
+                  style="-fx-background-color:#0d1117;-fx-border-radius:10;-fx-background-radius:10;"/>
+        </VBox>
+    </ScrollPane>
+
+</VBox>
