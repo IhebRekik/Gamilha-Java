@@ -25,6 +25,7 @@ module com.gamilha {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.net.http;
 
     // ── Opens (pour FXML) ─────────────────────────
     opens com.gamilha to javafx.fxml;

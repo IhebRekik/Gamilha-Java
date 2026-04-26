@@ -6,8 +6,12 @@ import com.gamilha.entity.User;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -233,20 +237,62 @@ public class PostService {
 
     // ── SUGGESTION IA — simulation locale (sans clé API) ─────────────────
     public static String suggestContent(String draft) {
-        if (draft == null || draft.isBlank())
-            return "Partagez votre expérience de jeu avec la communauté Gamilha ! 🎮";
-        String lower = draft.toLowerCase();
-        if (lower.contains("tournoi") || lower.contains("compétit"))
-            return " une expérience incroyable ! Niveau élevé, félicitations à tous ! 🏆";
-        if (lower.contains("victoire") || lower.contains("gagn") || lower.contains("win"))
-            return " une fierté immense ! L'équipe a joué brillamment 💪";
-        if (lower.contains("perdu") || lower.contains("defaite"))
-            return " une leçon précieuse. On analyse et on revient plus fort 🔥";
-        if (lower.contains("stream") || lower.contains("live"))
-            return " rejoignez-nous en direct, session explosive 🎥";
-        if (lower.contains("équipe") || lower.contains("team"))
-            return " n'hésitez pas à postuler ! On cherche des joueurs passionnés 👥";
-        return " votre avis compte pour toute la communauté Gamilha ! 💬";
+        try {
+
+            String apiKey = "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";
+
+            String body = "{"
+                    + "\"model\":\"liquid/lfm-2.5-1.2b-thinking:free\","
+                    + "\"messages\":[{"
+                    + "\"role\":\"user\","
+                    + "\"content\":\"Complète ce post gaming en une phrase: " + draft + "\""
+                    + "}]"
+                    + "}";
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://openrouter.ai/api/v1/chat/completions"))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
+                    .header("HTTP-Referer", "http://localhost")
+                    .header("X-Title", "Gamilha")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            HttpResponse<String> response =
+                    HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+            String json = response.body();
+            System.out.println("AI RESPONSE = " + json);
+
+            String suggestion = extractContent(json);
+
+            if(suggestion != null && !suggestion.isBlank())
+                return suggestion;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return simulateSuggestion(draft);
+    }
+    private static String extractContent(String json) {
+
+        int start = json.indexOf("\"content\":\"");
+        if (start == -1) return "";
+
+        start += 11;
+
+        int end = json.indexOf("\",\"refusal\"", start);
+        if (end == -1)
+            end = json.indexOf("\"", start);
+
+        String result = json.substring(start, end);
+
+        return result
+                .replace("\\n"," ")
+                .replace("\\\"","")
+                .replace("\"","")
+                .trim();
     }
 
 
@@ -431,4 +477,22 @@ public class PostService {
         if (content == null) return "";
         return content.replaceAll("^\\[(GRAS|ITALIQUE|CODE|CITATION|PARTAGE)\\]", "").trim();
     }
+    private static String simulateSuggestion(String draft) {
+        if (draft == null || draft.isBlank()) return "Partagez votre expérience de jeu avec la communauté Gamilha ! 🎮";
+        String lower = draft.toLowerCase();
+        if (lower.contains("tournoi") || lower.contains("compétit"))
+            return "... une expérience incroyable ! Le niveau était vraiment élevé, félicitations à tous ! 🏆";
+        if (lower.contains("victoire") || lower.contains("gagn") || lower.contains("win"))
+            return "... une fierté immense ! L'équipe a joué brillamment du début à la fin 💪";
+        if (lower.contains("perdu") || lower.contains("defaite") || lower.contains("loss"))
+            return "... une leçon précieuse. On analyse et on revient plus fort la prochaine fois 🔥";
+        if (lower.contains("stream") || lower.contains("live"))
+            return "... rejoignez-nous en direct, ce sera une session explosive 🎥";
+        if (lower.contains("équipe") || lower.contains("team") || lower.contains("recruit"))
+            return "... n'hésitez pas à postuler ! On cherche des joueurs motivés et passionnés 👥";
+        if (lower.contains("jeu") || lower.contains("game") || lower.contains("gaming"))
+            return "... une session vraiment intense, ce genre de moment rappelle pourquoi on aime l'esport ! 🎮";
+        return "... votre avis compte pour toute la communauté Gamilha ! 💬";
+    }
+
 }
