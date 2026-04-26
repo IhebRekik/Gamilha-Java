@@ -1,0 +1,113 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Gamilha — Corrections ciblées
+   NE PAS toucher aux boutons navbar (gérés par NavBarUserController)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── ScrollPane transparent ─────────────────────────────────────────── */
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TEXT AREA — Correction fond blanc → fond sombre
+   On cible .text-area ET .text-area .content (le nœud interne)
+   ══════════════════════════════════════════════════════════════════════ */
+.text-area {
+    -fx-control-inner-background: #1a1a30;
+    -fx-background-color: #1a1a30;
+    -fx-text-fill: #e2e8f0;
+    -fx-prompt-text-fill: #475569;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.text-area .content {
+    -fx-background-color: #1a1a30;
+    -fx-control-inner-background: #1a1a30;
+    -fx-background-radius: 7;
+}
+.text-area:focused {
+    -fx-border-color: #8b5cf6;
+}
+.text-area:focused .content {
+    -fx-background-color: #1a1e38;
+    -fx-control-inner-background: #1a1e38;
+}
+.text-area .selection {
+    -fx-fill: rgba(139,92,246,0.35);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   CONTEXT MENU (menu ⋮)
+   ══════════════════════════════════════════════════════════════════════ */
+.context-menu {
+    -fx-background-color: #1f1f3a;
+    -fx-border-color: #3a3a5c;
+    -fx-border-width: 1;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+.menu-item { -fx-background-color: transparent; -fx-text-fill: #e6edf3; }
+.menu-item:focused, .menu-item:hover {
+    -fx-background-color: #2a2b4a;
+    -fx-background-radius: 6;
+}
+.menu-item .label { -fx-text-fill: #e6edf3; }
+
+/* ══ MenuButton popup (Traduction) — texte blanc sur fond sombre ═══════ */
+.menu-button { -fx-background-color: transparent; }
+.menu-button .label { -fx-text-fill: #64748b; }
+.menu-button:showing { -fx-background-color: rgba(255,255,255,0.05); }
+
+/* Popup du MenuButton */
+.menu-button .context-menu,
+.menu-button .popup-menu {
+    -fx-background-color: #0d0d1a;
+    -fx-border-color: #3a3a5c;
+    -fx-border-width: 1;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.6),14,0,0,5);
+}
+.menu-button .menu-item {
+    -fx-background-color: transparent;
+}
+.menu-button .menu-item .label {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 13px;
+}
+.menu-button .menu-item:focused .label,
+.menu-button .menu-item:hover .label {
+    -fx-text-fill: #f1f5f9;
+}
+.menu-button .menu-item:focused,
+.menu-button .menu-item:hover {
+    -fx-background-color: rgba(139,92,246,0.15);
+    -fx-background-radius: 6;
+}
+
+/* ══ ComboBox — texte blanc dans la cellule sélectionnée ═══════════════ */
+.combo-box .list-cell {
+    -fx-text-fill: #e2e8f0;
+    -fx-background-color: #21273a;
+    -fx-font-size: 12px;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #0d0d1a;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.combo-box-popup .list-cell {
+    -fx-text-fill: #e2e8f0;
+    -fx-background-color: #0d0d1a;
+    -fx-font-size: 12px;
+    -fx-padding: 6 10;
+}
+.combo-box-popup .list-cell:hover,
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: rgba(139,92,246,0.2);
+    -fx-text-fill: #e2e8f0;
+}

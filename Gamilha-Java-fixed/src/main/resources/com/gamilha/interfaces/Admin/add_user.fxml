@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.gamilha.controllers.AddUserController"
+      spacing="25"
+      alignment="TOP_CENTER"
+      styleClass="content-area">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <children>
+
+        <!-- bouton retour -->
+        <HBox maxWidth="900" alignment="CENTER_LEFT">
+
+            <Button text="← Retour à la liste"
+                    onAction="#cancel"
+                    style="-fx-font-size:14px;
+                           -fx-background-color:#1a1e2e;
+                           -fx-text-fill:#c084fc;
+                           -fx-background-radius:8;
+                           -fx-padding:8 16;"/>
+
+        </HBox>
+
+
+        <!-- titre -->
+        <Label text="➕ Créer un utilisateur"
+               style="-fx-font-size:26px;
+                      -fx-font-weight:bold;
+                      -fx-text-fill:white;"/>
+
+
+        <!-- card -->
+        <VBox maxWidth="900"
+              spacing="22"
+              styleClass="card">
+
+            <padding>
+                <Insets top="35" right="35" bottom="35" left="35"/>
+            </padding>
+
+
+            <GridPane hgap="25" vgap="18">
+
+                <columnConstraints>
+
+                    <ColumnConstraints prefWidth="180"/>
+
+                    <ColumnConstraints hgrow="ALWAYS"/>
+
+                </columnConstraints>
+
+
+                <!-- nom -->
+                <Label text="Nom complet"
+                       style="-fx-text-fill:#c4c4c4;"/>
+
+                <TextField fx:id="nameField"
+                           GridPane.columnIndex="1"
+                           prefWidth="420"
+                           promptText="Ahmed Ben Ali"/>
+
+
+
+                <!-- email -->
+                <Label text="Email"
+                       GridPane.rowIndex="1"
+                       style="-fx-text-fill:#c4c4c4;"/>
+
+                <TextField fx:id="emailField"
+                           GridPane.columnIndex="1"
+                           GridPane.rowIndex="1"
+                           promptText="email@email.com"/>
+
+
+
+                <!-- password -->
+                <Label text="Mot de passe"
+                       GridPane.rowIndex="2"
+                       style="-fx-text-fill:#c4c4c4;"/>
+
+                <PasswordField fx:id="passwordField"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="2"
+                               promptText="minimum 6 caractères"/>
+
+
+
+                <!-- avatar -->
+                <Label text="Photo de profil"
+                       GridPane.rowIndex="3"
+                       style="-fx-text-fill:#c4c4c4;"/>
+
+
+                <HBox spacing="15"
+                      alignment="CENTER_LEFT"
+                      GridPane.columnIndex="1"
+                      GridPane.rowIndex="3">
+
+                    <Button text="Choisir image"
+                            onAction="#chooseAvatar"
+                            styleClass="button-primary"/>
+
+                    <Label fx:id="avatarPathLabel"
+                           text="aucune image"
+                           style="-fx-text-fill:#94a3b8;"/>
+
+                </HBox>
+
+
+
+                <!-- role -->
+                <Label text="Rôle"
+                       GridPane.rowIndex="4"
+                       style="-fx-text-fill:#c4c4c4;"/>
+
+                <ComboBox fx:id="roleCombo"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="4"
+                          prefWidth="200"/>
+
+
+
+                <!-- actif -->
+                <Label text="Compte actif"
+                       GridPane.rowIndex="5"
+                       style="-fx-text-fill:#c4c4c4;"/>
+
+                <CheckBox fx:id="activeCheckBox"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="5"
+                          selected="true"/>
+
+            </GridPane>
+
+        </VBox>
+
+
+
+        <!-- boutons -->
+        <HBox spacing="15"
+              alignment="CENTER_RIGHT"
+              maxWidth="900">
+
+            <Button text="Annuler"
+                    onAction="#cancel"
+                    style="-fx-background-color:#374151;
+                           -fx-text-fill:white;
+                           -fx-background-radius:999;
+                           -fx-padding:10 24;"/>
+
+
+            <Button text="Créer utilisateur"
+                    onAction="#saveUser"
+                    styleClass="button-primary"/>
+
+        </HBox>
+
+
+    </children>
+
+</VBox>

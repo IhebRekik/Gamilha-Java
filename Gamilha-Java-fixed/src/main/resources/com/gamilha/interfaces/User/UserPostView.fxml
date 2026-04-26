@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.UserPostController"
+            style="-fx-background-color:#111827;">
+
+    <!-- ══ HEADER ══ -->
+    <top>
+        <VBox style="-fx-background-color:#0d0d1a;
+                     -fx-border-color:#2a2a40;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label fx:id="welcomeLabel" text="Bonjour !"
+                           style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;"/>
+                    <Label text="Connectez-vous avec la communauté esports"
+                           style="-fx-text-fill:#475569;-fx-font-size:12;"/>
+                </VBox>
+
+                <Button text="＋  Publier" onAction="#onNewPost"
+                        minWidth="110"
+                        style="-fx-background-color:linear-gradient(to right,#8b5cf6,#d946ef);
+                               -fx-text-fill:white;-fx-background-radius:20;
+                               -fx-padding:8 20;-fx-font-size:13;-fx-font-weight:bold;
+                               -fx-cursor:hand;"/>
+
+                <Button text="↺"
+                        onAction="#onRefresh"
+                        prefWidth="40"
+                        prefHeight="40"
+                        minWidth="40"
+                        minHeight="40"
+                        style="-fx-background-color:#1a1e2e;
+               -fx-text-fill:#c9d1d9;
+               -fx-background-radius:10;
+               -fx-font-size:18;
+               -fx-cursor:hand;
+               -fx-padding:0;
+               -fx-border-color:rgba(139,92,246,0.35);
+               -fx-border-width:1;
+               -fx-border-radius:10;"/>            </HBox>
+        </VBox>
+    </top>
+
+
+    <!-- ══ CONTENU CENTRÉ ══ -->
+    <center>
+        <ScrollPane fx:id="mainScroll"
+                    fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    style="-fx-background:transparent;
+                           -fx-background-color:#111827;
+                           -fx-border-color:transparent;">
+
+            <content>
+
+                <!-- CENTRAGE -->
+                <StackPane alignment="TOP_CENTER">
+
+                    <HBox alignment="TOP_CENTER"
+                          spacing="20"
+                          maxWidth="1050">
+
+                        <padding>
+                            <Insets top="20" right="20" bottom="40" left="20"/>
+                        </padding>
+
+                        <!-- COLONNE GAUCHE : POSTS -->
+                        <VBox fx:id="feedBox"
+                              spacing="16"
+                              HBox.hgrow="ALWAYS"
+                              maxWidth="680"
+                              style="-fx-background-color:transparent;"/>
+
+
+                        <!-- COLONNE DROITE : SIDEBAR -->
+                        <VBox spacing="14"
+                              minWidth="310"
+                              maxWidth="310"
+                              prefWidth="310">
+
+                            <!-- Suggestions d'amis -->
+                            <VBox style="-fx-background-color:#161625;
+                                         -fx-background-radius:14;
+                                         -fx-border-radius:14;
+                                         -fx-border-color:rgba(139,92,246,0.3);
+                                         -fx-border-width:1;">
+
+                                <HBox spacing="8" alignment="CENTER_LEFT"
+                                      style="-fx-padding:14 16 12 16;">
+                                    <Label text="👤" style="-fx-font-size:16;"/>
+                                    <Label text="Suggestions d'amis"
+                                           HBox.hgrow="ALWAYS"
+                                           style="-fx-font-weight:bold;
+                                                  -fx-text-fill:#e2e8f0;
+                                                  -fx-font-size:14;"/>
+                                </HBox>
+
+                                <Separator/>
+                                <VBox fx:id="suggestionsBox"
+                                      style="-fx-padding:4 0 8 0;"/>
+                            </VBox>
+
+
+                            <!-- Amis en ligne -->
+                            <VBox style="-fx-background-color:#161625;
+                                         -fx-background-radius:14;
+                                         -fx-border-radius:14;
+                                         -fx-border-color:rgba(34,197,94,0.3);
+                                         -fx-border-width:1;">
+
+                                <HBox spacing="8" alignment="CENTER_LEFT"
+                                      style="-fx-padding:14 16 12 16;">
+                                    <Label text="🟢"/>
+                                    <Label text="Amis en ligne"
+                                           HBox.hgrow="ALWAYS"
+                                           style="-fx-font-weight:bold;
+                                                  -fx-text-fill:#4ade80;
+                                                  -fx-font-size:14;"/>
+                                </HBox>
+
+                                <Separator/>
+                                <VBox fx:id="amisBox"
+                                      style="-fx-padding:4 0 8 0;"/>
+                            </VBox>
+
+
+                            <!-- Smart Feed -->
+                            <VBox spacing="8"
+                                  style="-fx-background-color:#161625;
+                                         -fx-background-radius:14;
+                                         -fx-border-radius:14;
+                                         -fx-border-color:rgba(251,146,60,0.3);
+                                         -fx-border-width:1;
+                                         -fx-padding:14 16 16 16;">
+
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <Label text="📊"/>
+                                    <Label text="Algorithme Smart Feed"
+                                           style="-fx-font-weight:bold;
+                                                  -fx-text-fill:#e2e8f0;
+                                                  -fx-font-size:13;"/>
+                                </HBox>
+
+                                <Separator/>
+
+                                <HBox spacing="8">
+                                    <Label text="🟣"/>
+                                    <Label text="Bordure violette = post d'un ami"
+                                           style="-fx-text-fill:#a78bfa;-fx-font-size:11;"/>
+                                </HBox>
+
+                                <HBox spacing="8">
+                                    <Label text="🔥"/>
+                                    <Label text="Trending = 2 likes ou plus"
+                                           style="-fx-text-fill:#fb923c;-fx-font-size:11;"/>
+                                </HBox>
+
+                                <Label text="Score = amis×3 + likes×0.5 − jours×0.2"
+                                       style="-fx-text-fill:#475569;
+                                              -fx-font-size:10;
+                                              -fx-font-style:italic;"/>
+                            </VBox>
+
+                        </VBox>
+
+                    </HBox>
+
+                </StackPane>
+
+            </content>
+
+        </ScrollPane>
+    </center>
+
+</BorderPane>

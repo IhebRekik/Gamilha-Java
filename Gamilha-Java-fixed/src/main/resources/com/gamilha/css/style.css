@@ -1,0 +1,301 @@
+/* ══════════════════════════════════════════════════════════════════════
+   GAMILHA — Theme Sombre Violet (Version Finale & Propre)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #0a0a0f;
+}
+
+/* ====================== GLOBAL ====================== */
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: #0d0d1a;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #3a3a5c;
+    -fx-background-radius: 4;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: #c84cff;
+}
+.scroll-bar .track {
+    -fx-background-color: #12121a;
+}
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* ====================== INPUTS ====================== */
+.text-field,
+.password-field {
+    -fx-background-color: #1a1a26;
+    -fx-control-inner-background: #1a1a26;
+    -fx-text-fill: #e2e8f0;
+    -fx-prompt-text-fill: #475569;
+    -fx-border-color: #2a2a40;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12;
+}
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #8b5cf6;
+    -fx-background-color: #1e1e2e;
+    -fx-control-inner-background: #1e1e2e;
+}
+
+.text-area {
+    -fx-background-color: #1a1a26;
+    -fx-control-inner-background: #1a1a26;
+    -fx-text-fill: #e2e8f0;
+    -fx-prompt-text-fill: #475569;
+    -fx-border-color: #2a2a40;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 12;
+}
+.text-area .content {
+    -fx-background-color: #1a1a26;
+    -fx-control-inner-background: #1a1a26;
+}
+.text-area:focused {
+    -fx-border-color: #8b5cf6;
+}
+.text-area .selection {
+    -fx-fill: rgba(139, 92, 246, 0.35);
+}
+
+/* ====================== COMBOBOX ====================== */
+.combo-box {
+    -fx-background-color: #1a1a26;
+    -fx-border-color: #2a2a40;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.combo-box .list-cell,
+.combo-box-popup .list-cell {
+    -fx-background-color: #1a1a26;
+    -fx-text-fill: #e2e8f0;
+}
+.combo-box-popup .list-view {
+    -fx-background-color: #1a1a26;
+    -fx-border-color: #2a2a40;
+}
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #2a2a40;
+}
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+.combo-box .arrow {
+    -fx-background-color: #8b949e;
+}
+
+/* ====================== BUTTONS ====================== */
+.button:hover   { -fx-opacity: 0.9; }
+.button:pressed { -fx-opacity: 0.75; }
+
+.btn-primary {
+    -fx-background-color: #8b5cf6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+.btn-primary:hover { -fx-background-color: #7c3aed; }
+
+.btn-danger {
+    -fx-background-color: #dc2626;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+.btn-danger:hover { -fx-background-color: #b91c1c; }
+
+.btn-success {
+    -fx-background-color: #16a34a;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+.btn-success:hover { -fx-background-color: #15803d; }
+
+.btn-secondary {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: #94a3b8;
+    -fx-border-color: #334155;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8 18;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover {
+    -fx-background-color: #334155;
+    -fx-text-fill: #e2e8f0;
+}
+
+/* ====================== LABELS & TEXT ====================== */
+.label {
+    -fx-text-fill: #e2e8f0;
+}
+
+.err-lbl {
+    -fx-text-fill: #ef4444;
+    -fx-font-size: 11px;
+    -fx-padding: 2 0 0 4;
+}
+
+.field-hint {
+    -fx-text-fill: #475569;
+    -fx-font-size: 11px;
+    -fx-padding: 2 0 0 4;
+}
+
+/* ====================== CARDS & PANELS ====================== */
+.form-card,
+.info-panel,
+.section-box,
+.detail-card {
+    -fx-background-color: #1a1a26;
+    -fx-border-color: #2a2a40;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 16 18;
+}
+
+.page-header {
+    -fx-background-color: #0f0f18;
+}
+
+.navbar {
+    -fx-background-color: #141421;
+    -fx-border-color: transparent transparent #2a2a40 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ====================== SPECIAL ====================== */
+.badge-game {
+    -fx-background-color: #1e3a5f;
+    -fx-text-fill: #67e8f9;
+    -fx-background-radius: 20;
+    -fx-padding: 3 10;
+}
+
+.obs-box {
+    -fx-background-color: #0c1a2e;
+    -fx-border-color: #1d4ed8;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.footer {
+    -fx-background-color: #141421;
+    -fx-border-color: #2a2a40 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.footer-text {
+    -fx-text-fill: #475569;
+    -fx-font-size: 11px;
+}
+
+/* ====================== UTILITIES ====================== */
+.stream-thumb {
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.total-badge {
+    -fx-background-color: rgba(74, 222, 128, 0.15);
+    -fx-text-fill: #4ade80;
+    -fx-font-weight: bold;
+    -fx-border-color: rgba(74, 222, 128, 0.3);
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 4 14;
+}
+/* ═══════════════════════════════════════════════════════════════════════
+   MENUBUTTON — popup traduction (texte blanc sur fond sombre)
+   ═══════════════════════════════════════════════════════════════════════ */
+.context-menu {
+    -fx-background-color: #0d0d1a;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-border-color: #3a3a5c;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.6),14,0,0,5);
+    -fx-padding: 4 0;
+}
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 6 16;
+}
+.menu-item .label {
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 13px;
+}
+.menu-item:focused,
+.menu-item:hover {
+    -fx-background-color: rgba(139,92,246,0.18);
+}
+.menu-item:focused .label,
+.menu-item:hover .label {
+    -fx-text-fill: #f1f5f9;
+}
+.separator-menu-item .line {
+    -fx-border-color: #2a2a40;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TextArea fond sombre — correction nœud interne .content
+   ═══════════════════════════════════════════════════════════════════════ */
+.text-area .content {
+    -fx-background-color: #1a1a26;
+    -fx-control-inner-background: #1a1a26;
+    -fx-background-radius: 7;
+}
+.text-area:focused .content {
+    -fx-background-color: #1a1e38;
+    -fx-control-inner-background: #1a1e38;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ComboBox popup — texte blanc
+   ═══════════════════════════════════════════════════════════════════════ */
+.combo-box-popup .list-view {
+    -fx-background-color: #0d0d1a;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.combo-box-popup .list-cell {
+    -fx-text-fill: #e2e8f0;
+    -fx-background-color: transparent;
+    -fx-padding: 6 12;
+    -fx-font-size: 12px;
+}
+.combo-box-popup .list-cell:hover,
+.combo-box-popup .list-cell:filled:selected {
+    -fx-background-color: rgba(139,92,246,0.2);
+    -fx-text-fill: #f1f5f9;
+}
+.combo-box .list-cell {
+    -fx-text-fill: #e2e8f0;
+    -fx-background-color: transparent;
+}

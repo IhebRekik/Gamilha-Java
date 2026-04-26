@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.admin.AdminStreamListController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+
+    <top>
+        <VBox>
+            <!-- ══ NAVBAR admin ══ -->
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA — ADMIN" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="💰 Donations"    onAction="#onDonations"  styleClass="btn-primary"/>
+            </HBox>
+
+            <!-- En-tête — PAS de bouton Créer (admin = RUD uniquement) -->
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-header">
+                <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
+                <Label text="📡 Gestion des Streams" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="↺ Actualiser" onAction="#onRefresh" styleClass="btn-secondary"/>
+                <!-- Pas de bouton "Nouveau Stream" — lecture/modif/suppression uniquement -->
+            </HBox>
+
+            <!-- Filtres -->
+            <HBox spacing="10" styleClass="search-bar">
+                <padding><Insets top="0" right="24" bottom="14" left="24"/></padding>
+                <TextField fx:id="searchField" promptText="🔍  Titre ou URL…"
+                           styleClass="field-dark" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="gameFilter"    prefWidth="150" styleClass="combo-dark"/>
+                <ComboBox fx:id="sortFilter"    prefWidth="190" styleClass="combo-dark"/>
+                <ComboBox fx:id="viewersFilter" prefWidth="150" styleClass="combo-dark"/>
+            </HBox>
+
+            <HBox styleClass="count-bar">
+                <padding><Insets top="0" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="countLabel" text="" styleClass="count-label"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <!--
+          ScrollPane contient un GridPane.
+          Le GridPane est rempli dynamiquement par buildGridPane() dans le contrôleur.
+          3 colonnes définies via ColumnConstraints dans initialize().
+        -->
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <VBox>
+                <padding><Insets topRightBottomLeft="24"/></padding>
+                <GridPane fx:id="streamGrid" styleClass="stream-flow"/>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer">
+            <padding><Insets topRightBottomLeft="10"/></padding>
+            <Label text="Gamilha Admin — Lecture · Modification · Suppression"
+                   styleClass="footer-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>

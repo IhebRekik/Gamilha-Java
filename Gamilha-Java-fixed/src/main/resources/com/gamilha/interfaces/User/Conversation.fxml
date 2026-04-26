@@ -1,0 +1,58 @@
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollPane?>
+
+<VBox spacing="20"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.Messages.ConversationController"
+      style="-fx-background-color:#020617; -fx-padding:25;">
+
+
+    <Label fx:id="titleLabel"
+           text="Conversation"
+           style="-fx-text-fill:white; -fx-font-size:22; -fx-font-weight:bold;" />
+
+
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                style="-fx-background:#020617;">
+
+        <VBox fx:id="messagesBox"
+              spacing="10"
+              style="
+                    -fx-background-color:#111827;
+                    -fx-padding:20;
+                    -fx-background-radius:10;
+              "/>
+
+    </ScrollPane>
+
+
+    <HBox spacing="10"
+          style="
+                -fx-background-color:#1f2937;
+                -fx-padding:10;
+                -fx-background-radius:10;
+          ">
+
+        <TextField fx:id="messageField"
+                   promptText="Écrire un message..."
+                   HBox.hgrow="ALWAYS"
+                   style="
+                        -fx-background-color:#020617;
+                        -fx-text-fill:white;
+                   "/>
+
+
+        <Button text="Envoyer"
+                onAction="#envoyerMessage"
+                style="
+                    -fx-background-color:#22c55e;
+                    -fx-text-fill:white;
+                    -fx-font-weight:bold;
+                "/>
+
+    </HBox>
+
+</VBox>

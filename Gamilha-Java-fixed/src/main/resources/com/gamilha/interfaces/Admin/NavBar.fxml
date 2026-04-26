@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.NavBarAdminController"
+            prefWidth="1200" prefHeight="760"
+            style="-fx-background-color:#111827;">
+
+
+    <!-- SIDEBAR -->
+    <left>
+
+        <VBox prefWidth="245"
+              spacing="3"
+              style="-fx-background-color:#0d0d1a;
+                     -fx-border-color:#1f1f3a;
+                     -fx-border-width:0 1 0 0;">
+
+            <padding>
+                <Insets top="22" right="10" bottom="18" left="10"/>
+            </padding>
+
+
+            <!-- LOGO -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+
+                <HBox.margin>
+                    <Insets bottom="14"/>
+                </HBox.margin>
+
+                <Label text="🎮"
+                       style="-fx-font-size:26;"/>
+
+                <VBox spacing="1">
+
+                    <Label text="Gamilha"
+                           style="-fx-text-fill:#c84cff;
+                                  -fx-font-size:17;
+                                  -fx-font-weight:bold;"/>
+
+                    <Label text="Admin Panel"
+                           style="-fx-text-fill:#6b7280;
+                                  -fx-font-size:10;"/>
+
+                </VBox>
+
+            </HBox>
+
+
+            <Separator/>
+
+
+            <!-- PRINCIPAL -->
+            <Label text="PRINCIPAL"
+                   style="-fx-text-fill:#4b5563;
+                          -fx-font-size:10;
+                          -fx-font-weight:bold;"/>
+
+
+            <Button fx:id="btnDashboard"
+                    text="📊 Dashboard"
+                    onAction="#goDashboard"/>
+
+
+            <Button fx:id="btnUtilisateurs"
+                    text="👥 Utilisateurs"
+                    onAction="#goUtilisateurs"/>
+
+
+
+            <!-- COMPETITIONS -->
+            <Label text="COMPÉTITIONS"
+                   style="-fx-text-fill:#4b5563;
+                          -fx-font-size:10;
+                          -fx-font-weight:bold;"/>
+
+
+            <Button fx:id="btnEvenements"
+                    text="📅 Événements"
+                    onAction="#goEvenements"/>
+
+
+            <Button fx:id="btnMatchs"
+                    text="🏆 Matchs"
+                    onAction="#goMatchs"/>
+
+
+            <Button fx:id="btnBrackets"
+                    text="🧩 Brackets"
+                    onAction="#goBrackets"/>
+
+
+            <Button fx:id="btnEquipes"
+                    text="👨‍👩‍👧 Équipes"
+                    onAction="#goEquipe"/>
+
+
+
+            <!-- CONTENU -->
+            <Label text="CONTENU"
+                   style="-fx-text-fill:#4b5563;
+                          -fx-font-size:10;
+                          -fx-font-weight:bold;"/>
+
+
+            <Button fx:id="btnPlayList"
+                    text="🎓 Coaching"
+                    onAction="#goPlayList"/>
+            <Button fx:id="btnCoaching"
+                    text="🎓 Video"
+                    onAction="#goCoaching"/>
+
+
+            <Button fx:id="btnSocial"
+                    text="🌐 Social"
+                    onAction="#goSocial"/>
+
+
+            <Button fx:id="btnStreams"
+                    text="📡 Streams"
+                    onAction="#goStreams"/>
+
+
+
+            <!-- FINANCE -->
+            <Label text="FINANCE"
+                   style="-fx-text-fill:#4b5563;
+                          -fx-font-size:10;
+                          -fx-font-weight:bold;"/>
+
+
+            <Button fx:id="btnDonations"
+                    text="💰 Donations"
+                    onAction="#goDonations"/>
+
+
+            <Button fx:id="btnAbonnements"
+                    text="💳 Abonnements"
+                    onAction="#goAbonnement"/>
+
+
+            <Button fx:id="btnInscriptions"
+                    text="👤 Inscriptions"
+                    onAction="#goInscriptions"/>
+
+
+            <Button fx:id="btnHistorique"
+                    text="🧾 Historique Paiement"
+                    onAction="#goHistorique"/>
+
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+
+            <Separator/>
+
+
+            <Button text="🚪 Déconnexion"
+                    onAction="#logout"
+                    style="-fx-text-fill:#ff4d4d;"/>
+
+        </VBox>
+
+    </left>
+
+
+
+    <!-- TOP BAR -->
+    <top>
+
+        <HBox alignment="CENTER_RIGHT"
+              style="-fx-background-color:#0d0d1a;
+                     -fx-padding:11 20;">
+
+            <Label fx:id="welcomeLabel"
+                   style="-fx-text-fill:white;"/>
+
+        </HBox>
+
+    </top>
+
+
+
+    <!-- CONTENT -->
+    <center>
+
+        <BorderPane fx:id="contentArea"
+                    style="-fx-background-color:#111827;"/>
+
+    </center>
+
+</BorderPane>
