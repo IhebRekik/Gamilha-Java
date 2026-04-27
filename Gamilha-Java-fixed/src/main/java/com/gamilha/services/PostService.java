@@ -239,7 +239,7 @@ public class PostService {
     public static String suggestContent(String draft) {
         try {
 
-            String apiKey = "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";
+            String apiKey = "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";
 
             String body = "{"
                     + "\"model\":\"liquid/lfm-2.5-1.2b-thinking:free\","
