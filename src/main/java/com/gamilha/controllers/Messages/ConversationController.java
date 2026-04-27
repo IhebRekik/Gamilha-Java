@@ -268,7 +268,9 @@ public class ConversationController {
         }
 
         if (!remaining.isEmpty()) {
-            flow.getChildren().add(new Text(remaining));
+            Text text = new Text(remaining);
+            text.setStyle("-fx-fill: white;");
+            flow.getChildren().add(text);
         }
 
 

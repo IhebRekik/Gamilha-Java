@@ -40,8 +40,8 @@ public class EditAbonnementController {
 
         dureeField.setText(String.valueOf(a.getDuree()));
 
-        abonnement.setAvantages(
-                List.of(avantagesArea.getText().split("\\s*,\\s*"))
+        avantagesArea.setText(
+                String.join(", ", a.getAvantages())
         );
         a.getOptions().forEach(opt -> {
 
@@ -71,10 +71,9 @@ public class EditAbonnementController {
 
         abonnement.setDuree(Integer.parseInt(dureeField.getText()));
 
-        avantagesArea.setText(
-                String.join(", ", abonnement.getAvantages())
+        abonnement.setAvantages(
+                List.of(avantagesArea.getText().split("\\s*,\\s*"))
         );
-
         abonnement.setOptions(getOptions());
 
         service.updateAbonnement(abonnement);

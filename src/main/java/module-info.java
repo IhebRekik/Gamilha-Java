@@ -32,6 +32,8 @@ module com.gamilha {
     requires com.google.zxing;
     requires vosk;
     requires org.slf4j;
+    requires webcam.capture;
+    requires java.prefs;
 
     // Opens for FXML
     opens com.gamilha to javafx.fxml;

@@ -1,58 +1,215 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.gamilha.controllers.RegisterController"
-      spacing="15" alignment="CENTER" prefWidth="460" prefHeight="540"
-      styleClass="register-root">
+<StackPane xmlns="http://javafx.com/javafx/17"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.gamilha.controllers.RegisterController"
+           style="-fx-background-color:linear-gradient(to bottom right,#0a0d1a,#0f1629,#0a0d1a);">
 
-    <padding>
-        <Insets top="30" right="40" bottom="30" left="40"/>
-    </padding>
+    <ScrollPane fitToWidth="true"
+                style="-fx-background:transparent;-fx-background-color:transparent;
+                       -fx-border-color:transparent;" hbarPolicy="NEVER">
 
-    <HBox alignment="CENTER" spacing="10">
-        <StackPane styleClass="logo-badge">
-            <ImageView styleClass="logo" fitWidth="46" fitHeight="46" preserveRatio="true" smooth="true">
-                <image>
-                    <Image url="@../com/gamilha/images/logo.jpg"/>
-                </image>
-            </ImageView>
-        </StackPane>
-        <Label text="Gamilha" styleClass="brand-title"/>
-    </HBox>
+        <VBox alignment="CENTER" spacing="0">
+            <padding><Insets top="30" bottom="30"/></padding>
 
-    <Label text="Créer un compte" styleClass="section-subtitle"/>
+            <!-- Card -->
+            <VBox alignment="TOP_CENTER" spacing="0"
+                  maxWidth="420" prefWidth="420"
+                  style="-fx-background-color:#12172b;
+                         -fx-background-radius:20;
+                         -fx-border-color:#1e2a45;
+                         -fx-border-radius:20;
+                         -fx-border-width:1;
+                         -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.7),40,0,0,16);">
 
-    <Separator styleClass="form-separator"/>
+                <padding><Insets top="36" right="40" bottom="36" left="40"/></padding>
 
-    <Label text="Nom complet" styleClass="form-label"/>
-    <TextField fx:id="nameField" promptText="Votre nom" styleClass="form-text-field"/>
+                <!-- TITLE -->
+                <Label text="Créer un compte"
+                       style="-fx-font-size:24px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;-fx-font-family:'Segoe UI';">
+                    <VBox.margin><Insets bottom="20"/></VBox.margin>
+                </Label>
 
-    <Label text="Email" styleClass="form-label"/>
-    <TextField fx:id="emailField" promptText="exemple@email.com" styleClass="form-text-field"/>
+                <!-- ERROR BANNER -->
+                <VBox fx:id="errorBox" visible="false" managed="false">
+                    <VBox.margin><Insets bottom="14"/></VBox.margin>
+                    <HBox spacing="10" alignment="CENTER_LEFT"
+                          style="-fx-background-color:#3d1111;-fx-border-color:#7f1d1d;
+                                 -fx-border-radius:10;-fx-background-radius:10;-fx-padding:12 14;">
+                        <Label text="⚠" style="-fx-text-fill:#f87171;-fx-font-size:15px;-fx-font-weight:bold;"/>
+                        <VBox spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="Erreur" style="-fx-text-fill:#f87171;-fx-font-size:13px;-fx-font-weight:bold;"/>
+                            <Label fx:id="errorLabel" wrapText="true"
+                                   style="-fx-text-fill:#fca5a5;-fx-font-size:13px;"/>
+                        </VBox>
+                        <Button text="✕" onAction="#clearError"
+                                style="-fx-background-color:transparent;-fx-text-fill:#f87171;
+                                       -fx-cursor:hand;-fx-border-color:transparent;-fx-padding:2 6;"/>
+                    </HBox>
+                </VBox>
 
-    <!-- Avatar -->
-    <Label text="Photo de profil (optionnel)" styleClass="form-label"/>
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button text="Choisir une image" onAction="#chooseAvatar" styleClass="button-primary"/>
-        <Label fx:id="avatarPathLabel" text="Aucune" styleClass="avatar-path-label"/>
-    </HBox>
+                <!-- SUCCESS BANNER -->
+                <Label fx:id="successLabel" wrapText="true" maxWidth="340"
+                       style="-fx-text-fill:#86efac;-fx-background-color:#0f2d18;
+                              -fx-padding:10 14;-fx-background-radius:10;-fx-font-size:13px;
+                              -fx-border-color:#166534;-fx-border-radius:10;-fx-border-width:1;"
+                       visible="false" managed="false">
+                    <VBox.margin><Insets bottom="14"/></VBox.margin>
+                </Label>
 
-    <Label text="Mot de passe" styleClass="form-label"/>
-    <PasswordField fx:id="passwordField" promptText="Minimum 6 caractères" styleClass="form-text-field"/>
+                <!-- AVATAR SECTION -->
+                <VBox alignment="CENTER" spacing="10">
+                    <VBox.margin><Insets bottom="16"/></VBox.margin>
 
-    <Label text="Confirmer le mot de passe" styleClass="form-label"/>
-    <PasswordField fx:id="confirmPasswordField" promptText="Confirmer le mot de passe" styleClass="form-text-field"/>
+                    <!-- Circular avatar -->
+                    <StackPane fx:id="avatarCircle" prefWidth="110" prefHeight="110" maxWidth="110" maxHeight="110"
+                               style="-fx-background-color:#7c3aed;-fx-background-radius:999;">
 
-    <Button text="Créer mon compte" onAction="#handleRegister"
-            styleClass="button-primary button-large"/>
+                        <!-- Placeholder icon -->
+                        <Label fx:id="avatarPlaceholder" text="👤"
+                               style="-fx-font-size:48px;-fx-text-fill:white;"/>
 
-    <Button text="← Retour à la connexion" onAction="#handleBackToLogin"
-            styleClass="button-link"/>
-</VBox>
+                        <!-- Actual image (hidden until file chosen) -->
+                        <ImageView fx:id="avatarImageView"
+                                   fitWidth="110" fitHeight="110"
+                                   preserveRatio="true" smooth="true"
+                                   visible="false" managed="false"/>
+                    </StackPane>
+
+                    <!-- Choose photo button -->
+                    <Button text="📷  Choisir ma photo"
+                            onAction="#chooseAvatar"
+                            style="-fx-background-color:#6d28d9;
+                                   -fx-text-fill:white;
+                                   -fx-background-radius:20;
+                                   -fx-padding:7 20;
+                                   -fx-cursor:hand;
+                                   -fx-font-size:13px;
+                                   -fx-font-weight:bold;"/>
+
+                    <!-- AI status label (hidden until AI done) -->
+                    <Label fx:id="aiStatusLabel"
+                           style="-fx-background-color:#166534;-fx-text-fill:#86efac;
+                                  -fx-background-radius:20;-fx-padding:6 16;
+                                  -fx-font-size:13px;-fx-font-weight:bold;"
+                           visible="false" managed="false"/>
+
+                    <Label fx:id="avatarPathLabel" text=""
+                           style="-fx-text-fill:#64748b;-fx-font-size:11px;"
+                           wrapText="true"/>
+
+                    <!-- AI Generate button -->
+                    <Button text="✨  Générer avatar IA"
+                            onAction="#generateAiAvatar"
+                            style="-fx-background-color:transparent;
+                                   -fx-text-fill:#a78bfa;
+                                   -fx-border-color:#4c1d95;
+                                   -fx-border-radius:20;
+                                   -fx-background-radius:20;
+                                   -fx-padding:5 16;
+                                   -fx-cursor:hand;
+                                   -fx-font-size:12px;"/>
+                </VBox>
+
+                <!-- NOM COMPLET -->
+                <Label text="👤  Nom complet"
+                       style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;-fx-font-weight:bold;">
+                    <VBox.margin><Insets top="4"/></VBox.margin>
+                </Label>
+                <TextField fx:id="nameField" promptText="Votre nom complet"
+                           style="-fx-background-color:#1c2235;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#4b5563;-fx-border-color:#2d3a55;
+                                  -fx-border-radius:10;-fx-background-radius:10;
+                                  -fx-padding:12 14;-fx-font-size:14px;">
+                    <VBox.margin><Insets top="6" bottom="14"/></VBox.margin>
+                </TextField>
+
+                <!-- EMAIL -->
+                <Label text="✉  Email"
+                       style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;-fx-font-weight:bold;"/>
+                <TextField fx:id="emailField" promptText="email@exemple.com"
+                           style="-fx-background-color:#1c2235;-fx-text-fill:white;
+                                  -fx-prompt-text-fill:#4b5563;-fx-border-color:#2d3a55;
+                                  -fx-border-radius:10;-fx-background-radius:10;
+                                  -fx-padding:12 14;-fx-font-size:14px;">
+                    <VBox.margin><Insets top="6" bottom="14"/></VBox.margin>
+                </TextField>
+
+                <!-- MOT DE PASSE -->
+                <Label text="🔒  Mot de passe"
+                       style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;-fx-font-weight:bold;"/>
+
+                <HBox spacing="0" alignment="CENTER"
+                      style="-fx-background-color:#1c2235;-fx-border-color:#2d3a55;
+                             -fx-border-radius:10;-fx-background-radius:10;">
+                    <VBox.margin><Insets top="6" bottom="4"/></VBox.margin>
+
+                    <StackPane HBox.hgrow="ALWAYS">
+                        <PasswordField fx:id="passwordField"
+                                       promptText="Min 8 car., majuscule, chiffre"
+                                       style="-fx-background-color:transparent;-fx-text-fill:white;
+                                              -fx-prompt-text-fill:#4b5563;-fx-border-color:transparent;
+                                              -fx-background-radius:10;-fx-padding:12 14;-fx-font-size:14px;"/>
+                        <TextField fx:id="passwordVisible"
+                                   promptText="Min 8 car., majuscule, chiffre"
+                                   style="-fx-background-color:transparent;-fx-text-fill:white;
+                                          -fx-prompt-text-fill:#4b5563;-fx-border-color:transparent;
+                                          -fx-background-radius:10;-fx-padding:12 14;-fx-font-size:14px;"
+                                   visible="false" managed="false"/>
+                    </StackPane>
+
+                    <Button fx:id="eyeButton" text="👁"
+                            onAction="#toggleEye"
+                            style="-fx-background-color:transparent;-fx-text-fill:#64748b;
+                                   -fx-cursor:hand;-fx-font-size:16px;-fx-padding:8 12;
+                                   -fx-border-color:transparent;"/>
+                </HBox>
+
+                <!-- Strength + hint -->
+                <Label fx:id="strengthLabel"
+                       style="-fx-font-size:12px;"
+                       visible="false" managed="false">
+                    <VBox.margin><Insets top="4"/></VBox.margin>
+                </Label>
+
+                <Label text="ℹ  Min 8 caractères, dont 1 majuscule, 1 minuscule et 1 chiffre"
+                       wrapText="true"
+                       style="-fx-text-fill:#475569;-fx-font-size:11px;">
+                    <VBox.margin><Insets top="4" bottom="20"/></VBox.margin>
+                </Label>
+
+                <!-- REGISTER BUTTON -->
+                <Button text="✚  Créer mon compte"
+                        onAction="#handleRegister"
+                        maxWidth="Infinity"
+                        style="-fx-background-color:#7c3aed;
+                               -fx-text-fill:white;
+                               -fx-font-size:15px;
+                               -fx-font-weight:bold;
+                               -fx-background-radius:12;
+                               -fx-cursor:hand;
+                               -fx-padding:13 0;
+                               -fx-effect:dropshadow(gaussian,rgba(124,58,237,0.4),12,0,0,4);">
+                    <VBox.margin><Insets bottom="16"/></VBox.margin>
+                </Button>
+
+                <!-- Back to login -->
+                <HBox alignment="CENTER" spacing="6">
+                    <Label text="Vous avez déjà un compte ?"
+                           style="-fx-text-fill:#64748b;-fx-font-size:13px;"/>
+                    <Button text="🔑  Se connecter"
+                            onAction="#handleBackToLogin"
+                            style="-fx-background-color:transparent;-fx-text-fill:#a78bfa;
+                                   -fx-font-size:13px;-fx-cursor:hand;-fx-border-color:transparent;
+                                   -fx-padding:0;"/>
+                </HBox>
+
+            </VBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>

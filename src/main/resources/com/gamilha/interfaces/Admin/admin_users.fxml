@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -7,91 +6,70 @@
 <VBox xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.gamilha.controllers.AdminUsersController"
-      spacing="20"
-      styleClass="content-area">
+      spacing="16">
 
-    <padding>
-        <Insets top="25" right="25" bottom="25" left="25"/>
-    </padding>
+    <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
 
-    <children>
+    <!-- Header -->
+    <HBox spacing="16" alignment="CENTER_LEFT">
+        <Label text="👥 Gestion des utilisateurs"
+               style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="+ Créer un utilisateur"
+                onAction="#openNewUserForm"
+                style="-fx-background-color:#16a34a;-fx-text-fill:white;-fx-background-radius:8;
+                       -fx-padding:10 20;-fx-cursor:hand;-fx-font-weight:bold;"/>
+    </HBox>
 
-        <HBox spacing="20" alignment="CENTER_LEFT">
-            <Label text="Gestion des Utilisateurs" styleClass="title"/>
-            <Pane HBox.hgrow="ALWAYS"/>
-            <Button text="+ Créer un utilisateur"
-                    onAction="#openNewUserForm"
-                    styleClass="button-primary"/>
-        </HBox>
+    <!-- Filters -->
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField"
+                   promptText="🔍  Rechercher (nom, email...)"
+                   HBox.hgrow="ALWAYS"
+                   style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;
+                          -fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+        <ComboBox fx:id="roleFilter" prefWidth="175"
+                  style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;"/>
+        <ComboBox fx:id="statusFilter" prefWidth="175"
+                  style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;"/>
+        <ComboBox fx:id="sortFilter" prefWidth="185"
+                  style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;"/>
+        <Button text="⟳" onAction="#handleRefresh"
+                style="-fx-background-color:#374151;-fx-text-fill:white;-fx-background-radius:8;
+                       -fx-padding:10 14;-fx-cursor:hand;-fx-font-size:14px;"/>
+    </HBox>
 
-        <HBox spacing="12" alignment="CENTER_LEFT">
+    <!-- Table -->
+    <TableView fx:id="usersTable"
+               VBox.vgrow="ALWAYS"
+               style="-fx-background-color:#0d1117;-fx-border-color:#1e293b;-fx-border-radius:10;">
 
-            <TextField fx:id="searchField"
-                       promptText="Rechercher (nom, email...)"
-                       HBox.hgrow="ALWAYS"/>
+        <columns>
+            <TableColumn fx:id="colAvatar"   text="AVATAR"   prefWidth="70"/>
+            <TableColumn fx:id="colName"     text="NOM"      prefWidth="160"/>
+            <TableColumn fx:id="colEmail"    text="EMAIL"    prefWidth="260"/>
+            <TableColumn fx:id="colRoles"    text="RÔLE(S)"  prefWidth="130"/>
+            <TableColumn fx:id="colActive"   text="STATUT"   prefWidth="130"/>
+            <TableColumn fx:id="colPresence" text="PRÉSENCE" prefWidth="160"/>
+            <TableColumn fx:id="colActions"  text="ACTIONS"  prefWidth="240"/>
+        </columns>
 
-            <ComboBox fx:id="roleFilter" prefWidth="160"/>
+    </TableView>
 
-            <ComboBox fx:id="statusFilter" prefWidth="160"/>
-
-            <ComboBox fx:id="sortFilter" prefWidth="180"/>
-
-            <Button text="⟳"
-                    onAction="#handleRefresh"
-                    styleClass="button-primary"/>
-
-        </HBox>
-
-        <TableView fx:id="usersTable"
-                   prefHeight="500"
-                   styleClass="table-view">
-
-            <columns>
-
-                <TableColumn fx:id="colAvatar" text="Avatar" prefWidth="70"/>
-
-                <TableColumn fx:id="colName" text="Nom" prefWidth="200"/>
-
-                <TableColumn fx:id="colEmail" text="Email" prefWidth="300"/>
-
-                <TableColumn fx:id="colRoles" text="Rôle(s)" prefWidth="140"/>
-
-                <TableColumn fx:id="colActive" text="Statut" prefWidth="120"/>
-
-                <TableColumn fx:id="colActions" text="Actions" prefWidth="200"/>
-
-            </columns>
-
-        </TableView>
-
-        <HBox spacing="10" alignment="CENTER_LEFT">
-
-            <Label fx:id="paginationInfo"/>
-
-            <Pane HBox.hgrow="ALWAYS"/>
-
-            <Button fx:id="btnFirst"
-                    text="«"
-                    onAction="#goToFirstPage"/>
-
-            <Button fx:id="btnPrev"
-                    text="‹"
-                    onAction="#goToPrevPage"/>
-
-            <HBox fx:id="pageNumbers"
-                  spacing="6"
-                  alignment="CENTER"/>
-
-            <Button fx:id="btnNext"
-                    text="›"
-                    onAction="#goToNextPage"/>
-
-            <Button fx:id="btnLast"
-                    text="»"
-                    onAction="#goToLastPage"/>
-
-        </HBox>
-
-    </children>
+    <!-- Pagination -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Label fx:id="paginationInfo"
+               style="-fx-text-fill:#94a3b8;-fx-font-size:13px;"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnFirst" text="«" onAction="#goToFirstPage"
+                style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:6 10;-fx-cursor:hand;"/>
+        <Button fx:id="btnPrev"  text="‹" onAction="#goToPrevPage"
+                style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:6 10;-fx-cursor:hand;"/>
+        <HBox fx:id="pageNumbers" spacing="5" alignment="CENTER"/>
+        <Button fx:id="btnNext"  text="›" onAction="#goToNextPage"
+                style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:6 10;-fx-cursor:hand;"/>
+        <Button fx:id="btnLast"  text="»" onAction="#goToLastPage"
+                style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:6 10;-fx-cursor:hand;"/>
+    </HBox>
 
 </VBox>

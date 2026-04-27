@@ -6,9 +6,22 @@ import java.util.Properties;
 
 public class EmailSender {
 
-    private static final String FROM_EMAIL = "tonemail@gmail.com";  // ← Change avec ton email
-    private static final String PASSWORD = "ton_app_password";      // ← Mot de passe d'application Gmail
+    private static final String FROM_EMAIL = "bjaouijihen03@gmail.com";  // ← Change avec ton email
+    private static final String PASSWORD = "gkbe actx vbzg mflv";      // ← Mot de passe d'application Gmail
 
+    private static Session buildSession() {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        return Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM_EMAIL, PASSWORD);
+            }
+        });
+    }
     public static void sendResetCode(String toEmail, String code, String userName) {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
@@ -38,6 +51,33 @@ public class EmailSender {
             System.out.println("✅ Email envoyé à " + toEmail);
         } catch (Exception e) {
             System.out.println("❌ Erreur envoi email : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    public static void sendIntruderPhoto(String adminEmail, String suspectEmail, byte[] photoBytes) {
+        try {
+            Message message = new MimeMessage(buildSession());
+            message.setFrom(new InternetAddress(FROM_EMAIL));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(adminEmail));
+            message.setSubject("🚨 Tentatives suspectes - " + suspectEmail);
+
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText("Plusieurs tentatives de connexion échouées ont été détectées pour votre compte : " + suspectEmail +
+                    "\n\nVoici une photo prise lors de la dernière tentative.");
+
+            MimeBodyPart photoPart = new MimeBodyPart();
+            photoPart.setDataHandler(new jakarta.activation.DataHandler(new jakarta.mail.util.ByteArrayDataSource(photoBytes, "image/jpeg")));
+            photoPart.setFileName("intruder.jpg");
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(textPart);
+            multipart.addBodyPart(photoPart);
+
+            message.setContent(multipart);
+            Transport.send(message);
+            System.out.println("✅ Email d'intrusion envoyé à " + adminEmail);
+        } catch (Exception e) {
+            System.err.println("❌ Email photo erreur: " + e.getMessage());
             e.printStackTrace();
         }
     }
