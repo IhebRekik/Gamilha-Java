@@ -1,55 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox spacing="20"
+<VBox spacing="16"
       style="-fx-background-color:#050810;"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.gamilha.controllers.coaching.CoachingVideoController">
 
     <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
 
-    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
     <HBox spacing="12" alignment="CENTER_LEFT">
-        <Button fx:id="btnRetourVideo" text="← Retour"
+        <Button fx:id="btnRetourVideo" text="Retour"
                 style="-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;
                        -fx-background-radius:7;-fx-padding:9 16;-fx-font-size:13;"/>
-        <Label text="🎬 Lecteur Vidéo"
+        <Label text="Lecteur video"
                style="-fx-text-fill:white;-fx-font-size:21;-fx-font-weight:bold;"/>
         <Pane HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnModifierVideo" text="✏️ Modifier"
+        <Button fx:id="btnFavoriteVideo" text="♡"
+                style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                       -fx-background-radius:20;-fx-padding:9 16;-fx-font-size:14;-fx-font-weight:bold;"/>
+        <Button fx:id="btnModifierVideo" text="Modifier"
                 style="-fx-background-color:#d97706;-fx-text-fill:white;
                        -fx-font-weight:bold;-fx-background-radius:8;-fx-padding:9 20;"/>
-        <Button fx:id="btnSupprimerVideo" text="🗑 Supprimer"
+        <Button fx:id="btnSupprimerVideo" text="Supprimer"
                 style="-fx-background-color:#dc2626;-fx-text-fill:white;
                        -fx-font-weight:bold;-fx-background-radius:8;-fx-padding:9 20;"/>
     </HBox>
 
-    <!-- ═══ LECTEUR VIDÉO ════════════════════════════════════════════════════ -->
     <StackPane fx:id="videoContainer"
-               prefHeight="420" maxHeight="480"
-               VBox.vgrow="NEVER"
+               prefHeight="460" maxHeight="520"
                style="-fx-background-color:#000;-fx-background-radius:12;
                       -fx-border-color:#1e293b;-fx-border-radius:12;-fx-border-width:1;
-                      -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.7),20,0,0,6);">
-        <!-- Rempli dynamiquement par le controller (thumbnail+bouton YouTube ou MediaPlayer local) -->
-    </StackPane>
+                      -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.7),20,0,0,6);"/>
 
-    <!-- ═══ INFOS DE LA VIDÉO ════════════════════════════════════════════════ -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Sous-titres API"
+               style="-fx-text-fill:#38bdf8;-fx-font-size:13;-fx-font-weight:bold;"/>
+        <ComboBox fx:id="cbSubtitleLanguage"
+                  prefWidth="260"
+                  promptText="Choisir une langue"
+                  style="-fx-background-color:#0f172a;-fx-text-fill:#e2e8f0;
+                         -fx-prompt-text-fill:#64748b;-fx-mark-color:#38bdf8;"/>
+    </HBox>
+
+    <Label fx:id="lblSubtitleDisplay"
+           text=""
+           wrapText="true"
+           minHeight="48"
+           style="-fx-background-color:#111827;-fx-text-fill:white;
+                  -fx-font-size:16;-fx-font-weight:bold;-fx-alignment:CENTER;
+                  -fx-padding:12 20;-fx-background-radius:10;
+                  -fx-border-color:#334155;-fx-border-radius:10;-fx-border-width:1;"
+           visible="false" managed="false"/>
+
+    <Label fx:id="lblSubtitleStatus"
+           text=""
+           wrapText="true"
+           style="-fx-text-fill:#475569;-fx-font-size:11;-fx-font-style:italic;"
+           visible="false" managed="false"/>
+
     <VBox spacing="16"
           style="-fx-background-color:#1e293b;-fx-background-radius:12;-fx-padding:22;
                  -fx-border-color:#334155;-fx-border-radius:12;-fx-border-width:1;">
 
-        <!-- Titre -->
         <Label fx:id="lblTitreShow" text=""
                style="-fx-text-fill:white;-fx-font-size:20;-fx-font-weight:bold;"
                wrapText="true"/>
 
         <Separator style="-fx-background-color:#334155;"/>
 
-        <!-- Description -->
         <VBox spacing="5">
             <Label text="DESCRIPTION" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
             <Label fx:id="lblDescVideo" text="" wrapText="true"
@@ -58,9 +85,7 @@
 
         <Separator style="-fx-background-color:#334155;"/>
 
-        <!-- Stats en ligne -->
         <HBox spacing="40">
-
             <VBox spacing="5">
                 <Label text="NIVEAU" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
                 <Label fx:id="lblNiveauVideo" text=""
@@ -68,7 +93,7 @@
             </VBox>
 
             <VBox spacing="5">
-                <Label text="DURÉE" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
+                <Label text="DUREE" style="-fx-text-fill:#475569;-fx-font-size:10;-fx-font-weight:bold;"/>
                 <Label fx:id="lblDureeVideo" text=""
                        style="-fx-text-fill:#38bdf8;-fx-font-size:15;-fx-font-weight:bold;"/>
             </VBox>
@@ -84,7 +109,6 @@
                 <Label fx:id="lblPlaylistVideo" text=""
                        style="-fx-text-fill:#fbbf24;-fx-font-size:15;"/>
             </VBox>
-
         </HBox>
     </VBox>
 

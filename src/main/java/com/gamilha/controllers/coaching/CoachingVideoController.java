@@ -1,11 +1,18 @@
 package com.gamilha.controllers.coaching;
 
+import com.gamilha.MainFX;
 import com.gamilha.entity.CoachingVideo;
 import com.gamilha.entity.Playlist;
+import com.gamilha.entity.SubtitleCue;
 import com.gamilha.entity.User;
 import com.gamilha.services.CoachingVideoService;
+import com.gamilha.services.FavoriteVideoService;
+import com.gamilha.services.NotificationService;
 import com.gamilha.services.PlaylistService;
+import com.gamilha.services.PlaylistStatisticsService;
+import com.gamilha.services.SubtitleApiService;
 import com.gamilha.utils.SessionContext;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,17 +21,34 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.application.Platform;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
@@ -34,141 +58,157 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.callback.RenderCallback;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32BufferFormat;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * ══════════════════════════════════════════════════════════════════════════
- *  CONTROLLER UNIQUE — COACHING VIDEO  (affichage en CARDS)
- *  Pages gérées :
- *    • VideoList.fxml  → grille de cards modernes
- *    • VideoForm.fxml  → formulaire + import fichier local OU URL YouTube
- *    • VideoShow.fxml  → détails + lecteur vidéo intégré
- * ══════════════════════════════════════════════════════════════════════════
- */
 public class CoachingVideoController {
 
-    // ─── État statique partagé ────────────────────────────────────────────
-    private static CoachingVideo selectedVideo  = null;
-    private static Playlist      playlistFilter = null;
-    private static boolean       editMode       = false;
-    private static final String  BASE = "/com/gamilha/interfaces/coaching/";
+    private static final String BASE = "/com/gamilha/interfaces/coaching/";
+    private static final DateTimeFormatter LOG_TIME = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+    private static final String LOG_PREFIX = "[SUBTITLE][CTRL]";
+    private static CoachingVideo selectedVideo;
+    private static Playlist playlistFilter;
+    private static boolean editMode;
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  CHAMPS FXML — Page LISTE
-    // ════════════════════════════════════════════════════════════════════════
-    @FXML private TextField        searchInput;
+    // ── Liste ──────────────────────────────────────────────────────────────
+    @FXML private TextField searchInput;
     @FXML private ComboBox<String> filterNiveau;
     @FXML private ComboBox<String> filterPremium;
-    @FXML private Label            lblPlaylistBadge;
-    @FXML private FlowPane         cardsPane;
-    @FXML private Button           btnAdd;
+    @FXML private Label lblPlaylistBadge;
+    @FXML private FlowPane cardsPane;
+    @FXML private Button btnAdd;
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  CHAMPS FXML — Page FORMULAIRE
-    // ════════════════════════════════════════════════════════════════════════
-    @FXML private Label            lblFormTitle;
-    @FXML private TextField        txtTitre;
-    @FXML private TextArea         txtDescription;
-    @FXML private TextField        txtNiveau;
-    @FXML private TextField        txtDuration;
-    @FXML private CheckBox         cbPremium;
+    // ── Formulaire ─────────────────────────────────────────────────────────
+    @FXML private Label lblFormTitle;
+    @FXML private TextField txtTitre;
+    @FXML private TextArea txtDescription;
+    @FXML private ComboBox<String> cbNiveau;       // ← ComboBox (plus TextField)
+    @FXML private TextField txtDuration;
+    @FXML private CheckBox cbPremium;
     @FXML private ComboBox<String> cbPlaylist;
+    @FXML private VBox localSection;
+    @FXML private VBox urlSection;
+    @FXML private TextField txtUrl;
+    @FXML private Button btnChooseVideo;
+    @FXML private Label lblVideoPath;
+    @FXML private Button btnToggleLocal;
+    @FXML private Button btnToggleUrl;
+    @FXML private Label lblErrorVideo;
+    @FXML private Button btnSaveVideo;
+    @FXML private Button btnCancelVideo;
 
-    // Source vidéo — toggle
-    @FXML private VBox             localSection;   // section fichier local
-    @FXML private VBox             urlSection;     // section URL YouTube
-    @FXML private TextField        txtUrl;
-    @FXML private Button           btnChooseVideo;
-    @FXML private Label            lblVideoPath;
-    @FXML private Button           btnToggleLocal;
-    @FXML private Button           btnToggleUrl;
+    // ── Lecteur / Show ─────────────────────────────────────────────────────
+    @FXML private Label lblTitreShow;
+    @FXML private Label lblDescVideo;
+    @FXML private Label lblNiveauVideo;
+    @FXML private Label lblDureeVideo;
+    @FXML private Label lblPremiumVideo;
+    @FXML private Label lblPlaylistVideo;
+    @FXML private StackPane videoContainer;
+    @FXML private Button btnRetourVideo;
+    @FXML private Button btnModifierVideo;
+    @FXML private Button btnSupprimerVideo;
+    @FXML private Button btnFavoriteVideo;
+    @FXML private ComboBox<String> cbSubtitleLanguage;
 
-    @FXML private Label            lblErrorVideo;
-    @FXML private Button           btnSaveVideo;
-    @FXML private Button           btnCancelVideo;
+    // ── Sous-titres automatiques — affichés SOUS la vidéo ──────────────────
+    @FXML private Label lblSubtitleDisplay;   // zone de texte sous la vidéo
+    @FXML private Label lblSubtitleStatus;    // info de chargement
+
+    // ── Services ───────────────────────────────────────────────────────────
+    private final CoachingVideoService videoService           = new CoachingVideoService();
+    private final PlaylistService playlistService             = new PlaylistService();
+    private final FavoriteVideoService favoriteService        = new FavoriteVideoService();
+    private final NotificationService notificationService     = new NotificationService();
+    private final PlaylistStatisticsService statisticsService = new PlaylistStatisticsService();
+    private final SubtitleApiService subtitleApiService       = new SubtitleApiService();
+
+    // ── État ────────────────────────────────────────────────────────────────
+    private final ObservableList<CoachingVideo> masterData = FXCollections.observableArrayList();
+    private List<Playlist> allPlaylists = new ArrayList<>();
+    private String selectedVideoPath;
+    private boolean useLocalFile;
+
+    // ── Lecteur ─────────────────────────────────────────────────────────────
+    private MediaPlayer activePlayer;
+    private MediaPlayerFactory vlcFactory;
+    private EmbeddedMediaPlayer vlcPlayer;
+
+    // ── Sous-titres auto ─────────────────────────────────────────────────────
+    private List<SubtitleCue> autoSubtitles = new ArrayList<>();
+    private List<SubtitleCue> sourceSubtitles = new ArrayList<>();
+    private String sourceSubtitleLanguage = "";
+    private final Map<String, List<SubtitleCue>> subtitleCache = new HashMap<>();
+    private final Map<String, String> subtitleCodesByLabel = new LinkedHashMap<>();
+    private final Map<String, String> subtitleNamesByCode = new LinkedHashMap<>();
+    private boolean subtitleGenerationInProgress;
+    private boolean updatingSubtitleLanguageChoices;
+    private String subtitleRunId = "none";
+    private long subtitleFlowStartMs;
+    private long lastSubtitleTickLogMs;
+    private String lastSubtitleText = "";
 
     // ════════════════════════════════════════════════════════════════════════
-    //  CHAMPS FXML — Page DÉTAILS (Show)
+    //  INIT
     // ════════════════════════════════════════════════════════════════════════
-    @FXML private Label            lblTitreShow;
-    @FXML private Label            lblDescVideo;
-    @FXML private Label            lblNiveauVideo;
-    @FXML private Label            lblDureeVideo;
-    @FXML private Label            lblPremiumVideo;
-    @FXML private Label            lblPlaylistVideo;
-    @FXML private StackPane        videoContainer;
-    @FXML private Button           btnRetourVideo;
-    @FXML private Button           btnModifierVideo;
-    @FXML private Button           btnSupprimerVideo;
 
-    // ─── Services ─────────────────────────────────────────────────────────
-    private final CoachingVideoService videoService    = new CoachingVideoService();
-    private final PlaylistService      playlistService = new PlaylistService();
-    private ObservableList<CoachingVideo> masterData   = FXCollections.observableArrayList();
-    private List<Playlist>             allPlaylists;
+    public static void setPlaylistFilter(Playlist playlist) { playlistFilter = playlist; }
+    public static void setSelectedVideoStatic(CoachingVideo video) { selectedVideo = video; }
 
-    // ─── État formulaire (par instance) ───────────────────────────────────
-    private String  selectedVideoPath = null;
-    private boolean useLocalFile      = false;
-    private MediaPlayer activePlayer  = null;
-
-    // ─── VLCJ — lecteur universel (H.264 + H.265 + tous codecs) ──────────
-    private MediaPlayerFactory  vlcFactory   = null;
-    private EmbeddedMediaPlayer vlcPlayer    = null;
-
-    // ─── Cache thumbs locaux ──────────────────────────────────────────────
-    private static final File THUMB_CACHE_DIR =
-            new File(System.getProperty("java.io.tmpdir"), "gamilha-thumbs");
-
-    // ════════════════════════════════════════════════════════════════════════
-    //  MÉTHODES STATIQUES (appelées depuis d'autres controllers)
-    // ════════════════════════════════════════════════════════════════════════
-    public static void setPlaylistFilter(Playlist p)      { playlistFilter = p; }
-    public static void setSelectedVideoStatic(CoachingVideo v) { selectedVideo = v; }
-
-    // ════════════════════════════════════════════════════════════════════════
-    //  DÉTECTION DE PAGE
-    // ════════════════════════════════════════════════════════════════════════
     @FXML
     public void initialize() {
-        if      (cardsPane    != null) initListPage();
-        else if (txtTitre     != null) initFormPage();
+        if (cardsPane != null)       initListPage();
+        else if (txtTitre != null)   initFormPage();
         else if (lblTitreShow != null) initShowPage();
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  PAGE : LISTE — Grille de cards
+    //  PAGE LISTE
     // ════════════════════════════════════════════════════════════════════════
+
     private void initListPage() {
         chargerDonnees();
 
-        filterNiveau.getItems().add("Tous");
+        filterNiveau.getItems().setAll("Tous");
         filterNiveau.getItems().addAll(
-                masterData.stream().map(CoachingVideo::getNiveau)
-                        .filter(n -> n != null && !n.isEmpty()).distinct().toList()
+                masterData.stream()
+                        .map(CoachingVideo::getNiveau)
+                        .filter(v -> v != null && !v.isBlank())
+                        .distinct().toList()
         );
         filterNiveau.setValue("Tous");
 
-        filterPremium.getItems().addAll("Tous", "🔒 Premium", "❌ Gratuit");
+        filterPremium.getItems().setAll("Tous", "Premium", "Gratuit");
         filterPremium.setValue("Tous");
 
         if (lblPlaylistBadge != null && playlistFilter != null) {
-            lblPlaylistBadge.setText("📂 " + playlistFilter.getTitle());
+            lblPlaylistBadge.setText("Playlist : " + playlistFilter.getTitle());
             lblPlaylistBadge.setVisible(true);
             lblPlaylistBadge.setManaged(true);
         }
 
-        if (btnAdd != null) { btnAdd.setVisible(!isAdmin()); btnAdd.setManaged(!isAdmin()); }
+        if (btnAdd != null) {
+            btnAdd.setVisible(!isAdmin());
+            btnAdd.setManaged(!isAdmin());
+        }
 
         buildCards(masterData);
-
         searchInput.textProperty().addListener((obs, o, n) -> filterList());
         filterNiveau.valueProperty().addListener((obs, o, n) -> filterList());
         filterPremium.valueProperty().addListener((obs, o, n) -> filterList());
@@ -182,400 +222,350 @@ public class CoachingVideoController {
             masterData.addAll(videoService.afficherVideos());
     }
 
-    // ── Construction des cards vidéo ─────────────────────────────────────
     private void buildCards(ObservableList<CoachingVideo> data) {
         cardsPane.getChildren().clear();
-
-        for (CoachingVideo v : data) {
-            cardsPane.getChildren().add(createVideoCard(v));
-        }
-
         if (data.isEmpty()) {
             VBox empty = new VBox(12);
             empty.setAlignment(Pos.CENTER);
             empty.setPadding(new Insets(60));
-            Label ico = new Label("🎬");
-            ico.setStyle("-fx-font-size:52;");
-            Label msg = new Label("Aucune vidéo trouvée.");
-            msg.setStyle("-fx-text-fill:#475569;-fx-font-size:16;");
-            empty.getChildren().addAll(ico, msg);
+            Label icon = new Label("Videos");
+            icon.setStyle("-fx-text-fill:#38bdf8;-fx-font-size:22;-fx-font-weight:bold;");
+            Label msg  = new Label("Aucune video trouvee.");
+            msg.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:14;");
+            empty.getChildren().addAll(icon, msg);
             cardsPane.getChildren().add(empty);
+            return;
         }
+        for (CoachingVideo video : data) cardsPane.getChildren().add(createVideoCard(video));
     }
 
-    private VBox createVideoCard(CoachingVideo v) {
+    private VBox createVideoCard(CoachingVideo video) {
         VBox card = new VBox(0);
-        card.setPrefWidth(295);
-        card.setMaxWidth(295);
-        card.setStyle(
-                "-fx-background-color:#1e293b;-fx-background-radius:14;" +
-                        "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.55),12,0,0,5);"
-        );
-        card.setOnMouseEntered(e -> card.setStyle(
-                "-fx-background-color:#243350;-fx-background-radius:14;" +
-                        "-fx-effect:dropshadow(gaussian,rgba(56,189,248,0.25),16,0,0,4);"
-        ));
-        card.setOnMouseExited(e -> card.setStyle(
-                "-fx-background-color:#1e293b;-fx-background-radius:14;" +
-                        "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.55),12,0,0,5);"
-        ));
+        card.setPrefWidth(300);
+        card.setStyle("-fx-background-color:#1e293b;-fx-background-radius:14;"
+                + "-fx-border-color:#334155;-fx-border-radius:14;");
 
-        // ── Thumbnail ─────────────────────────────────────────────────────
         StackPane thumb = new StackPane();
-        thumb.setPrefHeight(165);
-        thumb.setMinHeight(165);
-        thumb.setStyle("-fx-background-color:linear-gradient(to bottom right,#0c1a3a,#1a1a3e);-fx-background-radius:14 14 0 0;");
+        thumb.setPrefHeight(170);
+        thumb.setStyle("-fx-background-color:linear-gradient(to bottom right,#0f172a,#1d4ed8);"
+                + "-fx-background-radius:14 14 0 0;");
 
-        // Icône par défaut (derrière)
-        Label defIcon = new Label("🎬");
-        defIcon.setStyle("-fx-font-size:48;-fx-text-fill:rgba(255,255,255,0.15);");
-        StackPane.setAlignment(defIcon, Pos.CENTER);
-        thumb.getChildren().add(defIcon);
+        Label fallbackIcon = new Label("VIDEO");
+        fallbackIcon.setStyle("-fx-text-fill:rgba(255,255,255,0.2);-fx-font-size:20;-fx-font-weight:bold;");
+        thumb.getChildren().add(fallbackIcon);
 
-        String url = v.getUrl();
-        boolean isYoutube = url != null && (url.contains("youtube") || url.contains("youtu.be"));
-        boolean isLocal   = url != null && !url.isEmpty() && !url.startsWith("http");
+        String url     = video.getUrl() != null ? video.getUrl() : "";
+        boolean youtube = isYoutubeUrl(url);
+        boolean local   = !url.isBlank() && !url.startsWith("http");
 
-        if (isYoutube) {
-            String ytId = extractYoutubeId(url);
-            if (ytId != null) {
+        if (youtube) {
+            String vid = extractYoutubeId(url);
+            if (vid != null) {
                 try {
-                    Image ytThumb = new Image(
-                            "https://img.youtube.com/vi/" + ytId + "/mqdefault.jpg",
-                            295, 165, false, true, true
-                    );
-                    ImageView iv = new ImageView(ytThumb);
-                    iv.setFitWidth(295); iv.setFitHeight(165); iv.setPreserveRatio(false);
+                    ImageView iv = new ImageView(new Image(
+                            "https://img.youtube.com/vi/" + vid + "/mqdefault.jpg",
+                            300, 170, false, true, true));
+                    iv.setFitWidth(300); iv.setFitHeight(170); iv.setPreserveRatio(false);
                     thumb.getChildren().add(iv);
                 } catch (Exception ignored) {}
             }
-            // Badge YouTube
-            Label ytBadge = new Label("▶ YouTube");
-            ytBadge.setStyle("-fx-background-color:#dc2626;-fx-text-fill:white;-fx-padding:3 8;-fx-background-radius:4;-fx-font-size:10;-fx-font-weight:bold;");
-            StackPane.setAlignment(ytBadge, Pos.BOTTOM_LEFT);
-            StackPane.setMargin(ytBadge, new Insets(0, 0, 6, 6));
-            thumb.getChildren().add(ytBadge);
-
-        } else if (isLocal) {
-            // ── Thumbnail local (générée en arrière-plan via FFmpeg) ──────
-            ImageView localThumb = new ImageView();
-            localThumb.setFitWidth(295);
-            localThumb.setFitHeight(165);
-            localThumb.setPreserveRatio(false);
-            localThumb.setVisible(false);
-            StackPane.setAlignment(localThumb, Pos.CENTER);
-            thumb.getChildren().add(1, localThumb); // après defIcon, avant badges
-
-            generateLocalThumbnail(new File(url), localThumb);
-
-            Label localBadge = new Label("📁 Fichier local");
-            localBadge.setStyle("-fx-background-color:#0369a1;-fx-text-fill:white;-fx-padding:3 8;-fx-background-radius:4;-fx-font-size:10;-fx-font-weight:bold;");
-            StackPane.setAlignment(localBadge, Pos.BOTTOM_LEFT);
-            StackPane.setMargin(localBadge, new Insets(0, 0, 6, 6));
-            thumb.getChildren().add(localBadge);
+        } else if (local) {
+            Label lb = new Label("LOCAL");
+            lb.setStyle("-fx-text-fill:white;-fx-font-size:24;-fx-font-weight:bold;");
+            thumb.getChildren().add(lb);
         }
 
-        // Icône play
-        Label play = new Label("▶");
-        play.setStyle("-fx-font-size:28;-fx-text-fill:rgba(255,255,255,0.8);-fx-effect:dropshadow(gaussian,black,6,0,0,0);");
-        thumb.getChildren().add(play);
+        Label playIcon = new Label("▶");
+        playIcon.setStyle("-fx-text-fill:white;-fx-font-size:28;");
+        thumb.getChildren().add(playIcon);
 
-        // Badge durée
-        Label dur = new Label(v.getDurationFormatted());
-        dur.setStyle("-fx-background-color:rgba(0,0,0,0.85);-fx-text-fill:white;-fx-padding:2 7;-fx-background-radius:4;-fx-font-size:10;");
-        StackPane.setAlignment(dur, Pos.BOTTOM_RIGHT);
-        StackPane.setMargin(dur, new Insets(0, 6, 6, 0));
-        thumb.getChildren().add(dur);
+        Label durationBadge = new Label(video.getDurationFormatted());
+        durationBadge.setStyle("-fx-background-color:rgba(0,0,0,0.75);-fx-text-fill:white;"
+                + "-fx-padding:3 8;-fx-background-radius:6;");
+        StackPane.setAlignment(durationBadge, Pos.BOTTOM_RIGHT);
+        StackPane.setMargin(durationBadge, new Insets(0, 8, 8, 0));
+        thumb.getChildren().add(durationBadge);
 
-        // Badge premium
-        if (v.isPremium()) {
-            Label prem = new Label("🔒 Premium");
-            prem.setStyle("-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-padding:3 8;-fx-background-radius:4;-fx-font-size:10;-fx-font-weight:bold;");
-            StackPane.setAlignment(prem, Pos.TOP_RIGHT);
-            StackPane.setMargin(prem, new Insets(8, 8, 0, 0));
-            thumb.getChildren().add(prem);
+        Button favoriteButton = createFavoriteButton(video);
+        StackPane.setAlignment(favoriteButton, Pos.TOP_LEFT);
+        StackPane.setMargin(favoriteButton, new Insets(8, 0, 0, 8));
+        thumb.getChildren().add(favoriteButton);
+
+        if (video.isPremium()) {
+            Label premiumBadge = new Label("Premium");
+            premiumBadge.setStyle("-fx-background-color:#7c3aed;-fx-text-fill:white;"
+                    + "-fx-padding:3 8;-fx-background-radius:6;");
+            StackPane.setAlignment(premiumBadge, Pos.TOP_RIGHT);
+            StackPane.setMargin(premiumBadge, new Insets(8, 8, 0, 0));
+            thumb.getChildren().add(premiumBadge);
         }
 
-        // ── Contenu ───────────────────────────────────────────────────────
         VBox content = new VBox(8);
-        content.setPadding(new Insets(14, 16, 10, 16));
+        content.setPadding(new Insets(14));
         VBox.setVgrow(content, Priority.ALWAYS);
 
-        Label titleLbl = new Label(v.getTitre());
-        titleLbl.setStyle("-fx-text-fill:white;-fx-font-size:14;-fx-font-weight:bold;");
-        titleLbl.setWrapText(true);
-        titleLbl.setMaxWidth(263);
+        Label title = new Label(video.getTitre());
+        title.setWrapText(true);
+        title.setStyle("-fx-text-fill:white;-fx-font-size:15;-fx-font-weight:bold;");
 
-        String descTxt = v.getDescription() != null ? v.getDescription() : "";
-        if (descTxt.length() > 72) descTxt = descTxt.substring(0, 72) + "…";
-        Label descLbl = new Label(descTxt);
-        descLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:12;");
-        descLbl.setWrapText(true);
-        descLbl.setMaxWidth(263);
+        String descText = video.getDescription() != null ? video.getDescription() : "";
+        if (descText.length() > 90) descText = descText.substring(0, 90) + "...";
+        Label description = new Label(descText);
+        description.setWrapText(true);
+        description.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:12;");
 
-        HBox badges = new HBox(6);
-        badges.setAlignment(Pos.CENTER_LEFT);
-        if (v.getNiveau() != null && !v.getNiveau().isEmpty()) {
-            Label lvl = new Label(v.getNiveau());
-            lvl.setStyle("-fx-background-color:" + niveauColor(v.getNiveau()) + ";-fx-text-fill:white;-fx-padding:3 9;-fx-background-radius:20;-fx-font-size:10;-fx-font-weight:bold;");
-            badges.getChildren().add(lvl);
+        HBox meta = new HBox(6);
+        if (video.getNiveau() != null && !video.getNiveau().isBlank()) {
+            Label level = new Label(video.getNiveau());
+            level.setStyle("-fx-background-color:" + niveauColor(video.getNiveau())
+                    + ";-fx-text-fill:white;-fx-padding:3 8;-fx-background-radius:20;");
+            meta.getChildren().add(level);
         }
-        if (v.getPlaylist() != null && v.getPlaylist().getTitle() != null) {
-            Label pl = new Label("📂 " + v.getPlaylist().getTitle());
-            pl.setStyle("-fx-text-fill:#38bdf8;-fx-font-size:10;-fx-background-color:#0c4a6e;-fx-background-radius:4;-fx-padding:3 8;");
-            badges.getChildren().add(pl);
+        if (video.getPlaylist() != null && video.getPlaylist().getTitle() != null) {
+            Label playlist = new Label(video.getPlaylist().getTitle());
+            playlist.setStyle("-fx-background-color:#0c4a6e;-fx-text-fill:#38bdf8;"
+                    + "-fx-padding:3 8;-fx-background-radius:6;");
+            meta.getChildren().add(playlist);
         }
+        content.getChildren().addAll(title, description, meta);
 
-        content.getChildren().addAll(titleLbl, descLbl, badges);
+        Pane separator = new Pane();
+        separator.setPrefHeight(1);
+        separator.setStyle("-fx-background-color:#334155;");
 
-        // ── Séparateur ────────────────────────────────────────────────────
-        Pane sep = new Pane();
-        sep.setPrefHeight(1);
-        sep.setStyle("-fx-background-color:#334155;");
-
-        // ── Boutons d'action ──────────────────────────────────────────────
-        HBox actions = new HBox(6);
+        HBox actions = new HBox(8);
         actions.setPadding(new Insets(10, 14, 14, 14));
         actions.setAlignment(Pos.CENTER_LEFT);
 
-        Button voir = styledBtn("▶ Voir", "#0284c7");
-        voir.setOnAction(e -> { selectedVideo = v; navigateTo("VideoShow.fxml"); });
+        Button voir = styledBtn("Voir", "#0284c7");
+        voir.setOnAction(e -> { selectedVideo = video; navigateTo("VideoShow.fxml"); });
         actions.getChildren().add(voir);
 
         if (!isAdmin()) {
-            Button modifier  = styledBtn("✏️",  "#d97706");
-            Button supprimer = styledBtn("🗑",   "#dc2626");
-            modifier.setOnAction(e  -> { selectedVideo = v; editMode = true; navigateTo("VideoForm.fxml"); });
-            supprimer.setOnAction(e -> confirmDelete(v));
-            actions.getChildren().addAll(modifier, supprimer);
+            Button modifier  = styledBtn("Modifier",  "#d97706");
+            modifier.setOnAction(e -> { selectedVideo = video; editMode = true; navigateTo("VideoForm.fxml"); });
+            actions.getChildren().add(modifier);
         }
 
-        card.getChildren().addAll(thumb, content, sep, actions);
+        card.getChildren().addAll(thumb, content, separator, actions);
         return card;
     }
 
-    @FXML private void handleAdd() {
-        editMode = false; selectedVideo = null;
-        navigateTo("VideoForm.fxml");
-    }
-
-    @FXML private void handleRetourPlaylist() {
-        playlistFilter = null;
-        navigateTo("PlaylistList.fxml");
-    }
+    @FXML private void handleAdd() { editMode = false; selectedVideo = null; navigateTo("VideoForm.fxml"); }
+    @FXML private void handleRetourPlaylist() { playlistFilter = null; navigateTo("PlaylistList.fxml"); }
 
     private void filterList() {
-        String search  = searchInput.getText() == null ? "" : searchInput.getText().toLowerCase();
+        String search  = searchInput.getText() == null ? "" : searchInput.getText().trim().toLowerCase();
         String niveau  = filterNiveau.getValue();
         String premium = filterPremium.getValue();
 
         ObservableList<CoachingVideo> filtered = masterData.stream()
                 .filter(v -> v.getTitre().toLowerCase().contains(search)
                         || (v.getDescription() != null && v.getDescription().toLowerCase().contains(search)))
-                .filter(v -> niveau == null || "Tous".equals(niveau) || niveau.equals(v.getNiveau()))
-                .filter(v -> {
-                    if ("🔒 Premium".equals(premium)) return v.isPremium();
-                    if ("❌ Gratuit".equals(premium))  return !v.isPremium();
-                    return true;
-                })
+                .filter(v -> niveau  == null || "Tous".equals(niveau)  || niveau.equals(v.getNiveau()))
+                .filter(v -> premium == null || "Tous".equals(premium)
+                        || ("Premium".equals(premium) && v.isPremium())
+                        || ("Gratuit".equals(premium) && !v.isPremium()))
                 .collect(Collectors.toCollection(FXCollections::observableArrayList));
-
         buildCards(filtered);
     }
 
-    private void confirmDelete(CoachingVideo v) {
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer « " + v.getTitre() + " » ?", ButtonType.OK, ButtonType.CANCEL);
-        a.setTitle("Supprimer Vidéo"); a.setHeaderText(null);
-        a.showAndWait().ifPresent(r -> {
-            if (r == ButtonType.OK) {
-                videoService.supprimerVideo(v.getId());
-                masterData.remove(v);
+    private void confirmDelete(CoachingVideo video) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Supprimer \"" + video.getTitre() + "\" ?", ButtonType.OK, ButtonType.CANCEL);
+        alert.setHeaderText(null);
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                videoService.supprimerVideo(video.getId());
+                masterData.remove(video);
                 buildCards(masterData);
             }
         });
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  PAGE : FORMULAIRE — toggle Local / YouTube + FileChooser
+    //  PAGE FORMULAIRE
     // ════════════════════════════════════════════════════════════════════════
+
     private void initFormPage() {
         allPlaylists = playlistService.afficherPlaylists();
 
-        // Remplir ComboBox playlists
-        if (cbPlaylist != null) {
-            cbPlaylist.getItems().clear();
-            cbPlaylist.getItems().add("-- Aucune --");
-            allPlaylists.forEach(p -> cbPlaylist.getItems().add(p.getTitle()));
-            cbPlaylist.setValue("-- Aucune --");
+        // Niveau — ComboBox avec valeurs fixes
+        if (cbNiveau != null) {
+            cbNiveau.getItems().setAll("Debutant", "Intermediaire", "Avance", "Expert");
+            cbNiveau.setValue("Debutant");
         }
+
+        // Playlists
+        cbPlaylist.getItems().clear();
+        cbPlaylist.getItems().add("-- Aucune --");
+        allPlaylists.forEach(p -> cbPlaylist.getItems().add(p.getTitle()));
+        cbPlaylist.setValue("-- Aucune --");
 
         if (editMode && selectedVideo != null) {
-            if (lblFormTitle   != null) lblFormTitle.setText("✏️ Modifier la Vidéo");
+            if (lblFormTitle != null) lblFormTitle.setText("Modifier la video");
             txtTitre.setText(selectedVideo.getTitre());
-            if (txtDescription != null) txtDescription.setText(selectedVideo.getDescription() != null ? selectedVideo.getDescription() : "");
-            if (txtNiveau      != null) txtNiveau.setText(selectedVideo.getNiveau() != null ? selectedVideo.getNiveau() : "");
-            if (txtDuration    != null) txtDuration.setText(String.valueOf(selectedVideo.getDuration()));
-            if (cbPremium      != null) cbPremium.setSelected(selectedVideo.isPremium());
-            if (cbPlaylist     != null && selectedVideo.getPlaylist() != null)
-                cbPlaylist.setValue(selectedVideo.getPlaylist().getTitle());
+            txtDescription.setText(selectedVideo.getDescription() != null ? selectedVideo.getDescription() : "");
+            if (cbNiveau != null && selectedVideo.getNiveau() != null) {
+                cbNiveau.setValue(selectedVideo.getNiveau());
+            }
+            txtDuration.setText(String.valueOf(selectedVideo.getDuration()));
+            cbPremium.setSelected(selectedVideo.isPremium());
+            if (selectedVideo.getPlaylist() != null) cbPlaylist.setValue(selectedVideo.getPlaylist().getTitle());
 
-            // Détecter le type de source
-            String existingUrl = selectedVideo.getUrl();
-            if (existingUrl != null && !existingUrl.startsWith("http") && !existingUrl.isEmpty()) {
-                // Fichier local
-                selectedVideoPath = existingUrl;
+            String existingUrl = selectedVideo.getUrl() != null ? selectedVideo.getUrl() : "";
+            if (!existingUrl.isBlank() && !existingUrl.startsWith("http")) {
                 useLocalFile = true;
+                selectedVideoPath = existingUrl;
             } else {
-                if (txtUrl != null && existingUrl != null) txtUrl.setText(existingUrl);
                 useLocalFile = false;
+                txtUrl.setText(existingUrl);
             }
         } else {
-            if (lblFormTitle != null) lblFormTitle.setText("➕ Nouvelle Vidéo");
-            if (cbPlaylist   != null && playlistFilter != null)
-                cbPlaylist.setValue(playlistFilter.getTitle());
+            if (lblFormTitle != null) lblFormTitle.setText("Nouvelle video");
             useLocalFile = false;
+            if (playlistFilter != null) cbPlaylist.setValue(playlistFilter.getTitle());
         }
 
-        // Appliquer l'état des sections
         appliquerToggle();
 
-        // Handlers boutons toggle
+        if (selectedVideoPath != null && lblVideoPath != null)
+            lblVideoPath.setText("OK " + new File(selectedVideoPath).getName());
+
         if (btnToggleLocal != null) btnToggleLocal.setOnAction(e -> { useLocalFile = true;  appliquerToggle(); });
         if (btnToggleUrl   != null) btnToggleUrl.setOnAction(e   -> { useLocalFile = false; appliquerToggle(); });
-
-        // Pré-remplir label fichier local si existant
-        if (useLocalFile && selectedVideoPath != null && lblVideoPath != null) {
-            String name = selectedVideoPath.contains(File.separator)
-                    ? selectedVideoPath.substring(selectedVideoPath.lastIndexOf(File.separator) + 1)
-                    : selectedVideoPath;
-            lblVideoPath.setText("✅ " + name);
-        }
-
-        if (btnSaveVideo   != null) btnSaveVideo.setOnAction(e -> handleSave());
-        if (btnCancelVideo != null) btnCancelVideo.setOnAction(e -> { editMode = false; selectedVideoPath = null; navigateTo("VideoList.fxml"); });
+        if (btnSaveVideo   != null) btnSaveVideo.setOnAction(e   -> handleSave());
+        if (btnCancelVideo != null) btnCancelVideo.setOnAction(e -> {
+            editMode = false;
+            selectedVideoPath = null;
+            navigateTo("VideoList.fxml");
+        });
     }
 
-    /** Affiche/masque les sections selon le mode sélectionné */
     private void appliquerToggle() {
-        if (localSection != null) { localSection.setVisible(useLocalFile);  localSection.setManaged(useLocalFile);  }
-        if (urlSection   != null) { urlSection.setVisible(!useLocalFile);   urlSection.setManaged(!useLocalFile);   }
+        if (localSection != null) { localSection.setVisible(useLocalFile);  localSection.setManaged(useLocalFile); }
+        if (urlSection   != null) { urlSection.setVisible(!useLocalFile);   urlSection.setManaged(!useLocalFile); }
 
         String activeStyle   = "-fx-background-color:#0284c7;-fx-text-fill:white;-fx-font-weight:bold;-fx-background-radius:8;-fx-padding:8 20;";
         String inactiveStyle = "-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;-fx-background-radius:8;-fx-padding:8 20;";
-
         if (btnToggleLocal != null) btnToggleLocal.setStyle(useLocalFile  ? activeStyle : inactiveStyle);
         if (btnToggleUrl   != null) btnToggleUrl.setStyle(!useLocalFile   ? activeStyle : inactiveStyle);
     }
 
-    /** Ouvre FileChooser pour sélectionner un fichier vidéo local */
     @FXML
     private void handleChooseVideo() {
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Choisir une vidéo");
-        fc.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Vidéos", "*.mp4","*.avi","*.mkv","*.mov","*.wmv","*.flv","*.webm"),
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choisir une video");
+        chooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Videos", "*.mp4","*.avi","*.mkv","*.mov","*.wmv","*.flv","*.webm"),
                 new FileChooser.ExtensionFilter("Tous les fichiers", "*.*")
         );
-        File file = fc.showOpenDialog(btnChooseVideo.getScene().getWindow());
+        File file = chooser.showOpenDialog(btnChooseVideo.getScene().getWindow());
         if (file != null) {
             selectedVideoPath = file.getAbsolutePath();
-            if (lblVideoPath != null) lblVideoPath.setText("✅ " + file.getName());
+            if (lblVideoPath != null) lblVideoPath.setText("OK " + file.getName());
         }
     }
 
     private void handleSave() {
-        if (lblErrorVideo != null) lblErrorVideo.setText("");
+        lblErrorVideo.setText("");
 
-        String titre = txtTitre.getText().trim();
-        if (titre.isEmpty()) {
-            if (lblErrorVideo != null) lblErrorVideo.setText("⚠️ Le titre est obligatoire.");
-            return;
-        }
+        String title = txtTitre.getText().trim();
+        if (title.isEmpty()) { lblErrorVideo.setText("Le titre est obligatoire."); return; }
 
-        // Résoudre la source vidéo
-        String finalUrl;
-        if (useLocalFile) {
-            finalUrl = selectedVideoPath != null ? selectedVideoPath : "";
-        } else {
-            finalUrl = txtUrl != null ? txtUrl.getText().trim() : "";
-        }
+        String finalUrl = useLocalFile
+                ? (selectedVideoPath != null ? selectedVideoPath : "")
+                : txtUrl.getText().trim();
+        if (finalUrl.isBlank()) { lblErrorVideo.setText("La source video est obligatoire."); return; }
 
-        int durationSec = 0;
+        int duration = 0;
         try {
-            if (txtDuration != null && !txtDuration.getText().trim().isEmpty())
-                durationSec = Integer.parseInt(txtDuration.getText().trim());
+            if (!txtDuration.getText().trim().isBlank())
+                duration = Integer.parseInt(txtDuration.getText().trim());
         } catch (NumberFormatException ex) {
-            if (lblErrorVideo != null) lblErrorVideo.setText("⚠️ La durée doit être un entier (secondes).");
-            return;
+            lblErrorVideo.setText("La duree doit etre un entier."); return;
         }
 
-        Playlist playlist = getSelectedPlaylist();
+        // Niveau depuis la ComboBox
+        String niveau = (cbNiveau != null && cbNiveau.getValue() != null)
+                ? cbNiveau.getValue() : "";
 
-        if (editMode && selectedVideo != null) {
-            selectedVideo.setTitre(titre);
-            selectedVideo.setDescription(txtDescription != null ? txtDescription.getText().trim() : "");
-            selectedVideo.setUrl(finalUrl);
-            selectedVideo.setNiveau(txtNiveau != null ? txtNiveau.getText().trim() : "");
-            selectedVideo.setPremium(cbPremium != null && cbPremium.isSelected());
-            selectedVideo.setDuration(durationSec);
-            selectedVideo.setPlaylist(playlist);
-            videoService.modifierVideo(selectedVideo);
-            showAlert(Alert.AlertType.INFORMATION, "Succès", "Vidéo modifiée avec succès !");
-        } else {
-            CoachingVideo v = new CoachingVideo(
-                    titre,
-                    txtDescription != null ? txtDescription.getText().trim() : "",
-                    finalUrl,
-                    txtNiveau != null ? txtNiveau.getText().trim() : "",
-                    cbPremium != null && cbPremium.isSelected(),
-                    durationSec,
-                    playlist
-            );
-            videoService.ajouterVideo(v);
-            showAlert(Alert.AlertType.INFORMATION, "Succès", "Vidéo ajoutée avec succès !");
-        }
+        Playlist playlist   = getSelectedPlaylist();
+        boolean creating    = !(editMode && selectedVideo != null);
+        CoachingVideo video = creating ? new CoachingVideo() : selectedVideo;
+        video.setTitre(title);
+        video.setDescription(txtDescription.getText().trim());
+        video.setUrl(finalUrl);
+        video.setNiveau(niveau);
+        video.setPremium(cbPremium.isSelected());
+        video.setDuration(duration);
+        video.setPlaylist(playlist);
 
-        editMode = false; selectedVideo = null; selectedVideoPath = null;
+        if (creating) videoService.ajouterVideo(video);
+        else          videoService.modifierVideo(video);
+
+        if (creating) notificationService.notifyVideoAdded(playlist, video);
+
+        MainFX.refreshNavigationBadges();
+        showAlert(Alert.AlertType.INFORMATION, "Succes",
+                creating ? "Video ajoutee avec succes !" : "Video modifiee avec succes !");
+
+        editMode          = false;
+        selectedVideo     = null;
+        selectedVideoPath = null;
         navigateTo("VideoList.fxml");
     }
 
     private Playlist getSelectedPlaylist() {
-        if (cbPlaylist == null || cbPlaylist.getValue() == null
-                || "-- Aucune --".equals(cbPlaylist.getValue())) return null;
-        String sel = cbPlaylist.getValue();
-        return allPlaylists.stream().filter(p -> p.getTitle().equals(sel)).findFirst().orElse(null);
+        if (cbPlaylist == null || cbPlaylist.getValue() == null || "-- Aucune --".equals(cbPlaylist.getValue()))
+            return null;
+        return allPlaylists.stream()
+                .filter(p -> p.getTitle().equals(cbPlaylist.getValue()))
+                .findFirst().orElse(null);
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  PAGE : DÉTAILS — avec lecteur vidéo intégré
+    //  PAGE SHOW (Lecteur)
     // ════════════════════════════════════════════════════════════════════════
+
     private void initShowPage() {
         if (selectedVideo == null) { navigateTo("VideoList.fxml"); return; }
 
+        logInfo("initShowPage video id=" + selectedVideo.getId()
+                + ", title=" + selectedVideo.getTitre()
+                + ", url=" + selectedVideo.getUrl()
+                + ", userId=" + getCurrentUserId()
+                + ", isAdmin=" + isAdmin());
+
         lblTitreShow.setText(selectedVideo.getTitre());
-        if (lblDescVideo     != null) lblDescVideo.setText(selectedVideo.getDescription() != null ? selectedVideo.getDescription() : "-");
-        if (lblNiveauVideo   != null) lblNiveauVideo.setText(selectedVideo.getNiveau() != null ? selectedVideo.getNiveau() : "-");
-        if (lblDureeVideo    != null) lblDureeVideo.setText(selectedVideo.getDurationFormatted());
-        if (lblPremiumVideo  != null) lblPremiumVideo.setText(selectedVideo.isPremium() ? "🔒 Premium" : "❌ Gratuit");
-        if (lblPlaylistVideo != null) lblPlaylistVideo.setText(selectedVideo.getPlaylist() != null ? selectedVideo.getPlaylist().getTitle() : "-");
+        lblDescVideo.setText(selectedVideo.getDescription() != null && !selectedVideo.getDescription().isBlank()
+                ? selectedVideo.getDescription() : "-");
+        lblNiveauVideo.setText(selectedVideo.getNiveau() != null && !selectedVideo.getNiveau().isBlank()
+                ? selectedVideo.getNiveau() : "-");
+        lblDureeVideo.setText(selectedVideo.getDurationFormatted());
+        lblPremiumVideo.setText(selectedVideo.isPremium() ? "Premium" : "Gratuit");
+        lblPlaylistVideo.setText(selectedVideo.getPlaylist() != null ? selectedVideo.getPlaylist().getTitle() : "-");
 
-        // ── Lecteur vidéo ─────────────────────────────────────────────────
-        if (videoContainer != null && selectedVideo.getUrl() != null && !selectedVideo.getUrl().isEmpty()) {
-            buildVideoPlayer(selectedVideo.getUrl());
-        }
+        statisticsService.recordView(selectedVideo, getCurrentUserId());
 
-        // Rôle → boutons
+        String videoUrl = selectedVideo.getUrl() != null ? selectedVideo.getUrl() : "";
+        buildVideoPlayer(videoUrl);
+        lancerSousTitresAuto(videoUrl);
+
+        configureFavoriteShowButton();
+
         boolean admin = isAdmin();
-        if (btnModifierVideo  != null) { btnModifierVideo.setVisible(!admin);  btnModifierVideo.setManaged(!admin);  }
-        if (btnSupprimerVideo != null) { btnSupprimerVideo.setVisible(!admin); btnSupprimerVideo.setManaged(!admin); }
+        btnModifierVideo.setVisible(!admin); btnModifierVideo.setManaged(!admin);
+        btnSupprimerVideo.setVisible(!admin); btnSupprimerVideo.setManaged(!admin);
 
-        if (btnRetourVideo    != null) btnRetourVideo.setOnAction(e -> { stopPlayer(); navigateTo("VideoList.fxml"); });
-        if (btnModifierVideo  != null) btnModifierVideo.setOnAction(e -> { stopPlayer(); editMode = true; navigateTo("VideoForm.fxml"); });
-        if (btnSupprimerVideo != null) btnSupprimerVideo.setOnAction(e -> {
-            Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer « " + selectedVideo.getTitre() + " » ?", ButtonType.OK, ButtonType.CANCEL);
-            a.setTitle("Supprimer Vidéo"); a.setHeaderText(null);
-            a.showAndWait().ifPresent(r -> {
-                if (r == ButtonType.OK) {
+        btnRetourVideo.setOnAction(e -> { stopPlayer(); navigateTo("VideoList.fxml"); });
+        btnModifierVideo.setOnAction(e -> { stopPlayer(); editMode = true; navigateTo("VideoForm.fxml"); });
+        btnSupprimerVideo.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Supprimer \"" + selectedVideo.getTitre() + "\" ?", ButtonType.OK, ButtonType.CANCEL);
+            alert.setHeaderText(null);
+            alert.showAndWait().ifPresent(result -> {
+                if (result == ButtonType.OK) {
                     stopPlayer();
                     videoService.supprimerVideo(selectedVideo.getId());
                     selectedVideo = null;
@@ -585,661 +575,1096 @@ public class CoachingVideoController {
         });
     }
 
-    /** Construit le lecteur approprié selon le type de source */
-    private void buildVideoPlayer(String url) {
-        videoContainer.getChildren().clear();
-        videoContainer.setStyle("-fx-background-color:#000;-fx-background-radius:10;");
+    // ════════════════════════════════════════════════════════════════════════
+    //  SOUS-TITRES AUTOMATIQUES — API
+    // ════════════════════════════════════════════════════════════════════════
 
-        boolean isYoutube = url.contains("youtube") || url.contains("youtu.be");
+    /**
+     * Lance la récupération des sous-titres en arrière-plan.
+     * - YouTube : appel à l'API timedtext (gratuit, sans clé)
+     * - Fichier local : message informatif (extensible à Whisper API, AssemblyAI, etc.)
+     */
+    private void lancerSousTitresAuto(String videoUrl) {
+        lancerSousTitresAutoV2(videoUrl);
+    }
 
-        // ── Vidéo locale : demander le mode de lecture ──────────────────────
-        if (!isYoutube && !url.startsWith("http")) {
-            File f = new File(url);
-            if (!f.exists()) {
-                videoContainer.getChildren().add(errorLabel("❌ Fichier introuvable : " + url));
-                return;
-            }
-            showLaunchChoiceScreen(f, url);
+    private void configureSubtitleLanguageComboUi() {
+        if (cbSubtitleLanguage == null) {
             return;
         }
 
-        if (isYoutube) {
-            // ── YouTube → thumbnail + bouton "Ouvrir dans YouTube" ─────────
-            String videoId = extractYoutubeId(url);
+        cbSubtitleLanguage.setStyle(
+                "-fx-background-color:#0f172a;"
+                        + "-fx-text-fill:#e2e8f0;"
+                        + "-fx-prompt-text-fill:#64748b;"
+                        + "-fx-mark-color:#38bdf8;"
+        );
 
-            // Fond gradient derrière la vignette
-            videoContainer.setStyle("-fx-background-color:linear-gradient(to bottom,#0c1220,#000);-fx-background-radius:10;");
-
-            VBox ytBox = new VBox(18);
-            ytBox.setAlignment(Pos.CENTER);
-            ytBox.setMaxWidth(Double.MAX_VALUE);
-            ytBox.setMaxHeight(Double.MAX_VALUE);
-
-            if (videoId != null) {
-                // Thumbnail YouTube (chargée en arrière-plan)
-                StackPane thumbStack = new StackPane();
-                thumbStack.setMaxWidth(640);
-                thumbStack.setMaxHeight(360);
-                thumbStack.setStyle("-fx-background-color:#000;-fx-background-radius:8;-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.8),20,0,0,6);");
-
-                // Image de fond par défaut
-                Label defIco = new Label("🎬");
-                defIco.setStyle("-fx-font-size:64;-fx-text-fill:rgba(255,255,255,0.2);");
-                thumbStack.getChildren().add(defIco);
-
-                try {
-                    Image thumb = new Image(
-                            "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg",
-                            640, 360, false, true, true
-                    );
-                    ImageView thumbIv = new ImageView(thumb);
-                    thumbIv.setFitWidth(640);
-                    thumbIv.setFitHeight(360);
-                    thumbIv.setPreserveRatio(false);
-                    thumbIv.setStyle("-fx-background-radius:8;");
-                    thumbStack.getChildren().add(thumbIv);
-                } catch (Exception ignored) {}
-
-                // Icône play par-dessus
-                Label playOverlay = new Label("▶");
-                playOverlay.setStyle("-fx-font-size:64;-fx-text-fill:rgba(255,255,255,0.85);" +
-                        "-fx-effect:dropshadow(gaussian,black,12,0.4,0,0);");
-                thumbStack.getChildren().add(playOverlay);
-
-                ytBox.getChildren().add(thumbStack);
+        cbSubtitleLanguage.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item);
+                setTextFill(Color.web("#e2e8f0"));
+                setStyle("-fx-background-color:#0f172a;");
             }
-
-            // Titre "YouTube"
-            Label ytLabel = new Label("🎬  Vidéo YouTube");
-            ytLabel.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
-
-            // Bouton principal
-            Button openBtn = new Button("▶  Ouvrir dans YouTube");
-            openBtn.setStyle(
-                    "-fx-background-color:#dc2626;" +
-                            "-fx-text-fill:white;" +
-                            "-fx-font-size:15;" +
-                            "-fx-font-weight:bold;" +
-                            "-fx-background-radius:9;" +
-                            "-fx-padding:12 30;" +
-                            "-fx-effect:dropshadow(gaussian,rgba(220,38,38,0.55),14,0,0,4);"
-            );
-            final String finalUrl = url;
-            openBtn.setOnAction(ev -> openUrlInBrowser(finalUrl));
-
-            ytBox.getChildren().addAll(ytLabel, openBtn);
-            videoContainer.getChildren().add(ytBox);
-
-        } else {
-            videoContainer.getChildren().add(errorLabel("⚠️ Aucun lecteur disponible pour cette URL."));
-        }
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    //  ÉCRAN DE CHOIX — Lancer dans l'app  OU  avec lecteur externe
-    // ════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Affiche un écran de choix stylisé directement dans videoContainer.
-     * L'utilisateur choisit entre lecteur intégré et lecteur externe.
-     */
-    private void showLaunchChoiceScreen(File f, String url) {
-        videoContainer.getChildren().clear();
-        videoContainer.setStyle(
-            "-fx-background-color:linear-gradient(to bottom,#0c1a2e,#0a0f1a);" +
-            "-fx-background-radius:10;"
-        );
-
-        // ── Icône / titre ────────────────────────────────────────────────
-        Label ico = new Label("🎬");
-        ico.setStyle("-fx-font-size:52;");
-
-        String fname = f.getName();
-        Label nameLabel = new Label("📁  " + fname);
-        nameLabel.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
-
-        Label question = new Label("Comment voulez-vous lire cette vidéo ?");
-        question.setStyle("-fx-text-fill:#e2e8f0;-fx-font-size:15;-fx-font-weight:bold;");
-
-        // ── Bouton : Lire dans l'application ────────────────────────────
-        VBox btnInApp = buildChoiceButton(
-            "▶  Lire dans l'application",
-            "Lecteur intégré  •  Recommandé pour PC performant",
-            "#0284c7",
-            "#0c1a2e",
-            "rgba(2,132,199,0.25)"
-        );
-        btnInApp.setOnMouseClicked(e -> {
-            videoContainer.setStyle("-fx-background-color:#000;-fx-background-radius:10;");
-            videoContainer.getChildren().clear();
-            buildJfxPlayerInContainer(f, url, videoContainer);
         });
 
-        // ── Bouton : Ouvrir avec lecteur externe ─────────────────────────
-        VBox btnExternal = buildChoiceButton(
-            "📂  Ouvrir avec lecteur externe",
-            "VLC, Windows Media Player…  •  Recommandé pour PC modeste",
-            "#7c3aed",
-            "#1a0c2e",
-            "rgba(124,58,237,0.25)"
-        );
-        btnExternal.setOnMouseClicked(e -> openWithSystem(f));
-
-        // ── Layout ───────────────────────────────────────────────────────
-        HBox buttons = new HBox(20, btnInApp, btnExternal);
-        buttons.setAlignment(Pos.CENTER);
-        buttons.setMaxWidth(Double.MAX_VALUE);
-
-        VBox box = new VBox(16, ico, nameLabel, question, buttons);
-        box.setAlignment(Pos.CENTER);
-        box.setPadding(new Insets(24));
-        box.setMaxWidth(Double.MAX_VALUE);
-
-        videoContainer.getChildren().add(box);
-    }
-
-    /** Construit un bouton de choix stylisé (carte cliquable). */
-    private VBox buildChoiceButton(String title, String subtitle,
-                                   String borderColor, String bgColor,
-                                   String hoverBg) {
-        Label titleLbl = new Label(title);
-        titleLbl.setStyle("-fx-text-fill:white;-fx-font-size:14;-fx-font-weight:bold;");
-
-        Label subLbl = new Label(subtitle);
-        subLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:11;");
-        subLbl.setWrapText(true);
-
-        VBox card = new VBox(6, titleLbl, subLbl);
-        card.setAlignment(Pos.CENTER);
-        card.setPrefWidth(220);
-        card.setMaxWidth(220);
-        card.setPadding(new Insets(18, 20, 18, 20));
-        card.setStyle(
-            "-fx-background-color:" + bgColor + ";" +
-            "-fx-background-radius:12;" +
-            "-fx-border-color:" + borderColor + ";" +
-            "-fx-border-radius:12;-fx-border-width:2;" +
-            "-fx-cursor:hand;" +
-            "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.5),10,0,0,4);"
-        );
-        card.setOnMouseEntered(e -> card.setStyle(
-            "-fx-background-color:" + hoverBg + ";" +
-            "-fx-background-radius:12;" +
-            "-fx-border-color:" + borderColor + ";" +
-            "-fx-border-radius:12;-fx-border-width:2;" +
-            "-fx-cursor:hand;" +
-            "-fx-effect:dropshadow(gaussian," + borderColor + ",16,0.3,0,0);"
-        ));
-        card.setOnMouseExited(e -> card.setStyle(
-            "-fx-background-color:" + bgColor + ";" +
-            "-fx-background-radius:12;" +
-            "-fx-border-color:" + borderColor + ";" +
-            "-fx-border-radius:12;-fx-border-width:2;" +
-            "-fx-cursor:hand;" +
-            "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.5),10,0,0,4);"
-        ));
-        return card;
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    //  DÉTECTION VLC / FFMPEG
-    // ════════════════════════════════════════════════════════════════════════
-
-    /** Retourne le répertoire d'installation de VLC, ou null si non trouvé. */
-    private static String findVlcPath() {
-        String[] candidates = {
-                "C:\\Program Files\\VideoLAN\\VLC",
-                "C:\\Program Files (x86)\\VideoLAN\\VLC",
-                System.getenv("USERPROFILE") != null
-                        ? System.getenv("USERPROFILE") + "\\AppData\\Local\\VideoLAN\\VLC" : ""
-        };
-        for (String c : candidates) {
-            if (!c.isEmpty() && new File(c, "libvlc.dll").exists()) return c;
-        }
-        // Vérifier PATH système
-        try {
-            ProcessBuilder pb = new ProcessBuilder("where", "vlc");
-            pb.redirectErrorStream(true);
-            Process p = pb.start();
-            if (p.waitFor(2, TimeUnit.SECONDS) && p.exitValue() == 0) {
-                String line = new String(p.getInputStream().readAllBytes()).trim().split("\\r?\\n")[0];
-                File vlcExe = new File(line);
-                if (vlcExe.exists()) return vlcExe.getParent();
+        cbSubtitleLanguage.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item);
+                setTextFill(Color.web("#e2e8f0"));
+                setStyle(empty ? "-fx-background-color:#0f172a;" : "-fx-background-color:#111827;");
             }
-        } catch (Exception ignored) {}
-        return null;
+        });
     }
 
-    /** Retourne le chemin vers ffmpeg.exe, ou null si non disponible. */
-    private static String findFFmpeg() {
-        String[] candidates = {
-                "C:\\ffmpeg\\bin\\ffmpeg.exe",
-                "C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe",
-                "C:\\Program Files (x86)\\ffmpeg\\bin\\ffmpeg.exe",
-                System.getenv("USERPROFILE") != null
-                        ? System.getenv("USERPROFILE") + "\\ffmpeg\\bin\\ffmpeg.exe" : ""
-        };
-        for (String c : candidates) {
-            if (!c.isEmpty() && new File(c).exists()) return c;
+    /** Affiche ou cache la zone de sous-titres sous la vidéo */
+    private void afficherSousTitre(String text) {
+        if (lblSubtitleDisplay == null) return;
+        boolean visible = text != null && !text.isBlank();
+        lblSubtitleDisplay.setText(visible ? text : "");
+        lblSubtitleDisplay.setVisible(visible);
+        lblSubtitleDisplay.setManaged(visible);
+
+        String normalized = text == null ? "" : text.trim();
+        if (!normalized.equals(lastSubtitleText)) {
+            lastSubtitleText = normalized;
+            if (!normalized.isEmpty()) {
+                logInfo("subtitle display update: text=" + shorten(normalized, 120));
+            }
         }
-        // Vérifier PATH
-        try {
-            Process p = new ProcessBuilder("ffmpeg", "-version").redirectErrorStream(true).start();
-            if (p.waitFor(3, TimeUnit.SECONDS) && p.exitValue() == 0) return "ffmpeg";
-        } catch (Exception ignored) {}
-        return null;
+    }
+
+    private void afficherStatutSousTitres(String msg) {
+        if (lblSubtitleStatus == null) return;
+        lblSubtitleStatus.setText(msg);
+        lblSubtitleStatus.setVisible(true);
+        lblSubtitleStatus.setManaged(true);
+        logInfo("subtitle status: " + msg);
+    }
+
+    private void masquerStatutSousTitres() {
+        if (lblSubtitleStatus == null) return;
+        lblSubtitleStatus.setVisible(false);
+        lblSubtitleStatus.setManaged(false);
+        logInfo("subtitle status cleared");
+    }
+
+    /** Appelé à chaque tick du player pour mettre à jour les sous-titres */
+    private void updateSubtitleDisplay(long positionMillis) {
+        if (autoSubtitles == null || autoSubtitles.isEmpty()) {
+            afficherSousTitre("");
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        if (now - lastSubtitleTickLogMs > 5000) {
+            lastSubtitleTickLogMs = now;
+            logInfo("subtitle tick: positionMs=" + positionMillis + ", activeCues=" + autoSubtitles.size());
+        }
+
+        String text = subtitleApiService.getSubtitleAt(autoSubtitles, positionMillis);
+        afficherSousTitre(text);
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    //  THUMBNAIL LOCAL (FFmpeg async)
+    //  LECTEUR VIDÉO
     // ════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Génère la thumbnail d'une vidéo locale en arrière-plan via FFmpeg,
-     * puis met à jour l'ImageView sur le thread JavaFX.
-     */
-    private void generateLocalThumbnail(File videoFile, ImageView target) {
-        Thread t = new Thread(() -> {
+    private void buildVideoPlayer(String url) {
+        buildIntegratedVideoPlayer(url);
+    }
+
+    private void buildYoutubePreview(String url) {
+        String videoId = extractYoutubeId(url);
+        VBox content = new VBox(16);
+        content.setAlignment(Pos.CENTER);
+
+        StackPane preview = new StackPane();
+        preview.setMaxWidth(760); preview.setMaxHeight(420);
+        preview.setStyle("-fx-background-color:#0f172a;-fx-background-radius:12;");
+
+        if (videoId != null) {
             try {
-                THUMB_CACHE_DIR.mkdirs();
-                String hash  = Integer.toHexString(videoFile.getAbsolutePath().hashCode());
-                File cache   = new File(THUMB_CACHE_DIR, hash + ".jpg");
+                ImageView iv = new ImageView(new Image(
+                        "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg",
+                        760, 420, false, true, true));
+                iv.setFitWidth(760); iv.setFitHeight(420); iv.setPreserveRatio(false);
+                preview.getChildren().add(iv);
+            } catch (Exception ignored) {}
+        }
+        Label play = new Label("Ouvrir dans YouTube");
+        play.setStyle("-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;");
+        preview.getChildren().add(play);
 
-                if (!cache.exists() || cache.length() == 0) {
-                    String ffmpeg = findFFmpeg();
-                    if (ffmpeg == null) return; // FFmpeg absent → pas de thumbnail
+        Button openButton = new Button("Lancer dans le navigateur");
+        openButton.setStyle("-fx-background-color:#dc2626;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:10 18;");
+        openButton.setOnAction(e -> openUrlInBrowser(url));
 
-                    ProcessBuilder pb = new ProcessBuilder(
-                            ffmpeg, "-y",
-                            "-ss", "00:00:02",
-                            "-i",  videoFile.getAbsolutePath(),
-                            "-vframes", "1",
-                            "-vf", "scale=295:165:force_original_aspect_ratio=decrease,pad=295:165:(ow-iw)/2:(oh-ih)/2:color=black",
-                            "-q:v", "3",
-                            cache.getAbsolutePath()
-                    );
-                    pb.redirectErrorStream(true);
-                    Process p = pb.start();
-                    boolean done = p.waitFor(20, TimeUnit.SECONDS);
-                    if (!done) { p.destroyForcibly(); return; }
-                }
-
-                if (cache.exists() && cache.length() > 0) {
-                    Image img = new Image(cache.toURI().toString(), 295, 165, false, true);
-                    Platform.runLater(() -> {
-                        target.setImage(img);
-                        target.setVisible(true);
-                    });
-                }
-            } catch (Exception e) {
-                System.err.println("[THUMB] " + e.getMessage());
-            }
-        });
-        t.setDaemon(true);
-        t.start();
+        content.getChildren().addAll(preview, openButton);
+        videoContainer.getChildren().add(content);
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  LECTEUR VLCJ (tous codecs : H.264, H.265/HEVC, AVI, MKV…)
-    // ════════════════════════════════════════════════════════════════════════
-
-    /**
-     * Construit un lecteur VLC intégré dans videoContainer.
-     * Le rendu se fait via un Canvas JavaFX + callback pixel VLCJ.
-     */
     private void buildVlcPlayerInContainer(String filePath, StackPane container) {
+        String vlcHome = findVlcPath();
+        if (vlcHome == null) { buildJfxPlayerInContainer(new File(filePath), container); return; }
+
         try {
-            String vlcHome = findVlcPath();
-            if (vlcHome == null) { buildJfxPlayerInContainer(new File(filePath), filePath, container); return; }
-
-            // Indiquer à JNA où trouver libvlc.dll
             System.setProperty("jna.library.path", vlcHome);
-
-            // Canvas qui recevra chaque frame décodée par VLC
-            // ⚠️ Taille bornée à 1280×720 max pour éviter le dépassement
-            //    de texture GPU (NPE NGCanvas$RenderBuf sur cartes faibles)
-            Canvas canvas = new Canvas(720, 405);
-            canvas.setStyle("-fx-background-color:#000;");
-            
-
-            // Lier la taille au container, mais JAMAIS au-delà de 1280×720
-            canvas.widthProperty().bind(
-                javafx.beans.binding.Bindings.min(container.widthProperty(), 1280)
-            );
-            canvas.heightProperty().bind(
-                javafx.beans.binding.Bindings.min(
-                    container.heightProperty().subtract(60), 720
-                )
-            );
-
-            WritableImage[] imgRef = {new WritableImage(1280, 720)};
-
-            vlcFactory = new MediaPlayerFactory(vlcHome,
-                    "--no-video-title-show", "--quiet", "--no-osd",
-                    "--no-snapshot-preview");
+            vlcFactory = new MediaPlayerFactory("--quiet", "--no-video-title-show", "--no-osd");
             vlcPlayer  = vlcFactory.mediaPlayers().newEmbeddedMediaPlayer();
 
-            // ── Buffer format : BGRA 32 bits ──────────────────────────────
-            BufferFormatCallback bfc = new BufferFormatCallback() {
+            Canvas canvas = new Canvas(960, 520);
+            WritableImage[] imageRef = {new WritableImage(960, 520)};
+
+            BufferFormatCallback formatCallback = new BufferFormatCallback() {
                 @Override
                 public BufferFormat getBufferFormat(int sw, int sh) {
-                    // Guard : dimensions valides avant de créer la WritableImage
-                    if (sw > 0 && sh > 0)
-                        Platform.runLater(() -> imgRef[0] = new WritableImage(sw, sh));
-                    return new RV32BufferFormat(sw, sh);
+                    int w = Math.max(sw, 1), h = Math.max(sh, 1);
+                    Platform.runLater(() -> imageRef[0] = new WritableImage(w, h));
+                    return new RV32BufferFormat(w, h);
                 }
-                @Override public void allocatedBuffers(ByteBuffer[] buffers) {}
+                @Override public void allocatedBuffers(ByteBuffer[] b) {}
             };
 
-            // ── Callback de rendu — copie les pixels dans la WritableImage ─
-            RenderCallback rc = (mp, nativeBuffers, fmt) -> {
+            RenderCallback renderCallback = (mp, nativeBuffers, bufferFormat) -> {
                 ByteBuffer buf = nativeBuffers[0];
-                final byte[] bytes = new byte[fmt.getWidth() * fmt.getHeight() * 4];
-                buf.get(bytes);
-                buf.rewind();
+                byte[] bytes = new byte[bufferFormat.getWidth() * bufferFormat.getHeight() * 4];
+                buf.get(bytes); buf.rewind();
                 Platform.runLater(() -> {
-                    WritableImage img = imgRef[0];
-                    double cw = canvas.getWidth();
-                    double ch = canvas.getHeight();
-                    // Guard : canvas doit avoir des dimensions valides
-                    //         ET la WritableImage doit correspondre au format reçu
-                    if (img != null && cw > 1 && ch > 1
-                            && (int) img.getWidth() == fmt.getWidth()) {
-                        img.getPixelWriter().setPixels(
-                                0, 0, fmt.getWidth(), fmt.getHeight(),
-                                PixelFormat.getByteBgraInstance(),
-                                bytes, 0, fmt.getWidth() * 4
-                        );
-                        canvas.getGraphicsContext2D()
-                                .drawImage(img, 0, 0, cw, ch);
+                    WritableImage img = imageRef[0];
+                    if (img != null) {
+                        img.getPixelWriter().setPixels(0, 0, bufferFormat.getWidth(), bufferFormat.getHeight(),
+                                PixelFormat.getByteBgraInstance(), bytes, 0, bufferFormat.getWidth() * 4);
+                        canvas.getGraphicsContext2D().drawImage(img, 0, 0, canvas.getWidth(), canvas.getHeight());
                     }
                 });
             };
 
             vlcPlayer.videoSurface().set(
-                    vlcFactory.videoSurfaces().newVideoSurface(bfc, rc, true)
-            );
+                    vlcFactory.videoSurfaces().newVideoSurface(formatCallback, renderCallback, true));
             vlcPlayer.media().play(filePath);
 
-            // ── Contrôles VLC ─────────────────────────────────────────────
-            final EmbeddedMediaPlayer player = vlcPlayer;
-
             Slider seekBar = new Slider(0, 1, 0);
             seekBar.setPrefWidth(Double.MAX_VALUE);
             HBox.setHgrow(seekBar, Priority.ALWAYS);
-            seekBar.setStyle("-fx-accent:#38bdf8;");
 
-            // Mise à jour de la seek bar (depuis thread VLC → FX thread)
-            new Thread(() -> {
-                while (player.status().isPlayable() || player.media().info() == null) {
-                    try { Thread.sleep(500); } catch (InterruptedException ie) { break; }
-                    float pos = player.status().position();
-                    Platform.runLater(() -> {
-                        if (!seekBar.isValueChanging()) seekBar.setValue(pos);
-                    });
-                }
-            }, "vlc-seek-updater").start();
-
-            seekBar.setOnMousePressed(e  -> player.controls().setPosition((float) seekBar.getValue()));
-            seekBar.setOnMouseDragged(e  -> player.controls().setPosition((float) seekBar.getValue()));
-
-            Button playPause = new Button("⏸ Pause");
-            playPause.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;" +
-                    "-fx-font-size:12;-fx-font-weight:bold;-fx-background-radius:6;-fx-padding:6 16;");
-            playPause.setPrefWidth(110);
+            Button playPause = new Button("Pause");
+            playPause.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;-fx-background-radius:8;");
             playPause.setOnAction(e -> {
-                if (player.status().isPlaying()) { player.controls().pause(); playPause.setText("▶ Lecture"); }
-                else                             { player.controls().play();  playPause.setText("⏸ Pause"); }
+                if (vlcPlayer.status().isPlaying()) { vlcPlayer.controls().pause(); playPause.setText("Lecture"); }
+                else { vlcPlayer.controls().play(); playPause.setText("Pause"); }
             });
 
-            Label volLbl = new Label("🔊");
-            volLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
-            Slider volSlider = new Slider(0, 100, 80);
-            volSlider.setPrefWidth(90);
-            volSlider.setStyle("-fx-accent:#38bdf8;");
-            player.audio().setVolume(80);
-            volSlider.valueProperty().addListener((obs, o, n) -> player.audio().setVolume(n.intValue()));
+            Label timeLabel = new Label("0:00");
+            timeLabel.setStyle("-fx-text-fill:#94a3b8;");
 
-            Label timeLbl = new Label("0:00");
-            timeLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:11;");
-            new Thread(() -> {
-                while (true) {
-                    try { Thread.sleep(500); } catch (InterruptedException ie) { break; }
-                    long ms = player.status().time();
+            Slider volume = new Slider(0, 100, 80);
+            volume.setPrefWidth(100);
+            vlcPlayer.audio().setVolume(80);
+            volume.valueProperty().addListener((obs, o, n) -> vlcPlayer.audio().setVolume(n.intValue()));
+
+            Thread updater = new Thread(() -> {
+                while (vlcPlayer != null) {
+                    try { Thread.sleep(400); } catch (InterruptedException e) { break; }
+                    long time     = vlcPlayer.status().time();
+                    float position = vlcPlayer.status().position();
                     Platform.runLater(() -> {
-                        int s = (int)(ms / 1000);
-                        timeLbl.setText(String.format("%d:%02d", s / 60, s % 60));
+                        if (!seekBar.isValueChanging()) seekBar.setValue(position);
+                        int s = (int)(time / 1000);
+                        timeLabel.setText(String.format("%d:%02d", s / 60, s % 60));
+                        updateSubtitleDisplay(time);  // ← mise à jour sous-titres
                     });
                 }
-            }, "vlc-time-updater").start();
+            }, "vlc-updater");
+            updater.setDaemon(true);
+            updater.start();
 
-            HBox seekRow = new HBox(seekBar);
-            seekRow.setPadding(new Insets(6, 12, 0, 12));
+            seekBar.setOnMousePressed(e  -> vlcPlayer.controls().setPosition((float) seekBar.getValue()));
+            seekBar.setOnMouseDragged(e  -> vlcPlayer.controls().setPosition((float) seekBar.getValue()));
 
-            HBox ctrlRow = new HBox(12, playPause, volLbl, volSlider, timeLbl);
-            ctrlRow.setAlignment(Pos.CENTER_LEFT);
-            ctrlRow.setPadding(new Insets(6, 12, 8, 12));
+            Button systemButton = new Button("Lecteur systeme");
+            systemButton.setStyle("-fx-background-color:#1e293b;-fx-text-fill:#cbd5e1;-fx-background-radius:8;");
+            systemButton.setOnAction(e -> openWithSystem(new File(filePath)));
 
-            VBox controls = new VBox(0, seekRow, ctrlRow);
-            controls.setStyle("-fx-background-color:rgba(10,20,35,0.95);");
-            controls.setPrefHeight(60);
+            // Row 1 : barre de progression + temps
+            HBox.setHgrow(seekBar, Priority.ALWAYS);
+            HBox progressRow = new HBox(8, seekBar, timeLabel);
+            progressRow.setAlignment(Pos.CENTER_LEFT);
 
-            VBox playerBox = new VBox(canvas, controls);
-            playerBox.setMaxWidth(Double.MAX_VALUE);
-            playerBox.setMaxHeight(Double.MAX_VALUE);
-            VBox.setVgrow(canvas, Priority.ALWAYS);
+            // Row 2 : lecture/pause à gauche | volume à droite | lecteur système
+            Label volIcon = new Label("🔊");
+            volIcon.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
+            Pane spacerCtrl = new Pane();
+            HBox.setHgrow(spacerCtrl, Priority.ALWAYS);
+            HBox buttonRow = new HBox(10, playPause, spacerCtrl, volIcon, volume, systemButton);
+            buttonRow.setAlignment(Pos.CENTER_LEFT);
 
-            container.getChildren().add(playerBox);
+            VBox controls = new VBox(4, progressRow, buttonRow);
+            controls.setPadding(new Insets(8, 12, 8, 12));
+            controls.setStyle("-fx-background-color:#0f172a;");
 
-            // Bouton discret "Ouvrir avec lecteur système"
-            Button sysBtn = new Button("📂 Ouvrir avec le lecteur système");
-            sysBtn.setStyle("-fx-background-color:rgba(30,41,59,0.85);-fx-text-fill:#64748b;" +
-                    "-fx-font-size:10;-fx-background-radius:5;-fx-padding:4 12;-fx-cursor:hand;");
-            sysBtn.setOnAction(ev -> openWithSystem(new File(filePath)));
-            StackPane.setAlignment(sysBtn, Pos.TOP_RIGHT);
-            StackPane.setMargin(sysBtn, new Insets(6));
-            container.getChildren().add(sysBtn);
+            VBox wrapper = new VBox(canvas, controls);
+            wrapper.setFillWidth(true);
+            container.getChildren().add(wrapper);
 
         } catch (Exception ex) {
-            System.err.println("[VLC] Erreur initialisation : " + ex.getMessage());
-            buildJfxPlayerInContainer(new File(filePath), filePath, container);
+            buildJfxPlayerInContainer(new File(filePath), container);
         }
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  LECTEUR JavaFX MediaPlayer (H.264/MP4 natif — aucune dépendance externe)
-    // ════════════════════════════════════════════════════════════════════════
-
-    private void buildJfxPlayerInContainer(File f, String url, StackPane container) {
+    private void buildJfxPlayerInContainer(File file, StackPane container) {
         try {
-            Media media  = new Media(f.toURI().toString());
-            activePlayer = new MediaPlayer(media);
-
-            boolean[] failed = {false};
-            Runnable onFail = () -> {
-                if (failed[0]) return;
-                failed[0] = true;
-                stopPlayer();
-                Platform.runLater(() -> showFallbackPlayer(container, f, url));
-            };
-            activePlayer.setOnError(() -> onFail.run());
-            media.setOnError(onFail::run);
-
+            Media media      = new Media(file.toURI().toString());
+            activePlayer     = new MediaPlayer(media);
             activePlayer.setAutoPlay(true);
 
-            MediaView mv = new MediaView(activePlayer);
-            mv.setPreserveRatio(true);
-            mv.setOnError(e -> onFail.run());
+            MediaView mediaView = new MediaView(activePlayer);
+            mediaView.setPreserveRatio(true);
 
-            StackPane mediaPane = new StackPane(mv);
+            StackPane mediaPane = new StackPane(mediaView);
             mediaPane.setStyle("-fx-background-color:#000;");
             VBox.setVgrow(mediaPane, Priority.ALWAYS);
-            mv.fitWidthProperty().bind(mediaPane.widthProperty());
-            mv.fitHeightProperty().bind(mediaPane.heightProperty());
+            mediaView.fitWidthProperty().bind(mediaPane.widthProperty());
+            mediaView.fitHeightProperty().bind(mediaPane.heightProperty());
 
             Slider seekBar = new Slider(0, 1, 0);
             seekBar.setPrefWidth(Double.MAX_VALUE);
             HBox.setHgrow(seekBar, Priority.ALWAYS);
-            seekBar.setStyle("-fx-accent:#38bdf8;");
+
             activePlayer.currentTimeProperty().addListener((obs, o, n) -> {
                 if (!seekBar.isValueChanging() && activePlayer.getTotalDuration() != null
-                        && !activePlayer.getTotalDuration().isUnknown())
-                    seekBar.setValue(n.toSeconds() / activePlayer.getTotalDuration().toSeconds());
+                        && !activePlayer.getTotalDuration().isUnknown()
+                        && activePlayer.getTotalDuration().toMillis() > 0)
+                    seekBar.setValue(n.toMillis() / activePlayer.getTotalDuration().toMillis());
+                updateSubtitleDisplay((long) n.toMillis());  // ← mise à jour sous-titres
             });
-            seekBar.setOnMousePressed(e -> { if (activePlayer.getTotalDuration() != null) activePlayer.seek(activePlayer.getTotalDuration().multiply(seekBar.getValue())); });
-            seekBar.setOnMouseDragged(e -> { if (activePlayer.getTotalDuration() != null) activePlayer.seek(activePlayer.getTotalDuration().multiply(seekBar.getValue())); });
 
-            Button playPause = new Button("⏸ Pause");
-            playPause.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;-fx-font-size:12;-fx-font-weight:bold;-fx-background-radius:6;-fx-padding:6 16;");
-            playPause.setPrefWidth(110);
+            seekBar.setOnMousePressed(e -> { if (activePlayer.getTotalDuration() != null)
+                activePlayer.seek(activePlayer.getTotalDuration().multiply(seekBar.getValue())); });
+            seekBar.setOnMouseDragged(e -> { if (activePlayer.getTotalDuration() != null)
+                activePlayer.seek(activePlayer.getTotalDuration().multiply(seekBar.getValue())); });
+
+            Button playPause = new Button("Pause");
+            playPause.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;-fx-background-radius:8;");
             playPause.setOnAction(e -> {
-                if (activePlayer.getStatus() == MediaPlayer.Status.PLAYING) { activePlayer.pause(); playPause.setText("▶ Lecture"); }
-                else { activePlayer.play(); playPause.setText("⏸ Pause"); }
+                if (activePlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                    activePlayer.pause(); playPause.setText("Lecture");
+                } else { activePlayer.play(); playPause.setText("Pause"); }
             });
 
-            Label volLbl = new Label("🔊");
-            volLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
-            Slider volSlider = new Slider(0, 1, 0.8);
-            volSlider.setPrefWidth(90); volSlider.setStyle("-fx-accent:#38bdf8;");
+            Slider volume = new Slider(0, 1, 0.8);
+            volume.setPrefWidth(100);
             activePlayer.setVolume(0.8);
-            volSlider.valueProperty().addListener((obs, o, n) -> activePlayer.setVolume(n.doubleValue()));
+            volume.valueProperty().addListener((obs, o, n) -> activePlayer.setVolume(n.doubleValue()));
 
-            Label timeLbl = new Label("0:00");
-            timeLbl.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:11;");
+            Label timeLabel = new Label("0:00");
+            timeLabel.setStyle("-fx-text-fill:#94a3b8;");
             activePlayer.currentTimeProperty().addListener((obs, o, n) -> {
                 int s = (int) n.toSeconds();
-                timeLbl.setText(String.format("%d:%02d", s / 60, s % 60));
+                timeLabel.setText(String.format("%d:%02d", s / 60, s % 60));
             });
 
-            HBox seekRow = new HBox(seekBar);
-            seekRow.setPadding(new Insets(6, 12, 0, 12));
-            HBox ctrlRow = new HBox(12, playPause, volLbl, volSlider, timeLbl);
-            ctrlRow.setAlignment(Pos.CENTER_LEFT);
-            ctrlRow.setPadding(new Insets(6, 12, 8, 12));
-            VBox controls = new VBox(0, seekRow, ctrlRow);
-            controls.setStyle("-fx-background-color:rgba(10,20,35,0.95);");
+            Button systemButton = new Button("Lecteur systeme");
+            systemButton.setStyle("-fx-background-color:#1e293b;-fx-text-fill:#cbd5e1;-fx-background-radius:8;");
+            systemButton.setOnAction(e -> openWithSystem(file));
 
-            VBox playerBox = new VBox(mediaPane, controls);
-            playerBox.setMaxWidth(Double.MAX_VALUE);
-            playerBox.setMaxHeight(Double.MAX_VALUE);
-            VBox.setVgrow(mediaPane, Priority.ALWAYS);
-            container.getChildren().add(playerBox);
+            // Row 1 : barre de progression + temps
+            HBox.setHgrow(seekBar, Priority.ALWAYS);
+            HBox progressRow = new HBox(8, seekBar, timeLabel);
+            progressRow.setAlignment(Pos.CENTER_LEFT);
+
+            // Row 2 : lecture/pause à gauche | volume à droite | lecteur système
+            Label volIcon = new Label("🔊");
+            volIcon.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
+            Pane spacerCtrl = new Pane();
+            HBox.setHgrow(spacerCtrl, Priority.ALWAYS);
+            HBox buttonRow = new HBox(10, playPause, spacerCtrl, volIcon, volume, systemButton);
+            buttonRow.setAlignment(Pos.CENTER_LEFT);
+
+            VBox controls = new VBox(4, progressRow, buttonRow);
+            controls.setPadding(new Insets(8, 12, 8, 12));
+            controls.setStyle("-fx-background-color:#0f172a;");
+
+            VBox wrapper = new VBox(mediaPane, controls);
+            wrapper.setFillWidth(true);
+            container.getChildren().add(wrapper);
+
+            activePlayer.setOnError(() -> buildFallbackPlayer(container, file));
+            media.setOnError(() -> buildFallbackPlayer(container, file));
 
         } catch (Exception ex) {
-            showFallbackPlayer(container, f, url);
+            buildFallbackPlayer(container, file);
         }
     }
 
-    /**
-     * Affiché quand JavaFX MediaPlayer ne peut pas décoder le codec.
-     * Tout reste DANS l'application — aucun lecteur externe n'est ouvert.
-     */
-    private void showFallbackPlayer(StackPane container, File f, String originalUrl) {
+    private void buildFallbackPlayer(StackPane container, File file) {
+        stopPlayer();
         container.getChildren().clear();
-        container.setStyle(
-                "-fx-background-color:linear-gradient(to bottom,#0c1a2e,#0a0f1a);" +
-                "-fx-background-radius:10;"
-        );
-
-        String ext = f.getName().contains(".")
-                ? f.getName().substring(f.getName().lastIndexOf('.') + 1).toUpperCase() : "?";
-
-        Label ico  = new Label("🎬");
-        ico.setStyle("-fx-font-size:48;-fx-text-fill:rgba(255,255,255,0.15);");
-
-        Label titre = new Label("Codec non supporté");
-        titre.setStyle("-fx-text-fill:#f1f5f9;-fx-font-size:16;-fx-font-weight:bold;");
-
-        Label sub = new Label(
-                "Le lecteur intégré ne peut pas lire ce fichier " + ext + ".\n" +
-                "Installez VLC sur votre PC pour activer la lecture de tous les formats."
-        );
-        sub.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:12;-fx-text-alignment:center;");
-        sub.setWrapText(true); sub.setMaxWidth(400); sub.setAlignment(Pos.CENTER);
-
-        Label fname = new Label("📁  " + f.getName());
-        fname.setStyle("-fx-text-fill:#38bdf8;-fx-font-size:11;" +
-                "-fx-background-color:#0c2a3e;-fx-background-radius:4;-fx-padding:4 10;");
-
-        VBox box = new VBox(14, ico, titre, sub, fname);
+        VBox box = new VBox(14);
         box.setAlignment(Pos.CENTER);
-        box.setMaxWidth(Double.MAX_VALUE);
-        box.setMaxHeight(Double.MAX_VALUE);
+        box.setPadding(new Insets(24));
+        Label title = new Label("Lecture integree indisponible");
+        title.setStyle("-fx-text-fill:white;-fx-font-size:18;-fx-font-weight:bold;");
+        Label message = new Label("Cette video ne peut pas etre decodee par le lecteur integre.");
+        message.setWrapText(true);
+        message.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:12;");
+        Button openButton = new Button("Ouvrir avec le lecteur systeme");
+        openButton.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;-fx-background-radius:8;");
+        openButton.setOnAction(e -> openWithSystem(file));
+        box.getChildren().addAll(title, message, openButton);
         container.getChildren().add(box);
     }
 
-    /** Ouvre un fichier avec l'application par défaut du système (VLC, Windows Media Player…) */
-    /**
-     * Ouvre un fichier avec l'application par défaut du système (en thread séparé
-     * pour ne pas bloquer le thread JavaFX).
-     */
-    private void openWithSystem(File f) {
-        new Thread(() -> {
-            try {
-                // cmd /c start "" "chemin" est la méthode la plus fiable sous Windows
-                new ProcessBuilder("cmd", "/c", "start", "", f.getAbsolutePath())
-                        .redirectErrorStream(true).start();
-            } catch (Exception ex) {
-                // Tentative via Desktop en dernier recours
-                try {
-                    if (Desktop.isDesktopSupported())
-                        Desktop.getDesktop().open(f);
-                } catch (Exception ex2) {
-                    Platform.runLater(() ->
-                            showAlert(Alert.AlertType.ERROR, "Erreur",
-                                    "Impossible d'ouvrir : " + ex2.getMessage()));
-                }
+    // ════════════════════════════════════════════════════════════════════════
+    //  FAVORIS
+    // ════════════════════════════════════════════════════════════════════════
+
+    private void lancerSousTitresAutoV2(String videoUrl) {
+        subtitleRunId = UUID.randomUUID().toString().substring(0, 8);
+        subtitleFlowStartMs = System.currentTimeMillis();
+        lastSubtitleTickLogMs = 0L;
+        lastSubtitleText = "";
+        logInfo("subtitle flow start: runId=" + subtitleRunId + ", url=" + videoUrl);
+
+        autoSubtitles = new ArrayList<>();
+        sourceSubtitles = new ArrayList<>();
+        sourceSubtitleLanguage = "";
+        subtitleCache.clear();
+        subtitleCodesByLabel.clear();
+        subtitleNamesByCode.clear();
+        subtitleGenerationInProgress = false;
+        afficherSousTitre("");
+
+        configureSubtitleLanguageComboUi();
+
+        List<SubtitleApiService.LanguageOption> fallbackLanguages = subtitleApiService.getFallbackTranslationLanguages();
+        populateSubtitleLanguages("auto", fallbackLanguages);
+        logInfo("subtitle languages preloaded from fallback list: count=" + fallbackLanguages.size());
+
+        if (cbSubtitleLanguage != null) {
+            cbSubtitleLanguage.setOnAction(e -> handleSubtitleLanguageSelection());
+            cbSubtitleLanguage.setDisable(false);
+        }
+
+        if (videoUrl == null || videoUrl.isBlank()) {
+            logWarn("subtitle flow aborted: empty video url");
+            return;
+        }
+
+        subtitleGenerationInProgress = true;
+        logInfo("subtitle generation flag=true");
+
+        if (isYoutubeUrl(videoUrl)) {
+            afficherStatutSousTitres("Chargement des sous-titres YouTube...");
+            String videoId = extractYoutubeId(videoUrl);
+            if (videoId == null) {
+                afficherStatutSousTitres("Impossible d'extraire l'identifiant YouTube.");
+                subtitleGenerationInProgress = false;
+                logWarn("subtitle flow YouTube failed: unable to extract videoId");
+                return;
             }
-        }, "open-system").start();
+            logInfo("subtitle flow YouTube branch: videoId=" + videoId);
+
+            Thread thread = new Thread(() -> {
+                List<SubtitleCue> cues = subtitleApiService.fetchYoutubeCaptions(videoId);
+                List<SubtitleApiService.LanguageOption> languages = subtitleApiService.fetchTranslationLanguages();
+                Platform.runLater(() -> {
+                    sourceSubtitles = cues;
+                    autoSubtitles = cues;
+                    if (cues.isEmpty()) {
+                        afficherStatutSousTitres("Aucun sous-titre automatique disponible pour cette video.");
+                        logWarn("subtitle flow YouTube: 0 cues returned");
+                    } else {
+                        sourceSubtitleLanguage = "auto";
+                        subtitleCache.put("auto", cues);
+                        populateSubtitleLanguages("auto", languages);
+                        masquerStatutSousTitres();
+                        logInfo("subtitle flow YouTube success: cues=" + cues.size()
+                                + ", languages=" + languages.size()
+                                + ", elapsedMs=" + (System.currentTimeMillis() - subtitleFlowStartMs));
+                    }
+                    subtitleGenerationInProgress = false;
+                    logInfo("subtitle generation flag=false");
+                });
+            }, "youtube-subtitle-loader");
+            thread.setDaemon(true);
+            thread.start();
+            return;
+        }
+
+        File mediaFile = new File(videoUrl);
+        if (!mediaFile.exists()) {
+            afficherStatutSousTitres("Le fichier video local est introuvable.");
+            subtitleGenerationInProgress = false;
+            logWarn("subtitle flow local failed: media file not found " + mediaFile.getAbsolutePath());
+            return;
+        }
+        logInfo("subtitle flow local branch: file=" + mediaFile.getAbsolutePath() + ", bytes=" + mediaFile.length());
+
+        if (!subtitleApiService.hasAssemblyAiApiKey()) {
+            afficherStatutSousTitres("Sous-titres API inactifs. Ajoutez ASSEMBLYAI_API_KEY pour activer la transcription automatique.");
+            subtitleGenerationInProgress = false;
+            logWarn("subtitle flow local failed: AssemblyAI API key missing");
+            return;
+        }
+
+        afficherStatutSousTitres("Generation des sous-titres automatiques via API...");
+        Thread thread = new Thread(() -> {
+            try {
+                SubtitleApiService.GeneratedSubtitleTrack track = subtitleApiService.generateLocalSubtitles(mediaFile);
+                List<SubtitleApiService.LanguageOption> languages;
+                try {
+                    languages = subtitleApiService.fetchTranslationLanguages();
+                } catch (Exception ignored) {
+                    languages = new ArrayList<>();
+                    logWarn("subtitle flow local: translation language fetch failed, using empty list");
+                }
+                List<SubtitleApiService.LanguageOption> availableLanguages = languages;
+
+                Platform.runLater(() -> applyLocalSubtitleTrack(track, availableLanguages));
+            } catch (Exception ex) {
+                Platform.runLater(() -> afficherStatutSousTitres(
+                        "Sous-titrage API indisponible: " + readableMessage(ex)));
+                subtitleGenerationInProgress = false;
+                logError("subtitle flow local failed: " + ex.getMessage(), ex);
+            }
+        }, "local-subtitle-loader");
+        thread.setDaemon(true);
+        thread.start();
     }
 
-    /**
-     * Ouvre une URL dans le navigateur par défaut.
-     * Utilise cmd /c start (Windows) comme méthode principale — plus fiable que
-     * Desktop.browse() depuis un processus JavaFX lancé par Maven.
-     */
+    private void applyLocalSubtitleTrack(SubtitleApiService.GeneratedSubtitleTrack track,
+                                         List<SubtitleApiService.LanguageOption> languages) {
+        subtitleGenerationInProgress = false;
+        logInfo("subtitle generation flag=false");
+        sourceSubtitles = track.getCues() != null ? track.getCues() : new ArrayList<>();
+        autoSubtitles = sourceSubtitles;
+        sourceSubtitleLanguage = subtitleApiService.normalizeLanguageCode(track.getDetectedLanguage());
+        if (sourceSubtitleLanguage.isBlank()) {
+            sourceSubtitleLanguage = "auto";
+        }
+
+        subtitleCache.put(sourceSubtitleLanguage, sourceSubtitles);
+        populateSubtitleLanguages(sourceSubtitleLanguage, languages);
+        logInfo("applyLocalSubtitleTrack: transcriptId=" + track.getTranscriptId()
+                + ", detectedLanguage=" + sourceSubtitleLanguage
+                + ", cues=" + sourceSubtitles.size()
+                + ", languageChoices=" + subtitleCodesByLabel.size()
+                + ", elapsedMs=" + (System.currentTimeMillis() - subtitleFlowStartMs));
+
+        if (sourceSubtitles.isEmpty()) {
+            afficherStatutSousTitres("L'API n'a retourne aucun sous-titre pour cette video.");
+            logWarn("applyLocalSubtitleTrack: no cues returned");
+            return;
+        }
+
+        masquerStatutSousTitres();
+        updateSubtitleDisplay(currentPlaybackPositionMillis());
+    }
+
+    private void populateSubtitleLanguages(String sourceLanguage,
+                                           List<SubtitleApiService.LanguageOption> languages) {
+        if (cbSubtitleLanguage == null) {
+            return;
+        }
+
+        subtitleCodesByLabel.clear();
+        subtitleNamesByCode.clear();
+
+        String sourceName = resolveLanguageName(sourceLanguage, languages);
+        registerSubtitleLanguage(sourceLanguage, "Original - " + sourceName);
+
+        languages.stream()
+                .sorted(Comparator.comparing(SubtitleApiService.LanguageOption::getName, String.CASE_INSENSITIVE_ORDER))
+                .forEach(language -> {
+                    String code = subtitleApiService.normalizeLanguageCode(language.getCode());
+                    if (!code.isBlank() && !code.equals(sourceLanguage)) {
+                        registerSubtitleLanguage(code, language.getName() + " (" + code + ")");
+                    }
+                });
+
+        updatingSubtitleLanguageChoices = true;
+        try {
+            cbSubtitleLanguage.getItems().setAll(subtitleCodesByLabel.keySet());
+            cbSubtitleLanguage.setDisable(subtitleCodesByLabel.isEmpty());
+            if (!subtitleCodesByLabel.isEmpty()) {
+                cbSubtitleLanguage.setValue(subtitleCodesByLabel.keySet().iterator().next());
+            } else {
+                cbSubtitleLanguage.setValue(null);
+            }
+            logInfo("populateSubtitleLanguages: source=" + sourceLanguage
+                    + ", requestedLangs=" + languages.size()
+                    + ", comboItems=" + subtitleCodesByLabel.size()
+                    + ", selected=" + cbSubtitleLanguage.getValue());
+        } finally {
+            updatingSubtitleLanguageChoices = false;
+        }
+    }
+
+    private void registerSubtitleLanguage(String code, String label) {
+        String normalizedCode = subtitleApiService.normalizeLanguageCode(code);
+        if (normalizedCode.isBlank() || subtitleNamesByCode.containsKey(normalizedCode)) {
+            return;
+        }
+        subtitleCodesByLabel.put(label, normalizedCode);
+        subtitleNamesByCode.put(normalizedCode, label);
+    }
+
+    private String resolveLanguageName(String code, List<SubtitleApiService.LanguageOption> languages) {
+        String normalizedCode = subtitleApiService.normalizeLanguageCode(code);
+        for (SubtitleApiService.LanguageOption language : languages) {
+            if (subtitleApiService.normalizeLanguageCode(language.getCode()).equals(normalizedCode)) {
+                return language.getName() + " (" + normalizedCode + ")";
+            }
+        }
+        return normalizedCode.isBlank() || "auto".equals(normalizedCode)
+                ? "Langue detectee"
+                : normalizedCode.toUpperCase();
+    }
+
+    private void handleSubtitleLanguageSelection() {
+        if (cbSubtitleLanguage == null || updatingSubtitleLanguageChoices) {
+            return;
+        }
+
+        String selectedLabel = cbSubtitleLanguage.getValue();
+        if (selectedLabel == null || selectedLabel.isBlank()) {
+            return;
+        }
+        logInfo("handleSubtitleLanguageSelection: selectedLabel=" + selectedLabel);
+
+        String targetLanguage = subtitleCodesByLabel.get(selectedLabel);
+        if (targetLanguage == null || targetLanguage.isBlank()) {
+            logWarn("handleSubtitleLanguageSelection: no code for label=" + selectedLabel);
+            return;
+        }
+        logInfo("handleSubtitleLanguageSelection: targetLanguage=" + targetLanguage
+                + ", sourceLanguage=" + sourceSubtitleLanguage
+                + ", sourceCues=" + sourceSubtitles.size());
+
+        List<SubtitleCue> cached = subtitleCache.get(targetLanguage);
+        if (cached != null) {
+            autoSubtitles = cached;
+            masquerStatutSousTitres();
+            updateSubtitleDisplay(currentPlaybackPositionMillis());
+            logInfo("handleSubtitleLanguageSelection: cache hit, cues=" + cached.size());
+            return;
+        }
+
+        if (sourceSubtitles.isEmpty()) {
+            if (subtitleGenerationInProgress) {
+                afficherStatutSousTitres("Generation des sous-titres en cours... Merci de patienter.");
+            } else {
+                afficherStatutSousTitres("Aucun sous-titre source disponible pour la traduction.");
+            }
+            return;
+        }
+
+        afficherStatutSousTitres("Traduction des sous-titres vers " + selectedLabel + "...");
+        Thread thread = new Thread(() -> {
+            try {
+                long startedAt = System.currentTimeMillis();
+                List<SubtitleCue> translated = subtitleApiService.translateSubtitles(
+                        sourceSubtitles,
+                        sourceSubtitleLanguage,
+                        targetLanguage
+                );
+
+                Platform.runLater(() -> {
+                    subtitleCache.put(targetLanguage, translated);
+                    if (selectedLabel.equals(cbSubtitleLanguage.getValue())) {
+                        autoSubtitles = translated;
+                        masquerStatutSousTitres();
+                        updateSubtitleDisplay(currentPlaybackPositionMillis());
+                    }
+                    logInfo("handleSubtitleLanguageSelection: translation success target=" + targetLanguage
+                            + ", cues=" + translated.size()
+                            + ", elapsedMs=" + (System.currentTimeMillis() - startedAt));
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> afficherStatutSousTitres(
+                        "Traduction indisponible: " + readableMessage(ex)));
+                logError("handleSubtitleLanguageSelection translation failed: " + ex.getMessage(), ex);
+            }
+        }, "subtitle-translation-loader");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void buildIntegratedVideoPlayer(String url) {
+        stopPlayer();
+        videoContainer.getChildren().clear();
+        videoContainer.setAlignment(Pos.CENTER);
+        videoContainer.setStyle("-fx-background-color:#000;-fx-background-radius:10;");
+        logInfo("buildIntegratedVideoPlayer start: url=" + url);
+
+        if (url == null || url.isBlank()) {
+            videoContainer.getChildren().add(errorLabel("Aucune source video disponible."));
+            logWarn("buildIntegratedVideoPlayer aborted: empty url");
+            return;
+        }
+        if (isYoutubeUrl(url)) {
+            logInfo("buildIntegratedVideoPlayer detected YouTube URL");
+            buildYoutubePreview(url);
+            return;
+        }
+
+        File file = new File(url);
+        if (!file.exists()) {
+            videoContainer.getChildren().add(errorLabel("Fichier introuvable : " + url));
+            logWarn("buildIntegratedVideoPlayer file not found: " + url);
+            return;
+        }
+
+        if (tryBuildJfxPlayerInContainer(file, videoContainer)) {
+            logInfo("buildIntegratedVideoPlayer using JavaFX native media player");
+            return;
+        }
+        if (tryBuildVlcPlayerInContainer(file.getAbsolutePath(), videoContainer)) {
+            logInfo("buildIntegratedVideoPlayer using VLCJ fallback player");
+            return;
+        }
+
+        logWarn("buildIntegratedVideoPlayer no embedded player available for file=" + file.getAbsolutePath());
+        buildEmbeddedPlaybackError(videoContainer, file);
+    }
+
+    private boolean tryBuildVlcPlayerInContainer(String filePath, StackPane container) {
+        String vlcHome = findVlcPath();
+        if (vlcHome == null) {
+            logWarn("tryBuildVlcPlayerInContainer: VLC not found on machine.");
+            return false;
+        }
+
+        try {
+            logInfo("tryBuildVlcPlayerInContainer start: vlcHome=" + vlcHome + ", filePath=" + filePath);
+            System.setProperty("jna.library.path", vlcHome);
+            vlcFactory = new MediaPlayerFactory("--quiet", "--no-video-title-show", "--no-osd");
+            vlcPlayer = vlcFactory.mediaPlayers().newEmbeddedMediaPlayer();
+
+            Canvas canvas = new Canvas(960, 520);
+            WritableImage[] imageRef = {new WritableImage(960, 520)};
+
+            BufferFormatCallback formatCallback = new BufferFormatCallback() {
+                @Override
+                public BufferFormat getBufferFormat(int sw, int sh) {
+                    int w = Math.max(sw, 1);
+                    int h = Math.max(sh, 1);
+                    Platform.runLater(() -> imageRef[0] = new WritableImage(w, h));
+                    return new RV32BufferFormat(w, h);
+                }
+
+                @Override
+                public void allocatedBuffers(ByteBuffer[] buffers) {
+                }
+            };
+
+            RenderCallback renderCallback = (mp, nativeBuffers, bufferFormat) -> {
+                ByteBuffer buffer = nativeBuffers[0];
+                byte[] bytes = new byte[bufferFormat.getWidth() * bufferFormat.getHeight() * 4];
+                buffer.get(bytes);
+                buffer.rewind();
+                Platform.runLater(() -> {
+                    WritableImage image = imageRef[0];
+                    if (image != null) {
+                        image.getPixelWriter().setPixels(
+                                0,
+                                0,
+                                bufferFormat.getWidth(),
+                                bufferFormat.getHeight(),
+                                PixelFormat.getByteBgraInstance(),
+                                bytes,
+                                0,
+                                bufferFormat.getWidth() * 4
+                        );
+                        canvas.getGraphicsContext2D().drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
+                    }
+                });
+            };
+
+            vlcPlayer.videoSurface().set(
+                    vlcFactory.videoSurfaces().newVideoSurface(formatCallback, renderCallback, true));
+            vlcPlayer.media().play(filePath);
+
+            Slider seekBar = new Slider(0, 1, 0);
+            seekBar.setMinWidth(260);
+            seekBar.setPrefWidth(Double.MAX_VALUE);
+            HBox.setHgrow(seekBar, Priority.ALWAYS);
+
+            Button playPause = new Button("Pause");
+            playPause.setMinWidth(96);
+            playPause.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;-fx-background-radius:8;-fx-font-weight:bold;");
+            playPause.setOnAction(e -> {
+                if (vlcPlayer.status().isPlaying()) {
+                    vlcPlayer.controls().pause();
+                    playPause.setText("Lecture");
+                } else {
+                    vlcPlayer.controls().play();
+                    playPause.setText("Pause");
+                }
+            });
+
+            Label timeLabel = new Label("0:00");
+            timeLabel.setStyle("-fx-text-fill:#94a3b8;");
+
+            Slider volume = new Slider(0, 100, 80);
+            volume.setMinWidth(110);
+            volume.setPrefWidth(110);
+            vlcPlayer.audio().setVolume(80);
+            volume.valueProperty().addListener((obs, oldValue, newValue) ->
+                    vlcPlayer.audio().setVolume(newValue.intValue()));
+
+            Thread updater = new Thread(() -> {
+                while (vlcPlayer != null) {
+                    try {
+                        Thread.sleep(400);
+                    } catch (InterruptedException ex) {
+                        break;
+                    }
+
+                    long time = vlcPlayer.status().time();
+                    float position = vlcPlayer.status().position();
+                    Platform.runLater(() -> {
+                        if (!seekBar.isValueChanging()) {
+                            seekBar.setValue(position);
+                        }
+                        int seconds = (int) (time / 1000);
+                        timeLabel.setText(String.format("%d:%02d", seconds / 60, seconds % 60));
+                        updateSubtitleDisplay(time);
+                    });
+                }
+            }, "vlc-updater-v2");
+            updater.setDaemon(true);
+            updater.start();
+
+            seekBar.setOnMousePressed(e -> vlcPlayer.controls().setPosition((float) seekBar.getValue()));
+            seekBar.setOnMouseDragged(e -> vlcPlayer.controls().setPosition((float) seekBar.getValue()));
+
+            // Row 1 : barre de progression + temps
+            HBox.setHgrow(seekBar, Priority.ALWAYS);
+            HBox progressRow = new HBox(8, seekBar, timeLabel);
+            progressRow.setAlignment(Pos.CENTER_LEFT);
+
+            // Row 2 : lecture/pause à gauche | volume à droite
+            Label volIcon = new Label("🔊");
+            volIcon.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
+            Pane spacerCtrl = new Pane();
+            HBox.setHgrow(spacerCtrl, Priority.ALWAYS);
+            HBox buttonRow = new HBox(10, playPause, spacerCtrl, volIcon, volume);
+            buttonRow.setAlignment(Pos.CENTER_LEFT);
+
+            VBox controls = new VBox(4, progressRow, buttonRow);
+            controls.setPadding(new Insets(8, 12, 8, 12));
+            controls.setStyle("-fx-background-color:#0f172a;");
+
+            StackPane mediaPane = new StackPane(canvas);
+            mediaPane.setStyle("-fx-background-color:#000;");
+            mediaPane.setPrefHeight(460);
+            VBox.setVgrow(mediaPane, Priority.ALWAYS);
+            canvas.widthProperty().bind(mediaPane.widthProperty());
+            canvas.heightProperty().bind(mediaPane.heightProperty());
+
+            VBox wrapper = new VBox(mediaPane, controls);
+            wrapper.setFillWidth(true);
+            wrapper.setMaxWidth(1120);
+            StackPane.setAlignment(wrapper, Pos.CENTER);
+            container.getChildren().add(wrapper);
+            logInfo("tryBuildVlcPlayerInContainer success");
+            return true;
+        } catch (Exception ex) {
+            logError("tryBuildVlcPlayerInContainer failed: " + ex.getMessage(), ex);
+            return false;
+        }
+    }
+
+    private boolean tryBuildJfxPlayerInContainer(File file, StackPane container) {
+        try {
+            logInfo("tryBuildJfxPlayerInContainer start: file=" + file.getAbsolutePath());
+            Media media = new Media(file.toURI().toString());
+            activePlayer = new MediaPlayer(media);
+            activePlayer.setAutoPlay(true);
+
+            MediaView mediaView = new MediaView(activePlayer);
+            mediaView.setPreserveRatio(true);
+
+            StackPane mediaPane = new StackPane(mediaView);
+            mediaPane.setStyle("-fx-background-color:#000;");
+            VBox.setVgrow(mediaPane, Priority.ALWAYS);
+            mediaView.fitWidthProperty().bind(mediaPane.widthProperty());
+            mediaView.fitHeightProperty().bind(mediaPane.heightProperty());
+
+            Slider seekBar = new Slider(0, 1, 0);
+            seekBar.setMinWidth(260);
+            seekBar.setPrefWidth(Double.MAX_VALUE);
+            HBox.setHgrow(seekBar, Priority.ALWAYS);
+
+            activePlayer.currentTimeProperty().addListener((obs, oldValue, newValue) -> {
+                if (!seekBar.isValueChanging()
+                        && activePlayer.getTotalDuration() != null
+                        && !activePlayer.getTotalDuration().isUnknown()
+                        && activePlayer.getTotalDuration().toMillis() > 0) {
+                    seekBar.setValue(newValue.toMillis() / activePlayer.getTotalDuration().toMillis());
+                }
+                updateSubtitleDisplay((long) newValue.toMillis());
+            });
+
+            seekBar.setOnMousePressed(e -> {
+                if (activePlayer.getTotalDuration() != null) {
+                    activePlayer.seek(activePlayer.getTotalDuration().multiply(seekBar.getValue()));
+                }
+            });
+            seekBar.setOnMouseDragged(e -> {
+                if (activePlayer.getTotalDuration() != null) {
+                    activePlayer.seek(activePlayer.getTotalDuration().multiply(seekBar.getValue()));
+                }
+            });
+
+            Button playPause = new Button("Pause");
+            playPause.setMinWidth(96);
+            playPause.setStyle("-fx-background-color:#0284c7;-fx-text-fill:white;-fx-background-radius:8;-fx-font-weight:bold;");
+            playPause.setOnAction(e -> {
+                if (activePlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                    activePlayer.pause();
+                    playPause.setText("Lecture");
+                } else {
+                    activePlayer.play();
+                    playPause.setText("Pause");
+                }
+            });
+
+            Slider volume = new Slider(0, 1, 0.8);
+            volume.setMinWidth(110);
+            volume.setPrefWidth(110);
+            activePlayer.setVolume(0.8);
+            volume.valueProperty().addListener((obs, oldValue, newValue) ->
+                    activePlayer.setVolume(newValue.doubleValue()));
+
+            Label timeLabel = new Label("0:00");
+            timeLabel.setStyle("-fx-text-fill:#94a3b8;");
+            activePlayer.currentTimeProperty().addListener((obs, oldValue, newValue) -> {
+                int seconds = (int) newValue.toSeconds();
+                timeLabel.setText(String.format("%d:%02d", seconds / 60, seconds % 60));
+            });
+
+            // Row 1 : barre de progression + temps
+            HBox.setHgrow(seekBar, Priority.ALWAYS);
+            HBox progressRow = new HBox(8, seekBar, timeLabel);
+            progressRow.setAlignment(Pos.CENTER_LEFT);
+
+            // Row 2 : lecture/pause à gauche | volume à droite
+            Label volIcon = new Label("🔊");
+            volIcon.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:13;");
+            Pane spacerCtrl = new Pane();
+            HBox.setHgrow(spacerCtrl, Priority.ALWAYS);
+            HBox buttonRow = new HBox(10, playPause, spacerCtrl, volIcon, volume);
+            buttonRow.setAlignment(Pos.CENTER_LEFT);
+
+            VBox controls = new VBox(4, progressRow, buttonRow);
+            controls.setPadding(new Insets(8, 12, 8, 12));
+            controls.setStyle("-fx-background-color:#0f172a;");
+
+            VBox wrapper = new VBox(mediaPane, controls);
+            wrapper.setFillWidth(true);
+            wrapper.setMaxWidth(1120);
+            StackPane.setAlignment(wrapper, Pos.CENTER);
+            container.getChildren().add(wrapper);
+            activePlayer.setOnError(() -> buildEmbeddedPlaybackError(container, file));
+            media.setOnError(() -> buildEmbeddedPlaybackError(container, file));
+            logInfo("tryBuildJfxPlayerInContainer success");
+            return true;
+        } catch (Exception ex) {
+            logError("tryBuildJfxPlayerInContainer failed: " + ex.getMessage(), ex);
+            return false;
+        }
+    }
+
+    private void buildEmbeddedPlaybackError(StackPane container, File file) {
+        stopPlayer();
+        container.getChildren().clear();
+
+        VBox box = new VBox(14);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(24));
+
+        Label title = new Label("Lecture integree indisponible");
+        title.setStyle("-fx-text-fill:white;-fx-font-size:18;-fx-font-weight:bold;");
+
+        Label message = new Label(
+                "Cette video ne peut pas etre lue avec le decodeur integre de cette machine.");
+        message.setWrapText(true);
+        message.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:12;");
+
+        Label path = new Label(file.getAbsolutePath());
+        path.setWrapText(true);
+        path.setStyle("-fx-text-fill:#475569;-fx-font-size:11;");
+
+        box.getChildren().addAll(title, message, path);
+        container.getChildren().add(box);
+    }
+
+    private long currentPlaybackPositionMillis() {
+        try {
+            if (activePlayer != null && activePlayer.getCurrentTime() != null) {
+                return (long) activePlayer.getCurrentTime().toMillis();
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            if (vlcPlayer != null) {
+                return vlcPlayer.status().time();
+            }
+        } catch (Exception ignored) {
+        }
+
+        return 0L;
+    }
+
+    private String readableMessage(Exception ex) {
+        String message = ex.getMessage();
+        if (message != null && !message.isBlank()) {
+            return message;
+        }
+        if (ex.getCause() != null && ex.getCause().getMessage() != null) {
+            return ex.getCause().getMessage();
+        }
+        return "Erreur reseau ou configuration API manquante.";
+    }
+
+    private void configureFavoriteShowButton() {
+        if (btnFavoriteVideo == null || selectedVideo == null) return;
+        refreshFavoriteButton(btnFavoriteVideo, selectedVideo);
+        btnFavoriteVideo.setOnAction(e -> toggleFavorite(selectedVideo, btnFavoriteVideo));
+    }
+
+    private Button createFavoriteButton(CoachingVideo video) {
+        Button button = new Button();
+        button.setFocusTraversable(false);
+        refreshFavoriteButton(button, video);
+        button.setOnAction(e -> { e.consume(); toggleFavorite(video, button); });
+        return button;
+    }
+
+    private void refreshFavoriteButton(Button button, CoachingVideo video) {
+        boolean fav = favoriteService.isFavorite(getCurrentUserId(), video.getId());
+        button.setText(fav ? "❤" : "♡");
+        button.setStyle("-fx-background-color:" + (fav ? "#be185d" : "rgba(15,23,42,0.75)") + ";"
+                + "-fx-text-fill:white;-fx-background-radius:20;-fx-padding:6 10;-fx-font-size:14;");
+    }
+
+    private void toggleFavorite(CoachingVideo video, Button button) {
+        favoriteService.toggleFavorite(getCurrentUserId(), video);
+        refreshFavoriteButton(button, video);
+        MainFX.refreshNavigationBadges();
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  UTILITAIRES
+    // ════════════════════════════════════════════════════════════════════════
+
+    private String findVlcPath() {
+        String envPath = System.getenv("VLC_HOME");
+        if (envPath != null && !envPath.isBlank() && new File(envPath, "libvlc.dll").exists()) {
+            return envPath;
+        }
+
+        for (String path : new String[]{
+                "C:\\Program Files\\VideoLAN\\VLC",
+                "C:\\Program Files (x86)\\VideoLAN\\VLC",
+                "C:\\Users\\m50057189\\AppData\\Local\\Programs\\VideoLAN\\VLC"}) {
+            if (new File(path, "libvlc.dll").exists()) return path;
+        }
+
+        try {
+            Process process = new ProcessBuilder("where", "vlc").redirectErrorStream(true).start();
+            process.waitFor();
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                String executable = reader.readLine();
+                if (executable != null && !executable.isBlank()) {
+                    File parent = new File(executable).getParentFile();
+                    if (parent != null && new File(parent, "libvlc.dll").exists()) {
+                        return parent.getAbsolutePath();
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        return null;
+    }
+
+    private void openWithSystem(File file) {
+        new Thread(() -> {
+            try {
+                new ProcessBuilder("cmd", "/c", "start", "", file.getAbsolutePath())
+                        .redirectErrorStream(true).start();
+            } catch (Exception ex) {
+                try { if (Desktop.isDesktopSupported()) Desktop.getDesktop().open(file); }
+                catch (Exception ignored) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Erreur",
+                            "Impossible d'ouvrir le lecteur systeme."));
+                }
+            }
+        }, "open-system-player").start();
+    }
+
     private void openUrlInBrowser(String url) {
         new Thread(() -> {
             try {
-                // Méthode 1 : cmd /c start (Windows — la plus fiable)
                 new ProcessBuilder("cmd", "/c", "start", "", url)
                         .redirectErrorStream(true).start();
             } catch (Exception ex1) {
                 try {
-                    // Méthode 2 : Desktop.browse (autres OS)
-                    if (Desktop.isDesktopSupported() &&
-                            Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    if (Desktop.isDesktopSupported()
+                            && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE))
                         Desktop.getDesktop().browse(new URI(url));
-                    } else {
-                        // Méthode 3 : xdg-open (Linux)
-                        new ProcessBuilder("xdg-open", url).start();
-                    }
                 } catch (Exception ex2) {
-                    Platform.runLater(() ->
-                            showAlert(Alert.AlertType.ERROR, "Erreur",
-                                    "Impossible d'ouvrir le navigateur."));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Erreur",
+                            "Impossible d'ouvrir le navigateur."));
                 }
             }
         }, "open-browser").start();
     }
 
-    private Label errorLabel(String msg) {
-        Label l = new Label(msg);
-        l.setStyle("-fx-text-fill:#f87171;-fx-font-size:14;-fx-wrap-text:true;");
-        return l;
+    private Integer getCurrentUserId() {
+        User user = SessionContext.getCurrentUser();
+        return user != null ? user.getId() : null;
+    }
+
+    private boolean isYoutubeUrl(String url) {
+        return url.contains("youtube") || url.contains("youtu.be");
+    }
+
+    private String niveauColor(String niveau) {
+        if (niveau == null) return "#475569";
+        return switch (niveau.toLowerCase()) {
+            case "debutant"      -> "#166534";
+            case "intermediaire" -> "#1d4ed8";
+            case "avance"        -> "#c2410c";
+            case "expert"        -> "#7c3aed";
+            default              -> "#475569";
+        };
+    }
+
+    private String extractYoutubeId(String url) {
+        Pattern p = Pattern.compile(
+                "(?:youtu\\.be/|youtube\\.com/(?:watch\\?v=|embed/|v/))([^&?\\s]+)");
+        Matcher m = p.matcher(url);
+        return m.find() ? m.group(1) : null;
     }
 
     private void stopPlayer() {
-        // Arrêt JavaFX MediaPlayer
         if (activePlayer != null) {
-            try { activePlayer.stop();    } catch (Exception ignored) {}
-            try { activePlayer.dispose(); } catch (Exception ignored) {}
+            try { activePlayer.stop(); activePlayer.dispose(); } catch (Exception ignored) {}
             activePlayer = null;
         }
-        // Arrêt VLCJ
         if (vlcPlayer != null) {
-            try { vlcPlayer.controls().stop(); } catch (Exception ignored) {}
-            try { vlcPlayer.release();         } catch (Exception ignored) {}
+            try { vlcPlayer.controls().stop(); vlcPlayer.release(); } catch (Exception ignored) {}
             vlcPlayer = null;
         }
         if (vlcFactory != null) {
@@ -1248,55 +1673,70 @@ public class CoachingVideoController {
         }
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    //  HELPERS
-    // ════════════════════════════════════════════════════════════════════════
-    private String niveauColor(String n) {
-        if (n == null) return "#374151";
-        return switch (n.toLowerCase()) {
-            case "débutant"      -> "#166534";
-            case "intermédiaire" -> "#1e40af";
-            case "avancé"        -> "#9a3412";
-            case "expert"        -> "#581c87";
-            default              -> "#374151";
-        };
-    }
-
-    private String extractYoutubeId(String url) {
-        Pattern p = Pattern.compile("(?:youtu\\.be/|youtube\\.com/(?:watch\\?v=|embed/|v/))([^&?\\s]+)");
-        Matcher m = p.matcher(url);
-        return m.find() ? m.group(1) : null;
-    }
-
     private void navigateTo(String fxmlFile) {
         try {
-            Node anchor = (cardsPane    != null) ? cardsPane
-                    : (txtTitre     != null) ? txtTitre
-                    : lblTitreShow;
-            if (anchor == null) return;
-            Parent view      = FXMLLoader.load(getClass().getResource(BASE + fxmlFile));
-            BorderPane root  = (BorderPane) anchor.getScene().getRoot();
-            BorderPane cArea = (BorderPane) root.lookup("#contentArea");
-            if (cArea != null) cArea.setCenter(view);
+            Node anchor = cardsPane != null ? cardsPane
+                    : (txtTitre != null ? txtTitre : lblTitreShow);
+            if (anchor == null) { MainFX.navigateFromShell(fxmlFile); return; }
+            Parent view = FXMLLoader.load(getClass().getResource(BASE + fxmlFile));
+            BorderPane root = (BorderPane) anchor.getScene().getRoot();
+            BorderPane contentArea = (BorderPane) root.lookup("#contentArea");
+            if (contentArea != null) contentArea.setCenter(view);
         } catch (Exception e) { e.printStackTrace(); }
     }
 
     private boolean isAdmin() {
-        User u = SessionContext.getCurrentUser();
-        return u != null && u.getRoles() != null
-                && u.getRoles().stream().anyMatch(r -> r.toUpperCase().contains("ADMIN"));
+        User user = SessionContext.getCurrentUser();
+        return user != null && user.getRoles() != null
+                && user.getRoles().stream().anyMatch(r -> r.toUpperCase().contains("ADMIN"));
     }
 
     private Button styledBtn(String text, String color) {
         Button btn = new Button(text);
-        btn.setStyle("-fx-background-color:" + color + ";-fx-text-fill:white;" +
-                "-fx-background-radius:6;-fx-padding:5 12;-fx-font-size:12;");
+        btn.setMinWidth(104);
+        btn.setStyle("-fx-background-color:" + color + ";-fx-text-fill:white;"
+                + "-fx-background-radius:8;-fx-font-weight:bold;-fx-font-size:12;");
         return btn;
     }
 
-    private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert a = new Alert(type);
-        a.setTitle(title); a.setHeaderText(null); a.setContentText(msg);
-        a.showAndWait();
+    private Label errorLabel(String message) {
+        Label label = new Label(message);
+        label.setWrapText(true);
+        label.setStyle("-fx-text-fill:#f87171;-fx-font-size:14;");
+        return label;
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void logInfo(String message) {
+        System.out.println(LOG_PREFIX + "[" + LocalDateTime.now().format(LOG_TIME) + "][run=" + subtitleRunId + "] " + message);
+    }
+
+    private void logWarn(String message) {
+        System.out.println(LOG_PREFIX + "[" + LocalDateTime.now().format(LOG_TIME) + "][run=" + subtitleRunId + "][WARN] " + message);
+    }
+
+    private void logError(String message, Throwable throwable) {
+        System.out.println(LOG_PREFIX + "[" + LocalDateTime.now().format(LOG_TIME) + "][run=" + subtitleRunId + "][ERROR] " + message);
+        if (throwable != null) {
+            throwable.printStackTrace(System.out);
+        }
+    }
+
+    private String shorten(String text, int max) {
+        if (text == null) {
+            return "";
+        }
+        String normalized = text.replace('\n', ' ').replace('\r', ' ');
+        if (normalized.length() <= max) {
+            return normalized;
+        }
+        return normalized.substring(0, max) + "...";
     }
 }
