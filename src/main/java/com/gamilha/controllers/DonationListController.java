@@ -1,7 +1,6 @@
 package com.gamilha.controllers;
 
 import com.gamilha.MainApp;
-import com.gamilha.utils.NavigationContext;
 
 import com.gamilha.services.DonationService;
 
@@ -10,17 +9,20 @@ import com.gamilha.entity.Stream;
 
 import com.gamilha.utils.AlertUtil;
 
+import com.gamilha.utils.NavigationContext;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
-import javafx.geometry.Pos;
-
+import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 
 import java.net.URL;
@@ -165,6 +167,13 @@ public class DonationListController implements Initializable {
                         .trim();
 
 
+        Comparator<Donation> sorter = switch (sortFilter.getValue()) {
+            case "Plus anciens" -> Comparator.comparing(Donation::getCreatedAt);
+            case "Montant ↓" -> Comparator.comparingDouble(Donation::getAmount).reversed();
+            case "Montant ↑" -> Comparator.comparingDouble(Donation::getAmount);
+            default -> Comparator.comparing(Donation::getCreatedAt).reversed();
+        };
+
         List<Donation> res =
 
                 all.stream()
@@ -186,15 +195,7 @@ public class DonationListController implements Initializable {
 
                         )
 
-                        .sorted(
-
-                                Comparator.comparing(
-
-                                        Donation::getCreatedAt
-
-                                ).reversed()
-
-                        )
+                        .sorted(sorter)
 
                         .collect(Collectors.toList());
 
@@ -210,11 +211,7 @@ public class DonationListController implements Initializable {
 
 
 
-        lblTotal.setText(
-
-                "Total : "
-                        + total
-        );
+        lblTotal.setText(String.format("Total : %.2f €", total));
 
 
         countLabel.setText(
@@ -235,6 +232,12 @@ public class DonationListController implements Initializable {
 
         donationGrid.getChildren().clear();
 
+        if (list.isEmpty()) {
+            Label empty = new Label("Aucune donation trouvée");
+            empty.setStyle("-fx-text-fill:#94a3b8;-fx-font-size:15px;");
+            donationGrid.getChildren().add(empty);
+            return;
+        }
 
         for(Donation d : list)
 
@@ -250,28 +253,29 @@ public class DonationListController implements Initializable {
 
     private VBox buildCard(Donation d){
 
-        VBox card =
-                new VBox(8);
+        VBox card = new VBox(10);
+        card.setPrefWidth(280);
+        card.setMaxWidth(280);
+        card.setPadding(new Insets(14));
+        card.setStyle("-fx-background-color:#1a1a26;-fx-border-color:#2a2a40;" +
+                "-fx-border-radius:12;-fx-background-radius:12;");
 
+        Label donor = new Label("👤 " + d.getDonorName());
+        donor.setStyle("-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;");
+        donor.setWrapText(true);
 
-        Label donor =
-                new Label(
+        Label amount = new Label("💰 " + d.getFormattedAmount());
+        amount.setStyle("-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#4ade80;");
 
-                        d.getDonorName()
+        Label createdAt = new Label(d.getCreatedAt() != null ? "📅 " + d.getCreatedAt().format(FMT) : "");
+        createdAt.setStyle("-fx-font-size:12px;-fx-text-fill:#94a3b8;");
 
-                );
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_RIGHT);
 
-
-        Label amount =
-                new Label(
-
-                        d.getFormattedAmount()
-
-                );
-
-
-        Button show =
-                new Button("Voir");
+        Button show = new Button("Voir");
+        show.setStyle("-fx-background-color:#8b5cf6;-fx-text-fill:white;-fx-font-weight:bold;" +
+                "-fx-background-radius:8;-fx-cursor:hand;-fx-padding:6 14;");
 
 
         show.setOnAction(e->{
@@ -293,8 +297,10 @@ public class DonationListController implements Initializable {
 
 
 
-        Button edit =
-                new Button("Edit");
+        Button edit = new Button("Modifier");
+        edit.setStyle("-fx-background-color:#1e293b;-fx-text-fill:#e2e8f0;" +
+                "-fx-border-color:#334155;-fx-border-radius:8;-fx-background-radius:8;" +
+                "-fx-cursor:hand;-fx-padding:6 12;");
 
 
         edit.setOnAction(e->{
@@ -316,14 +322,8 @@ public class DonationListController implements Initializable {
 
 
 
-        card.getChildren().addAll(
-
-                donor,
-                amount,
-                show,
-                edit
-
-        );
+        actions.getChildren().addAll(edit, show);
+        card.getChildren().addAll(donor, amount, createdAt, actions);
 
 
         return card;
@@ -368,6 +368,27 @@ public class DonationListController implements Initializable {
 
             c.setStream(cur, true);
 
+    }
+    private <T> T loadWithController(String fxml) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            Parent root = loader.load();
+
+            // 🔥 récupérer contentArea depuis NavigationContext
+            BorderPane contentArea = NavigationContext.getContentArea();
+
+            if (contentArea == null) {
+                throw new RuntimeException("contentArea null !");
+            }
+
+            contentArea.setCenter(root);
+
+            return loader.getController();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

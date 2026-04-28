@@ -1,7 +1,6 @@
 package com.gamilha.services;
 
 import com.gamilha.entity.Donation;
-
 import com.gamilha.utils.ConnectionManager;
 
 import java.sql.*;

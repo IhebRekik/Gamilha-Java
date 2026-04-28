@@ -1,15 +1,18 @@
 package com.gamilha.controllers;
 
 import com.gamilha.MainApp;
-import com.gamilha.utils.NavigationContext;
 
 import com.gamilha.entity.Donation;
 import com.gamilha.entity.Stream;
 
+import com.gamilha.utils.NavigationContext;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -87,9 +90,9 @@ public class DonationShowController implements Initializable {
 
                         d.getStreamTitle()!=null
 
-                                ? d.getStreamTitle()
+                        ? d.getStreamTitle()
 
-                                : "-"
+                        : "-"
                 )
         );
 
@@ -100,37 +103,60 @@ public class DonationShowController implements Initializable {
     @FXML
     private void onBack(ActionEvent e){
 
-        DonationListController c =
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/gamilha/interfaces/User/DonationList.fxml")
+            );
 
-                MainApp.loadSceneWithController(
+            Parent root = loader.load();
 
-                        "User/DonationList.fxml"
-                );
+            DonationListController c = loader.getController();
 
+            BorderPane contentArea = NavigationContext.getContentArea();
 
-        if(c!=null && parentStream!=null)
+            if (contentArea == null) {
+                throw new RuntimeException("contentArea null !");
+            }
 
-            c.setStream(parentStream);
+            contentArea.setCenter(root);
 
+            if (c != null && parentStream != null) {
+                c.setStream(parentStream);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
-
-
 
     @FXML
     private void onEdit(ActionEvent e){
 
-        DonationFormController c =
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/gamilha/interfaces/User/DonationForm.fxml")
+            );
 
-                MainApp.loadSceneWithController(
+            Parent root = loader.load();
 
-                        "User/DonationForm.fxml"
-                );
+            Object controller = loader.getController();
 
+            BorderPane contentArea = NavigationContext.getContentArea();
 
-        if(c!=null)
+            if (contentArea == null) {
+                throw new RuntimeException("contentArea null !");
+            }
 
-            c.initEdit(cur,parentStream);
+            contentArea.setCenter(root);
 
+            // 🔥 éviter ton crash ClassCastException
+            if (controller instanceof DonationFormController c) {
+                c.initEdit(cur, parentStream);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

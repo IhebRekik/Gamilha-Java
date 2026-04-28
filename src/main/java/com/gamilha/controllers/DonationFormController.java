@@ -1,7 +1,6 @@
 package com.gamilha.controllers;
 
 import com.gamilha.MainApp;
-import com.gamilha.utils.NavigationContext;
 
 import com.gamilha.services.DonationService;
 import com.gamilha.services.StreamService;
@@ -10,6 +9,7 @@ import com.gamilha.entity.Donation;
 import com.gamilha.entity.Stream;
 
 import com.gamilha.utils.AlertUtil;
+import com.gamilha.utils.NavigationContext;
 import com.gamilha.utils.ValidationUtil;
 
 import javafx.collections.FXCollections;
@@ -17,9 +17,12 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
+import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -272,9 +275,9 @@ public class DonationFormController implements Initializable {
 
                         : v>=10 ? "💎"
 
-                        : v>=5 ? "🍕"
+                          : v>=5 ? "🍕"
 
-                        : "🍩"
+                            : "🍩"
 
         );
 
@@ -404,43 +407,42 @@ public class DonationFormController implements Initializable {
     @FXML
     private void onCancel(ActionEvent e){
 
-        Stream s =
+        try {
 
-                ctxStream!=null
+            Stream s = ctxStream != null ? ctxStream : streamCombo.getValue();
 
-                        ? ctxStream
+            FXMLLoader loader;
 
-                        : streamCombo.getValue();
+            if (s != null) {
+                loader = new FXMLLoader(
+                        getClass().getResource("/com/gamilha/interfaces/User/DonationList.fxml")
+                );
+            } else {
+                loader = new FXMLLoader(
+                        getClass().getResource("/com/gamilha/interfaces/User/StreamList.fxml")
+                );
+            }
 
+            Parent root = loader.load();
 
+            // 🔥 récupérer contentArea
+            BorderPane contentArea = NavigationContext.getContentArea();
 
-        if(s!=null){
+            if (contentArea == null) {
+                throw new RuntimeException("contentArea null !");
+            }
 
-            DonationListController c =
+            contentArea.setCenter(root);
 
-                    MainApp.loadSceneWithController(
+            // passer les données
+            if (s != null) {
+                DonationListController c = loader.getController();
+                if (c != null) c.setStream(s);
+            }
 
-                            "User/DonationList.fxml"
-
-                    );
-
-
-            if(c!=null)
-
-                c.setStream(s);
-
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-
-        else{
-
-            MainApp.loadScene(
-
-                    "User/StreamList.fxml"
-
-            );
-
-        }
-
     }
 
 

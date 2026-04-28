@@ -131,7 +131,7 @@ public class NavBarUserController implements Initializable {
     /** Active un bouton principal, désactive tous les autres */
     private void setActive(Button target) {
         Button[] all = {btnAccueil, btnEvenements, btnEquipes, btnCoaching,
-                        btnAI,  btnReseaux, btnStreams, btnAbonnements};
+                btnAI,  btnReseaux, btnStreams, btnAbonnements};
         for (Button b : all) {
             if (b == null) continue;
             b.getStyleClass().removeAll(NORMAL, ACTIVE);
@@ -223,7 +223,7 @@ public class NavBarUserController implements Initializable {
         }
     }
 
-   @FXML
+    @FXML
     void goEvenements() {
 
         setActive(btnEvenements);
@@ -256,7 +256,25 @@ public class NavBarUserController implements Initializable {
         }
     }
 
+    @FXML void goActivityStats() {
+        NavigationContext.setContentArea(contentArea);
+        try {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource(BASE_USER + "activity_stats.fxml"));
+            contentArea.setCenter(loader.load());
+        } catch (Exception e) {
+            System.err.println("ActivityStats error: " + e.getMessage());
+        }
+    }
+
     @FXML void logout(ActionEvent e) {
+        // Clôturer la session d'activité
+        try {
+            com.gamilha.entity.User u = SessionContext.getCurrentUser();
+            if (u != null) {
+                com.gamilha.services.ActivityService.getInstance().endSession(u.getId());
+            }
+        } catch (Exception ignored) {}
         NavigationContext.clear();
         SessionContext.clear();
         MainApp.showLogin();

@@ -2,6 +2,7 @@ package com.gamilha.controllers;
 
 import com.gamilha.MainApp;
 import com.gamilha.entity.User;
+import com.gamilha.services.ActivityService;
 import com.gamilha.services.UserService;
 import com.gamilha.utils.SavedCredentials;
 import com.gamilha.utils.SessionContext;
@@ -191,6 +192,18 @@ public class LoginController {
             }
 
             SessionContext.setCurrentUser(user);
+
+            // ── Suivi d'activité (démarrage session) ──────────────────────
+            final User loggedUser = user;
+            new Thread(() -> {
+                try {
+                    ActivityService.getInstance()
+                            .startSession(loggedUser.getId());
+                } catch (Exception ex) {
+                    System.err.println("⚠ Suivi activité : " + ex.getMessage());
+                }
+            }, "ActivityTrackingThread").start();
+
             MainApp.openDashboard(user);
 
         } catch (RuntimeException re) {
@@ -242,7 +255,7 @@ public class LoginController {
 
         // Container for steps
         StackPane container = new StackPane();
-        
+
         // --- STEP 1: EMAIL ---
         VBox step1 = new VBox(15);
         step1.setAlignment(Pos.CENTER);

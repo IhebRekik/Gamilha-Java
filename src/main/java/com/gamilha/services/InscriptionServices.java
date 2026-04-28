@@ -260,10 +260,7 @@ public class InscriptionServices {
 
             Session session = Session.create(params);
 
-            // ❌ SUPPRIMER Chrome
-            // Desktop.getDesktop().browse(new URI(session.getUrl()));
 
-            // ✅ OUVRIR DANS TON APP
             javafx.application.Platform.runLater(() -> {
                 StripeWindow.open(
                         session.getUrl(),

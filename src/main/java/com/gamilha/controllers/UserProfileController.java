@@ -152,15 +152,15 @@ public class UserProfileController implements Initializable {
         if (headerRoleLabel != null) {
             headerRoleLabel.setText(roleText);
             headerRoleLabel.setStyle(
-                (user.isAdmin() ? "-fx-background-color:#eab308;-fx-text-fill:black;"
-                                : "-fx-background-color:#7c3aed;-fx-text-fill:white;")
-                + "-fx-padding:3 12;-fx-background-radius:20;-fx-font-size:12px;");
+                    (user.isAdmin() ? "-fx-background-color:#eab308;-fx-text-fill:black;"
+                            : "-fx-background-color:#7c3aed;-fx-text-fill:white;")
+                            + "-fx-padding:3 12;-fx-background-radius:20;-fx-font-size:12px;");
         }
         if (headerStatusLabel != null) {
             headerStatusLabel.setText(user.isActive() ? "✅ Actif" : "⛔ Inactif");
             headerStatusLabel.setStyle((user.isActive()
-                ? "-fx-background-color:#22c55e;" : "-fx-background-color:#ef4444;")
-                + "-fx-text-fill:white;-fx-padding:3 12;-fx-background-radius:20;-fx-font-size:12px;");
+                    ? "-fx-background-color:#22c55e;" : "-fx-background-color:#ef4444;")
+                    + "-fx-text-fill:white;-fx-padding:3 12;-fx-background-radius:20;-fx-font-size:12px;");
         }
         if (presenceLabel != null) presenceLabel.setText(user.getPresenceLabel());
 
@@ -171,8 +171,8 @@ public class UserProfileController implements Initializable {
         if (statusLabel != null) {
             statusLabel.setText(user.isActive() ? "Actif" : "Inactif");
             statusLabel.setStyle(user.isActive()
-                ? "-fx-text-fill:#22c55e;-fx-font-weight:bold;"
-                : "-fx-text-fill:#ef4444;-fx-font-weight:bold;");
+                    ? "-fx-text-fill:#22c55e;-fx-font-weight:bold;"
+                    : "-fx-text-fill:#ef4444;-fx-font-weight:bold;");
         }
         if (lastSeenLabel != null) lastSeenLabel.setText(user.getPresenceLabel());
 
@@ -305,7 +305,7 @@ public class UserProfileController implements Initializable {
         }
         // Validate strength
         if (newPwd.length() < 8 || !newPwd.matches(".*[A-Z].*") ||
-            !newPwd.matches(".*[0-9].*") || !newPwd.matches(".*[^A-Za-z0-9].*")) {
+                !newPwd.matches(".*[0-9].*") || !newPwd.matches(".*[^A-Za-z0-9].*")) {
             showError("Mot de passe trop faible : min 8 car., 1 majuscule, 1 chiffre, 1 symbole."); return;
         }
 
@@ -389,10 +389,38 @@ public class UserProfileController implements Initializable {
     // ── LOGOUT ────────────────────────────────────────────────────────────
     @FXML
     private void logout() {
-        if (currentUser != null) userService.logout(currentUser.getId());
+        if (currentUser != null) {
+            userService.logout(currentUser.getId());
+            try { com.gamilha.services.ActivityService.getInstance()
+                    .endSession(currentUser.getId()); }
+            catch (Exception ignored) {}
+        }
         SessionContext.clear();
         MainApp.showLogin();
     }
+
+    // ── EXPORT PDF ────────────────────────────────────────────────────────
+    @FXML
+    private void handleExportPdf() {
+        if (currentUser == null) return;
+        showSuccess("⏳ Génération du profil en cours...");
+        new Thread(() -> {
+            com.gamilha.services.PdfExportService svc =
+                    new com.gamilha.services.PdfExportService();
+            String path = svc.generateUserProfilePdf(currentUser);
+            Platform.runLater(() -> {
+                if (path != null) {
+                    showSuccess("✅ Profil généré : " + path);
+                    try { java.awt.Desktop.getDesktop().open(new java.io.File(path)); }
+                    catch (Exception ignored) {}
+                } else {
+                    showError("Impossible de générer le profil.");
+                }
+            });
+        }, "ProfileExportThread").start();
+    }
+
+    // ── HISTORIQUE CONNEXIONS (supprimé) ─────────────────────────────────
 
     // ── Helpers ────────────────────────────────────────────────────────────
     private void setText(Label l, String v) {

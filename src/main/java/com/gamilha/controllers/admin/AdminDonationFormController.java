@@ -9,13 +9,17 @@ import com.gamilha.entity.Donation;
 import com.gamilha.entity.Stream;
 
 import com.gamilha.utils.AlertUtil;
+import com.gamilha.utils.NavigationContext;
 import com.gamilha.utils.ValidationUtil;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -281,9 +285,9 @@ public class AdminDonationFormController implements Initializable {
 
                         : v>=10 ? "💎"
 
-                        : v>=5 ? "🍕"
+                          : v>=5 ? "🍕"
 
-                        : "🍩"
+                            : "🍩"
 
         );
 
@@ -416,9 +420,7 @@ public class AdminDonationFormController implements Initializable {
 
             AdminDonationListController c =
 
-                    MainApp.loadSceneWithController(
-
-                            "Admin/AdminDonationList.fxml"
+                    loadWithController("/com/gamilha/interfaces/Admin/AdminDonationList.fxml"
 
                     );
 
@@ -431,9 +433,7 @@ public class AdminDonationFormController implements Initializable {
 
         else{
 
-            MainApp.loadScene(
-
-                    "Admin/AdminStreamList.fxml"
+            loadWithController("/com/gamilha/interfaces/Admin/AdminStreamList.fxml"
 
             );
 
@@ -545,5 +545,25 @@ public class AdminDonationFormController implements Initializable {
         return err==null;
 
     }
+    private <T> T loadWithController(String fxml) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            Parent root = loader.load();
 
+            // 🔥 récupérer contentArea depuis NavigationContext
+            BorderPane contentArea = NavigationContext.getContentArea();
+
+            if (contentArea == null) {
+                throw new RuntimeException("contentArea null !");
+            }
+
+            contentArea.setCenter(root);
+
+            return loader.getController();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -5,43 +5,71 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.gamilha.controllers.admin.AdminDonationStreamsController"
-            stylesheets="@../../css/style.css"
-            prefWidth="1280" prefHeight="800">
+            stylesheets="@../css/styles.css,@../css/gamilha.css"
+            prefWidth="1280" prefHeight="800"
+            style="-fx-background-color:#0d1117;">
+
     <top>
-        <VBox>
-            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="navbar">
-                <padding><Insets topRightBottomLeft="14"/></padding>
-                <Label text="🎮 GAMILHA — ADMIN" styleClass="brand"/>
+        <VBox style="-fx-background-color:#0d1117;">
+
+            <!-- Navbar -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color:#111827;
+                         -fx-border-color:transparent transparent #1f2937 transparent;
+                         -fx-border-width:0 0 1 0;-fx-padding:12 20;">
+                <Label text="🎮 GAMILHA — ADMIN"
+                       style="-fx-text-fill:#c84cff;-fx-font-size:16px;-fx-font-weight:bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="📡 Streams"     onAction="#onStreams" styleClass="btn-secondary"/>
-                <Button text="↺ Actualiser"   onAction="#onRefresh" styleClass="btn-secondary"/>
+                <Button text="↺ Actualiser" onAction="#onRefresh"
+                        style="-fx-background-color:#1f2937;-fx-text-fill:#9ca3af;
+                               -fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;
+                               -fx-padding:7 14;-fx-cursor:hand;"/>
+                <Button text="← Streams" onAction="#onBack"
+                        style="-fx-background-color:#1f2937;-fx-text-fill:#9ca3af;
+                               -fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;
+                               -fx-padding:7 14;-fx-cursor:hand;"/>
             </HBox>
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="page-header">
-                <padding><Insets top="18" right="24" bottom="10" left="24"/></padding>
-                <Label text="💰 Donations par stream" styleClass="page-title"/>
+
+            <!-- Titre -->
+            <HBox alignment="CENTER_LEFT" spacing="14"
+                  style="-fx-background-color:#0d1117;-fx-padding:18 24 10 24;">
+                <Label text="💰 Donations par Stream"
+                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#f9fafb;"/>
             </HBox>
-            <HBox spacing="10" styleClass="search-bar">
-                <padding><Insets top="0" right="24" bottom="14" left="24"/></padding>
-                <TextField fx:id="searchField" promptText="🔍  Rechercher un stream…"
-                           styleClass="field-dark" HBox.hgrow="ALWAYS"/>
+
+            <!-- Recherche -->
+            <HBox spacing="10"
+                  style="-fx-background-color:#0d1117;-fx-padding:0 24 12 24;">
+                <TextField fx:id="searchField"
+                           promptText="🔍  Rechercher un stream…"
+                           style="-fx-background-color:#111827;
+                                  -fx-control-inner-background:#111827;
+                                  -fx-text-fill:#e2e8f0;
+                                  -fx-prompt-text-fill:#4b5563;
+                                  -fx-border-color:#1f2937;
+                                  -fx-border-radius:8;-fx-background-radius:8;
+                                  -fx-padding:9 14;-fx-font-size:13px;"
+                           HBox.hgrow="ALWAYS"/>
             </HBox>
-            <HBox styleClass="count-bar">
-                <padding><Insets top="0" right="24" bottom="10" left="24"/></padding>
-                <Label fx:id="countLabel" text="" styleClass="count-label"/>
+
+            <!-- Compteur -->
+            <HBox style="-fx-background-color:#0d1117;-fx-padding:0 24 10 24;">
+                <Label fx:id="countLabel" text=""
+                       style="-fx-text-fill:#6b7280;-fx-font-size:12px;"/>
             </HBox>
         </VBox>
     </top>
+
     <center>
-        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
-            <FlowPane fx:id="streamGrid" hgap="20" vgap="20" styleClass="stream-flow">
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background-color:#0d1117;
+                           -fx-background:transparent;
+                           -fx-border-color:transparent;">
+            <FlowPane fx:id="streamGrid" hgap="20" vgap="20"
+                      style="-fx-background-color:#0d1117;">
                 <padding><Insets topRightBottomLeft="24"/></padding>
             </FlowPane>
         </ScrollPane>
     </center>
-    <bottom>
-        <HBox alignment="CENTER" styleClass="footer">
-            <padding><Insets topRightBottomLeft="10"/></padding>
-            <Label text="Gamilha Admin — Donations" styleClass="footer-text"/>
-        </HBox>
-    </bottom>
+
 </BorderPane>
