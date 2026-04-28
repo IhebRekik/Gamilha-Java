@@ -23,7 +23,7 @@
     </top>
     <center>
         <ScrollPane fitToWidth="true" styleClass="scroll-dark">
-            <VBox spacing="18" maxWidth="700" styleClass="form-wrap">
+            <VBox spacing="18" prefWidth="700" styleClass="form-wrap">
                 <padding><Insets top="20" right="40" bottom="30" left="40"/></padding>
 
                 <VBox spacing="10" styleClass="form-card">

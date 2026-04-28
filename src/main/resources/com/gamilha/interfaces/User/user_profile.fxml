@@ -12,261 +12,265 @@
             fx:controller="com.gamilha.controllers.UserProfileController"
             style="-fx-background-color:#0d1117;-fx-background:transparent;">
 
-<VBox spacing="0" style="-fx-background-color:#0d1117;">
-    <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
+    <VBox spacing="0" style="-fx-background-color:#0d1117;">
+        <padding><Insets top="28" right="28" bottom="28" left="28"/></padding>
 
-    <!-- ── Topbar ── -->
-    <HBox alignment="CENTER_LEFT" spacing="14">
-        <VBox.margin><Insets bottom="24"/></VBox.margin>
-        <Label text="👤 Mon Profil"
-               style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:white;"/>
-        <Pane HBox.hgrow="ALWAYS"/>
-        <Button text="⎋  Déconnexion" onAction="#logout"
-                style="-fx-background-color:#7f1d1d;-fx-text-fill:#fca5a5;
-                       -fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;-fx-font-weight:bold;"/>
-    </HBox>
-
-    <!-- ── Success/Error banner ── -->
-    <Label fx:id="successBanner" wrapText="true"
-           style="-fx-text-fill:#86efac;-fx-background-color:#0f2d18;-fx-padding:10 14;
-                  -fx-background-radius:8;-fx-font-size:13px;-fx-border-color:#166534;-fx-border-radius:8;"
-           visible="false" managed="false">
-        <VBox.margin><Insets bottom="14"/></VBox.margin>
-    </Label>
-    <Label fx:id="errorBanner" wrapText="true"
-           style="-fx-text-fill:#fca5a5;-fx-background-color:#2d1111;-fx-padding:10 14;
-                  -fx-background-radius:8;-fx-font-size:13px;-fx-border-color:#7f1d1d;-fx-border-radius:8;"
-           visible="false" managed="false">
-        <VBox.margin><Insets bottom="14"/></VBox.margin>
-    </Label>
-
-    <!-- ── Profile Header Card ── -->
-    <HBox spacing="24" alignment="CENTER_LEFT"
-          style="-fx-background-color:#12172b;-fx-background-radius:16;
-                 -fx-border-color:#1e2a45;-fx-border-radius:16;-fx-padding:24;">
-        <VBox.margin><Insets bottom="20"/></VBox.margin>
-
-        <!-- Avatar cercle -->
-        <StackPane prefWidth="90" prefHeight="90"
-                   style="-fx-background-color:#7c3aed;-fx-background-radius:999;">
-            <ImageView fx:id="profileImageView" fitWidth="90" fitHeight="90"
-                       preserveRatio="true" smooth="true">
-                <clip><Circle radius="45" centerX="45" centerY="45"/></clip>
-            </ImageView>
-        </StackPane>
-
-        <!-- Infos header -->
-        <VBox spacing="6" HBox.hgrow="ALWAYS">
-            <Label fx:id="headerNameLabel" text="—"
+        <!-- ── Topbar ── -->
+        <HBox alignment="CENTER_LEFT" spacing="14">
+            <VBox.margin><Insets bottom="24"/></VBox.margin>
+            <Label text="👤 Mon Profil"
                    style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:white;"/>
-            <Label fx:id="headerEmailLabel" text="—"
-                   style="-fx-font-size:14px;-fx-text-fill:#94a3b8;"/>
-            <HBox spacing="8" alignment="CENTER_LEFT">
-                <Label fx:id="headerRoleLabel" text="—"
-                       style="-fx-background-color:#7c3aed;-fx-text-fill:white;
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Button text="⎋  Déconnexion" onAction="#logout"
+                    style="-fx-background-color:#7f1d1d;-fx-text-fill:#fca5a5;
+                       -fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;-fx-font-weight:bold;"/>
+        </HBox>
+
+        <!-- ── Success/Error banner ── -->
+        <Label fx:id="successBanner" wrapText="true"
+               style="-fx-text-fill:#86efac;-fx-background-color:#0f2d18;-fx-padding:10 14;
+                  -fx-background-radius:8;-fx-font-size:13px;-fx-border-color:#166534;-fx-border-radius:8;"
+               visible="false" managed="false">
+            <VBox.margin><Insets bottom="14"/></VBox.margin>
+        </Label>
+        <Label fx:id="errorBanner" wrapText="true"
+               style="-fx-text-fill:#fca5a5;-fx-background-color:#2d1111;-fx-padding:10 14;
+                  -fx-background-radius:8;-fx-font-size:13px;-fx-border-color:#7f1d1d;-fx-border-radius:8;"
+               visible="false" managed="false">
+            <VBox.margin><Insets bottom="14"/></VBox.margin>
+        </Label>
+
+        <!-- ── Profile Header Card ── -->
+        <HBox spacing="24" alignment="CENTER_LEFT"
+              style="-fx-background-color:#12172b;-fx-background-radius:16;
+                 -fx-border-color:#1e2a45;-fx-border-radius:16;-fx-padding:24;">
+            <VBox.margin><Insets bottom="20"/></VBox.margin>
+
+            <!-- Avatar cercle -->
+            <StackPane prefWidth="90" prefHeight="90"
+                       style="-fx-background-color:#7c3aed;-fx-background-radius:999;">
+                <ImageView fx:id="profileImageView" fitWidth="90" fitHeight="90"
+                           preserveRatio="true" smooth="true">
+                    <clip><Circle radius="45" centerX="45" centerY="45"/></clip>
+                </ImageView>
+            </StackPane>
+
+            <!-- Infos header -->
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label fx:id="headerNameLabel" text="—"
+                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+                <Label fx:id="headerEmailLabel" text="—"
+                       style="-fx-font-size:14px;-fx-text-fill:#94a3b8;"/>
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Label fx:id="headerRoleLabel" text="—"
+                           style="-fx-background-color:#7c3aed;-fx-text-fill:white;
                               -fx-padding:3 12;-fx-background-radius:20;-fx-font-size:12px;"/>
-                <Label fx:id="headerStatusLabel" text="—"
-                       style="-fx-background-color:#22c55e;-fx-text-fill:white;
+                    <Label fx:id="headerStatusLabel" text="—"
+                           style="-fx-background-color:#22c55e;-fx-text-fill:white;
                               -fx-padding:3 12;-fx-background-radius:20;-fx-font-size:12px;"/>
-                <Label fx:id="presenceLabel" text=""
-                       style="-fx-font-size:12px;-fx-text-fill:#94a3b8;"/>
-            </HBox>
-        </VBox>
-
-        <!-- Quick actions -->
-        <VBox spacing="8" alignment="CENTER_RIGHT">
-            <Button text="✏  Modifier mon profil" onAction="#showEditSection"
-                    style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:8;
-                           -fx-padding:9 18;-fx-cursor:hand;-fx-font-weight:bold;"/>
-            <Button text="🔒  Changer mot de passe" onAction="#showPasswordSection"
-                    style="-fx-background-color:#1e293b;-fx-text-fill:#a78bfa;-fx-background-radius:8;
-                           -fx-padding:9 18;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
-        </VBox>
-    </HBox>
-
-    <!-- ── Main 2 columns ── -->
-    <HBox spacing="20" alignment="TOP_LEFT">
-
-        <!-- LEFT: Info card + Edit form -->
-        <VBox spacing="16" HBox.hgrow="ALWAYS">
-
-            <!-- Info card -->
-            <VBox spacing="14"
-                  style="-fx-background-color:#12172b;-fx-background-radius:14;
-                         -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
-                <Label text="ℹ  Informations personnelles"
-                       style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
-                <Separator style="-fx-border-color:#1e2a45;"/>
-                <GridPane hgap="20" vgap="12">
-                    <columnConstraints>
-                        <javafx.scene.layout.ColumnConstraints prefWidth="130"/>
-                        <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS"/>
-                    </columnConstraints>
-                    <Label text="Nom"    style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <Label fx:id="nameLabel" style="-fx-text-fill:white;-fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                    <Label text="Email"  style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <Label fx:id="emailLabel" style="-fx-text-fill:white;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    <Label text="Rôle"   style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <Label fx:id="roleLabel" style="-fx-text-fill:white;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                    <Label text="Statut" style="-fx-text-fill:#64748b;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <Label fx:id="statusLabel" style="-fx-text-fill:white;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                    <Label text="Présence" style="-fx-text-fill:#64748b;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <Label fx:id="lastSeenLabel" style="-fx-text-fill:#94a3b8;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-                </GridPane>
+                    <Label fx:id="presenceLabel" text=""
+                           style="-fx-font-size:12px;-fx-text-fill:#94a3b8;"/>
+                </HBox>
             </VBox>
 
-            <!-- ── EDIT FORM (hidden by default) ── -->
-            <VBox fx:id="editSection" spacing="14" visible="false" managed="false"
-                  style="-fx-background-color:#12172b;-fx-background-radius:14;
+            <!-- Quick actions -->
+            <VBox spacing="8" alignment="CENTER_RIGHT">
+                <Button text="✏  Modifier mon profil" onAction="#showEditSection"
+                        style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:8;
+                           -fx-padding:9 18;-fx-cursor:hand;-fx-font-weight:bold;"/>
+                <Button text="🔒  Changer mot de passe" onAction="#showPasswordSection"
+                        style="-fx-background-color:#1e293b;-fx-text-fill:#a78bfa;-fx-background-radius:8;
+                           -fx-padding:9 18;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
+                <Button text="⬇  Télécharger mon profil" onAction="#handleExportPdf"
+                        style="-fx-background-color:#14532d;-fx-text-fill:#86efac;-fx-background-radius:8;
+                           -fx-padding:9 18;-fx-cursor:hand;-fx-border-color:#166534;-fx-border-radius:8;
+                           -fx-font-weight:bold;"/>
+            </VBox>
+        </HBox>
+
+        <!-- ── Main 2 columns ── -->
+        <HBox spacing="20" alignment="TOP_LEFT">
+
+            <!-- LEFT: Info card + Edit form -->
+            <VBox spacing="16" HBox.hgrow="ALWAYS">
+
+                <!-- Info card -->
+                <VBox spacing="14"
+                      style="-fx-background-color:#12172b;-fx-background-radius:14;
+                         -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
+                    <Label text="ℹ  Informations personnelles"
+                           style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
+                    <Separator style="-fx-border-color:#1e2a45;"/>
+                    <GridPane hgap="20" vgap="12">
+                        <columnConstraints>
+                            <javafx.scene.layout.ColumnConstraints prefWidth="130"/>
+                            <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label text="Nom"    style="-fx-text-fill:#64748b;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <Label fx:id="nameLabel" style="-fx-text-fill:white;-fx-font-weight:bold;" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label text="Email"  style="-fx-text-fill:#64748b;" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Label fx:id="emailLabel" style="-fx-text-fill:white;" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label text="Rôle"   style="-fx-text-fill:#64748b;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <Label fx:id="roleLabel" style="-fx-text-fill:white;" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        <Label text="Statut" style="-fx-text-fill:#64748b;" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <Label fx:id="statusLabel" style="-fx-text-fill:white;" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        <Label text="Présence" style="-fx-text-fill:#64748b;" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <Label fx:id="lastSeenLabel" style="-fx-text-fill:#94a3b8;" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    </GridPane>
+                </VBox>
+
+                <!-- ── EDIT FORM (hidden by default) ── -->
+                <VBox fx:id="editSection" spacing="14" visible="false" managed="false"
+                      style="-fx-background-color:#12172b;-fx-background-radius:14;
                          -fx-border-color:#7c3aed;-fx-border-radius:14;-fx-padding:22;
                          -fx-border-width:2;">
 
-                <Label text="✏  Modifier mes informations"
-                       style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
-                <Separator style="-fx-border-color:#1e2a45;"/>
+                    <Label text="✏  Modifier mes informations"
+                           style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
+                    <Separator style="-fx-border-color:#1e2a45;"/>
 
-                <!-- Avatar change -->
-                <HBox spacing="16" alignment="CENTER_LEFT">
-                    <StackPane prefWidth="70" prefHeight="70"
-                               style="-fx-background-color:#7c3aed;-fx-background-radius:999;">
-                        <ImageView fx:id="editAvatarPreview" fitWidth="70" fitHeight="70" preserveRatio="true">
-                            <clip><Circle radius="35" centerX="35" centerY="35"/></clip>
-                        </ImageView>
-                    </StackPane>
-                    <VBox spacing="6">
-                        <HBox spacing="8" alignment="CENTER_LEFT">
-                            <Button text="📷 Choisir une photo" onAction="#chooseNewAvatar"
-                                    style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:8;
+                    <!-- Avatar change -->
+                    <HBox spacing="16" alignment="CENTER_LEFT">
+                        <StackPane prefWidth="70" prefHeight="70"
+                                   style="-fx-background-color:#7c3aed;-fx-background-radius:999;">
+                            <ImageView fx:id="editAvatarPreview" fitWidth="70" fitHeight="70" preserveRatio="true">
+                                <clip><Circle radius="35" centerX="35" centerY="35"/></clip>
+                            </ImageView>
+                        </StackPane>
+                        <VBox spacing="6">
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <Button text="📷 Choisir une photo" onAction="#chooseNewAvatar"
+                                        style="-fx-background-color:#1e293b;-fx-text-fill:white;-fx-background-radius:8;
                                            -fx-padding:7 14;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
-                            <Button text="✨ Générer avatar IA" onAction="#generateAiAvatar"
-                                    style="-fx-background-color:transparent;-fx-text-fill:#a78bfa;
+                                <Button text="✨ Générer avatar IA" onAction="#generateAiAvatar"
+                                        style="-fx-background-color:transparent;-fx-text-fill:#a78bfa;
                                            -fx-border-color:#4c1d95;-fx-border-radius:8;-fx-padding:7 14;-fx-cursor:hand;"/>
-                        </HBox>
-                        <Label fx:id="editAvatarLabel" text=""
-                               style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
-                        <Label fx:id="aiStatusLabel" visible="false" managed="false"
-                               style="-fx-font-size:12px;"/>
-                    </VBox>
-                </HBox>
+                            </HBox>
+                            <Label fx:id="editAvatarLabel" text=""
+                                   style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                            <Label fx:id="aiStatusLabel" visible="false" managed="false"
+                                   style="-fx-font-size:12px;"/>
+                        </VBox>
+                    </HBox>
 
-                <!-- Nom -->
-                <VBox spacing="5">
-                    <Label text="Nom complet" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
-                    <TextField fx:id="editNameField"
-                               style="-fx-background-color:#0d1117;-fx-text-fill:white;
+                    <!-- Nom -->
+                    <VBox spacing="5">
+                        <Label text="Nom complet" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
+                        <TextField fx:id="editNameField"
+                                   style="-fx-background-color:#0d1117;-fx-text-fill:white;
                                       -fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+                    </VBox>
+
+                    <!-- Buttons -->
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+                        <Button text="✕ Annuler" onAction="#hideEditSection"
+                                style="-fx-background-color:#374151;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:9 18;-fx-cursor:hand;"/>
+                        <Button text="💾 Enregistrer" onAction="#saveProfile"
+                                style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:8;
+                                   -fx-padding:9 18;-fx-cursor:hand;-fx-font-weight:bold;"/>
+                    </HBox>
                 </VBox>
 
-                <!-- Buttons -->
-                <HBox spacing="12" alignment="CENTER_RIGHT">
-                    <Button text="✕ Annuler" onAction="#hideEditSection"
-                            style="-fx-background-color:#374151;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:9 18;-fx-cursor:hand;"/>
-                    <Button text="💾 Enregistrer" onAction="#saveProfile"
-                            style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:8;
-                                   -fx-padding:9 18;-fx-cursor:hand;-fx-font-weight:bold;"/>
-                </HBox>
-            </VBox>
-
-            <!-- ── PASSWORD FORM (hidden by default) ── -->
-            <VBox fx:id="passwordSection" spacing="14" visible="false" managed="false"
-                  style="-fx-background-color:#12172b;-fx-background-radius:14;
+                <!-- ── PASSWORD FORM (hidden by default) ── -->
+                <VBox fx:id="passwordSection" spacing="14" visible="false" managed="false"
+                      style="-fx-background-color:#12172b;-fx-background-radius:14;
                          -fx-border-color:#0891b2;-fx-border-radius:14;-fx-padding:22;-fx-border-width:2;">
 
-                <Label text="🔒  Changer mon mot de passe"
-                       style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#38bdf8;"/>
-                <Separator style="-fx-border-color:#1e2a45;"/>
+                    <Label text="🔒  Changer mon mot de passe"
+                           style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#38bdf8;"/>
+                    <Separator style="-fx-border-color:#1e2a45;"/>
 
-                <VBox spacing="5">
-                    <Label text="Ancien mot de passe" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
-                    <PasswordField fx:id="oldPwdField" promptText="Votre mot de passe actuel"
-                                   style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
-                </VBox>
-                <VBox spacing="5">
-                    <Label text="Nouveau mot de passe" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
-                    <PasswordField fx:id="newPwdField" promptText="Min 8 car., majuscule, chiffre"
-                                   style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
-                    <Label fx:id="pwdStrengthLabel" visible="false" managed="false"
-                           style="-fx-font-size:12px;"/>
-                </VBox>
-                <VBox spacing="5">
-                    <Label text="Confirmer le nouveau mot de passe" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
-                    <PasswordField fx:id="confirmPwdField" promptText="Répétez le nouveau mot de passe"
-                                   style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
-                </VBox>
-                <HBox spacing="12" alignment="CENTER_RIGHT">
-                    <Button text="✕ Annuler" onAction="#hidePasswordSection"
-                            style="-fx-background-color:#374151;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:9 18;-fx-cursor:hand;"/>
-                    <Button text="🔒 Modifier le mot de passe" onAction="#savePassword"
-                            style="-fx-background-color:#0891b2;-fx-text-fill:white;-fx-background-radius:8;
+                    <VBox spacing="5">
+                        <Label text="Ancien mot de passe" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
+                        <PasswordField fx:id="oldPwdField" promptText="Votre mot de passe actuel"
+                                       style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label text="Nouveau mot de passe" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
+                        <PasswordField fx:id="newPwdField" promptText="Min 8 car., majuscule, chiffre"
+                                       style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+                        <Label fx:id="pwdStrengthLabel" visible="false" managed="false"
+                               style="-fx-font-size:12px;"/>
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label text="Confirmer le nouveau mot de passe" style="-fx-text-fill:#c4c4c4;-fx-font-size:13px;"/>
+                        <PasswordField fx:id="confirmPwdField" promptText="Répétez le nouveau mot de passe"
+                                       style="-fx-background-color:#0d1117;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+                    </VBox>
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+                        <Button text="✕ Annuler" onAction="#hidePasswordSection"
+                                style="-fx-background-color:#374151;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:9 18;-fx-cursor:hand;"/>
+                        <Button text="🔒 Modifier le mot de passe" onAction="#savePassword"
+                                style="-fx-background-color:#0891b2;-fx-text-fill:white;-fx-background-radius:8;
                                    -fx-padding:9 18;-fx-cursor:hand;-fx-font-weight:bold;"/>
-                </HBox>
-            </VBox>
-
-        </VBox>
-
-        <!-- RIGHT: Actions + Danger zone -->
-        <VBox spacing="16" prefWidth="280" minWidth="240">
-
-            <!-- Actions card -->
-            <VBox spacing="12"
-                  style="-fx-background-color:#12172b;-fx-background-radius:14;
-                         -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
-                <Label text="⚡ Actions rapides"
-                       style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:white;"/>
-                <Separator style="-fx-border-color:#1e2a45;"/>
-                <Button text="✏  Modifier mon profil" onAction="#showEditSection"
-                        maxWidth="Infinity"
-                        style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:8;
-                               -fx-padding:10;-fx-cursor:hand;-fx-font-weight:bold;"/>
-                <Button text="🔒  Changer mot de passe" onAction="#showPasswordSection"
-                        maxWidth="Infinity"
-                        style="-fx-background-color:#1e293b;-fx-text-fill:#a78bfa;-fx-background-radius:8;
-                               -fx-padding:10;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
-                <Button text="⎋  Se déconnecter" onAction="#logout"
-                        maxWidth="Infinity"
-                        style="-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;-fx-background-radius:8;
-                               -fx-padding:10;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
-            </VBox>
-
-            <!-- Danger zone -->
-            <VBox spacing="12"
-                  style="-fx-background-color:#2d1111;-fx-background-radius:14;
-                         -fx-border-color:#7f1d1d;-fx-border-radius:14;-fx-padding:22;-fx-border-width:1;">
-                
-                <Label text="⚠ Zone de sécurité"
-                       style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#f87171;"/>
-                <Separator style="-fx-border-color:#7f1d1d;"/>
-
-                <!-- Deactivation -->
-                <VBox spacing="8">
-                    <Label text="Désactiver mon compte"
-                           style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:bold;"/>
-                    <Label text="Vous ne serez plus visible. La connexion réactivera le compte."
-                           wrapText="true" style="-fx-text-fill:#fca5a5;-fx-font-size:11px;"/>
-                    
-                    <DatePicker fx:id="deactivationDatePicker" promptText="Date de réactivation (optionnel)"
-                                style="-fx-background-color:#1a1e2e;-fx-text-fill:white;"/>
-                    
-                    <Button text="💤 Désactiver temporairement" onAction="#handleDeactivate"
-                            maxWidth="Infinity"
-                            style="-fx-background-color:#4b5563;-fx-text-fill:white;-fx-background-radius:8;
-                                   -fx-padding:9;-fx-cursor:hand;-fx-font-size:12px;"/>
+                    </HBox>
                 </VBox>
 
-                <Separator style="-fx-border-color:#7f1d1d;"/>
-                
-                <Label text="Suppression définitive"
-                       style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:bold;"/>
-                <Label text="La suppression est irréversible. Toutes vos données seront perdues."
-                       wrapText="true"
-                       style="-fx-text-fill:#fca5a5;-fx-font-size:11px;"/>
-                <Button text="🗑  Supprimer mon compte" onAction="#deleteUser"
-                        maxWidth="Infinity"
-                        style="-fx-background-color:#dc2626;-fx-text-fill:white;-fx-background-radius:8;
-                               -fx-padding:10;-fx-cursor:hand;-fx-font-weight:bold;"/>
             </VBox>
 
-        </VBox>
-    </HBox>
-</VBox>
+            <!-- RIGHT: Actions + Danger zone -->
+            <VBox spacing="16" prefWidth="280" minWidth="240">
+
+                <!-- Actions card -->
+                <VBox spacing="12"
+                      style="-fx-background-color:#12172b;-fx-background-radius:14;
+                         -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
+                    <Label text="⚡ Actions rapides"
+                           style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+                    <Separator style="-fx-border-color:#1e2a45;"/>
+                    <Button text="✏  Modifier mon profil" onAction="#showEditSection"
+                            maxWidth="Infinity"
+                            style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:8;
+                               -fx-padding:10;-fx-cursor:hand;-fx-font-weight:bold;"/>
+                    <Button text="🔒  Changer mot de passe" onAction="#showPasswordSection"
+                            maxWidth="Infinity"
+                            style="-fx-background-color:#1e293b;-fx-text-fill:#a78bfa;-fx-background-radius:8;
+                               -fx-padding:10;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
+                    <Button text="⎋  Se déconnecter" onAction="#logout"
+                            maxWidth="Infinity"
+                            style="-fx-background-color:#1e293b;-fx-text-fill:#94a3b8;-fx-background-radius:8;
+                               -fx-padding:10;-fx-cursor:hand;-fx-border-color:#374151;-fx-border-radius:8;"/>
+                </VBox>
+
+                <!-- Danger zone -->
+                <VBox spacing="12"
+                      style="-fx-background-color:#2d1111;-fx-background-radius:14;
+                         -fx-border-color:#7f1d1d;-fx-border-radius:14;-fx-padding:22;-fx-border-width:1;">
+
+                    <Label text="⚠ Zone de sécurité"
+                           style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#f87171;"/>
+                    <Separator style="-fx-border-color:#7f1d1d;"/>
+
+                    <!-- Deactivation -->
+                    <VBox spacing="8">
+                        <Label text="Désactiver mon compte"
+                               style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:bold;"/>
+                        <Label text="Vous ne serez plus visible. La connexion réactivera le compte."
+                               wrapText="true" style="-fx-text-fill:#fca5a5;-fx-font-size:11px;"/>
+
+                        <DatePicker fx:id="deactivationDatePicker" promptText="Date de réactivation (optionnel)"
+                                    style="-fx-background-color:#1a1e2e;-fx-text-fill:white;"/>
+
+                        <Button text="💤 Désactiver temporairement" onAction="#handleDeactivate"
+                                maxWidth="Infinity"
+                                style="-fx-background-color:#4b5563;-fx-text-fill:white;-fx-background-radius:8;
+                                   -fx-padding:9;-fx-cursor:hand;-fx-font-size:12px;"/>
+                    </VBox>
+
+                    <Separator style="-fx-border-color:#7f1d1d;"/>
+
+                    <Label text="Suppression définitive"
+                           style="-fx-text-fill:white;-fx-font-size:13px;-fx-font-weight:bold;"/>
+                    <Label text="La suppression est irréversible. Toutes vos données seront perdues."
+                           wrapText="true"
+                           style="-fx-text-fill:#fca5a5;-fx-font-size:11px;"/>
+                    <Button text="🗑  Supprimer mon compte" onAction="#deleteUser"
+                            maxWidth="Infinity"
+                            style="-fx-background-color:#dc2626;-fx-text-fill:white;-fx-background-radius:8;
+                               -fx-padding:10;-fx-cursor:hand;-fx-font-weight:bold;"/>
+                </VBox>
+
+            </VBox>
+        </HBox>
+    </VBox>
 </ScrollPane>

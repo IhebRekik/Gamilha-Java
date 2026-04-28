@@ -8,7 +8,7 @@ public class ConnectionManager {
 
     // ───────── CONFIG ─────────
     private static final String URL =
-            "jdbc:mysql://localhost:3306/gamilhajava" +
+            "jdbc:mysql://localhost:3306/gamylha" +
                     "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8";
 
     private static final String USER = "root";

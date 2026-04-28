@@ -5,34 +5,38 @@ import com.gamilha.entity.Stream;
 import com.gamilha.services.DonationService;
 import com.gamilha.services.StreamService;
 import com.gamilha.utils.AlertUtil;
+import com.gamilha.utils.NavigationContext;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-/**
- * AdminDonationStreamsController — liste des streams avec total donations.
- * Identique à admin/donation/streams.html.twig Symfony.
- */
 public class AdminDonationStreamsController implements Initializable {
 
     @FXML private TextField searchField;
     @FXML private Label     countLabel;
     @FXML private FlowPane  streamGrid;
 
-    private final StreamService   streamService  = new StreamService();
-    private final DonationService donService     = new DonationService();
-    private ObservableList<Stream> all = FXCollections.observableArrayList();
+    private final StreamService   streamSvc = new StreamService();
+    private final DonationService donSvc    = new DonationService();
+    private ObservableList<Stream> all      = FXCollections.observableArrayList();
+
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -41,102 +45,184 @@ public class AdminDonationStreamsController implements Initializable {
     }
 
     private void load() {
-        try { all.setAll(streamService.findAll()); filter(); }
-        catch (SQLException e) { AlertUtil.showError("Erreur BDD", e.getMessage()); }
+        try {
+            all.setAll(streamSvc.findAll());
+            filter();
+        } catch (SQLException e) {
+            AlertUtil.showError("Erreur BDD", e.getMessage());
+        }
     }
 
     private void filter() {
         String q = searchField.getText().toLowerCase().trim();
+
         List<Stream> res = all.stream()
                 .filter(s -> q.isBlank() || s.getTitle().toLowerCase().contains(q))
                 .sorted(Comparator.comparing(Stream::getCreatedAt,
                         Comparator.nullsLast(Comparator.reverseOrder())))
                 .collect(Collectors.toList());
-        countLabel.setText(res.size() + " stream(s)");
-        buildGrid(res);
-    }
 
-    private void buildGrid(List<Stream> streams) {
+        countLabel.setText(res.size() + " stream(s)");
         streamGrid.getChildren().clear();
-        if (streams.isEmpty()) {
-            Label lbl = new Label("Aucun stream trouvé");
-            lbl.setStyle("-fx-text-fill:#64748b;-fx-font-size:14px;");
-            streamGrid.getChildren().add(lbl);
+
+        if (res.isEmpty()) {
+            Label empty = new Label("Aucun stream trouvé");
+            empty.setStyle("-fx-text-fill:#4b5563;-fx-font-size:14px;");
+            streamGrid.getChildren().add(empty);
             return;
         }
-        for (Stream s : streams) streamGrid.getChildren().add(buildCard(s));
+
+        for (Stream s : res)
+            streamGrid.getChildren().add(buildCard(s));
     }
 
     private VBox buildCard(Stream s) {
-        VBox card = new VBox(10);
-        card.setPrefWidth(340);
-        card.setPadding(new Insets(16));
-        card.setStyle("-fx-background-color:#111827;-fx-border-color:#1f2937;" +
-                "-fx-border-radius:12;-fx-background-radius:12;-fx-cursor:hand;");
-
-        // Titre + badge statut
-        HBox header = new HBox(10);
-        header.setAlignment(Pos.CENTER_LEFT);
-        Label title = new Label(s.getTitle());
-        title.setStyle("-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;");
-        title.setWrapText(true);
-        HBox.setHgrow(title, Priority.ALWAYS);
-        Label status = new Label(s.getStatusBadge());
-        status.setStyle("live".equals(s.getStatus())
-                ? "-fx-background-color:#dc2626;-fx-text-fill:white;-fx-background-radius:20;-fx-padding:3 10;-fx-font-size:11px;"
-                : "-fx-background-color:#374151;-fx-text-fill:#94a3b8;-fx-background-radius:20;-fx-padding:3 10;-fx-font-size:11px;");
-        header.getChildren().addAll(title, status);
-
-        // Infos
-        HBox meta = new HBox(12);
-        Label game = new Label("🎮 " + s.getGame());
-        game.setStyle("-fx-font-size:12px;-fx-text-fill:#67e8f9;");
-        Label views = new Label("👁 " + s.getViewers());
-        views.setStyle("-fx-font-size:12px;-fx-text-fill:#94a3b8;");
-        meta.getChildren().addAll(game, views);
-
-        // Total donations (calculé en live)
-        double total = 0;
-        int count = 0;
+        // ── Récupérer stats donations ─────────────────────────────────
+        int    donCount = 0;
+        double donTotal = 0;
         try {
-            var dons = donService.findByStream(s.getId());
-            total = dons.stream().mapToDouble(d -> d.getAmount()).sum();
-            count = dons.size();
+            var dons = donSvc.findByStream(s.getId());
+            donCount = dons.size();
+            donTotal = dons.stream().mapToDouble(d -> d.getAmount()).sum();
         } catch (Exception ignored) {}
 
-        HBox donRow = new HBox(10);
+        // ── Card ──────────────────────────────────────────────────────
+        VBox card = new VBox(0);
+        card.setPrefWidth(300);
+        card.setMaxWidth(300);
+        card.setStyle(
+                "-fx-background-color:#111827;" +
+                        "-fx-border-color:#1f2937;" +
+                        "-fx-border-radius:14;-fx-background-radius:14;" +
+                        "-fx-cursor:hand;");
+
+        // ── Header coloré selon statut ────────────────────────────────
+        String headerColor = "live".equals(s.getStatus()) ? "#7c3aed" : "#1f2937";
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setPadding(new Insets(14, 16, 14, 16));
+        header.setStyle("-fx-background-color:" + headerColor + ";" +
+                "-fx-background-radius:14 14 0 0;");
+
+        // Badge statut
+        Label statusBadge = new Label(s.getStatusBadge());
+        statusBadge.setStyle("live".equals(s.getStatus())
+                ? "-fx-background-color:#dc2626;-fx-text-fill:white;-fx-font-size:10px;" +
+                  "-fx-font-weight:bold;-fx-background-radius:20;-fx-padding:2 8;"
+                : "-fx-background-color:rgba(255,255,255,0.15);-fx-text-fill:#9ca3af;" +
+                  "-fx-font-size:10px;-fx-background-radius:20;-fx-padding:2 8;");
+
+        Label titleLbl = new Label(s.getTitle());
+        titleLbl.setStyle("-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:white;");
+        titleLbl.setWrapText(true);
+        titleLbl.setMaxWidth(200);
+        HBox.setHgrow(titleLbl, Priority.ALWAYS);
+
+        header.getChildren().addAll(titleLbl, statusBadge);
+
+        // ── Corps ─────────────────────────────────────────────────────
+        VBox body = new VBox(10);
+        body.setPadding(new Insets(14, 16, 6, 16));
+
+        // Jeu + viewers
+        HBox meta = new HBox(10);
+        Label gameLbl = new Label("🎮 " + (s.getGame() != null ? s.getGame() : "—"));
+        gameLbl.setStyle("-fx-font-size:12px;-fx-text-fill:#67e8f9;-fx-font-weight:500;");
+        Label viewLbl = new Label("👁 " + s.getViewers());
+        viewLbl.setStyle("-fx-font-size:12px;-fx-text-fill:#6b7280;");
+        meta.getChildren().addAll(gameLbl, viewLbl);
+
+        // Date
+        Label dateLbl = new Label(s.getCreatedAt() != null
+                ? "📅 " + s.getCreatedAt().format(FMT) : "");
+        dateLbl.setStyle("-fx-font-size:11px;-fx-text-fill:#4b5563;");
+
+        // Séparateur
+        Separator sep = new Separator();
+        sep.setStyle("-fx-background-color:#1f2937;");
+
+        // Stats donations
+        HBox donRow = new HBox(0);
         donRow.setAlignment(Pos.CENTER_LEFT);
         donRow.setPadding(new Insets(8, 12, 8, 12));
-        donRow.setStyle("-fx-background-color:#0a0f1a;-fx-border-color:#1e3a5f;" +
+        donRow.setStyle("-fx-background-color:#0d1117;-fx-border-color:#1f2937;" +
                 "-fx-border-radius:8;-fx-background-radius:8;");
-        Label donCount = new Label("💰 " + count + " donation(s)");
-        donCount.setStyle("-fx-font-size:13px;-fx-text-fill:#94a3b8;");
-        Region sp2 = new Region(); HBox.setHgrow(sp2, Priority.ALWAYS);
-        Label donTotal = new Label(String.format("%.2f €", total));
-        donTotal.setStyle("-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#4ade80;");
-        donRow.getChildren().addAll(donCount, sp2, donTotal);
 
-        // Bouton
-        Button btn = new Button("💰 Voir les donations");
-        btn.setStyle("-fx-background-color:#8b5cf6;-fx-text-fill:white;-fx-font-weight:bold;" +
-                "-fx-background-radius:8;-fx-cursor:hand;-fx-padding:8 20;");
+        VBox donLeft = new VBox(2);
+        Label donCountLbl = new Label(donCount + " donation(s)");
+        donCountLbl.setStyle("-fx-font-size:12px;-fx-text-fill:#9ca3af;");
+        Label donIcon = new Label("💰");
+        donIcon.setStyle("-fx-font-size:20px;");
+        donLeft.getChildren().addAll(donIcon, donCountLbl);
+
+        Region donSp = new Region();
+        HBox.setHgrow(donSp, Priority.ALWAYS);
+
+        Label totalLbl = new Label(String.format("%.2f €", donTotal));
+        totalLbl.setStyle("-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#4ade80;");
+
+        donRow.getChildren().addAll(donLeft, donSp, totalLbl);
+
+        body.getChildren().addAll(meta, dateLbl, sep, donRow);
+
+        // ── Bouton ────────────────────────────────────────────────────
+        HBox btnBox = new HBox();
+        btnBox.setPadding(new Insets(10, 16, 14, 16));
+
+        Button btn = new Button("💰  Voir les donations");
         btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setStyle(
+                "-fx-background-color:#8b5cf6;-fx-text-fill:white;" +
+                        "-fx-font-weight:bold;-fx-font-size:13px;" +
+                        "-fx-background-radius:8;-fx-cursor:hand;-fx-padding:9 0;");
         btn.setOnAction(e -> {
             AdminDonationListController c =
-                    MainApp.loadSceneWithController("Admin/AdminDonationList.fxml");
+                    loadWithController("/com/gamilha/interfaces/Admin/AdminDonationList.fxml");
             if (c != null) c.setStream(s);
         });
+        HBox.setHgrow(btn, Priority.ALWAYS);
+        btnBox.getChildren().add(btn);
 
-        card.getChildren().addAll(header, meta, donRow, btn);
-        card.setOnMouseEntered(e -> card.setStyle("-fx-background-color:#1a1a2e;-fx-border-color:#8b5cf6;" +
-                "-fx-border-radius:12;-fx-background-radius:12;-fx-cursor:hand;" +
-                "-fx-effect:dropshadow(gaussian,rgba(139,92,246,0.25),12,0,0,3);"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-background-color:#111827;-fx-border-color:#1f2937;" +
-                "-fx-border-radius:12;-fx-background-radius:12;-fx-cursor:hand;"));
+        card.getChildren().addAll(header, body, btnBox);
+
+        // ── Hover ─────────────────────────────────────────────────────
+        card.setOnMouseEntered(e -> card.setStyle(
+                "-fx-background-color:#1a1a2e;-fx-border-color:#8b5cf6;" +
+                        "-fx-border-radius:14;-fx-background-radius:14;-fx-cursor:hand;" +
+                        "-fx-effect:dropshadow(gaussian,rgba(139,92,246,0.3),16,0,0,4);"));
+        card.setOnMouseExited(e -> card.setStyle(
+                "-fx-background-color:#111827;-fx-border-color:#1f2937;" +
+                        "-fx-border-radius:14;-fx-background-radius:14;-fx-cursor:hand;"));
+
         return card;
     }
+    private <T> T loadWithController(String fxml) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            Parent root = loader.load();
 
-    @FXML private void onRefresh(ActionEvent e) { searchField.clear(); load(); }
-    @FXML private void onStreams(ActionEvent e)  { MainApp.loadScene("Admin/AdminStreamList.fxml"); }
-    @FXML private void onBack(ActionEvent e)     { MainApp.loadScene("Admin/AdminStreamList.fxml"); }
+            // 🔥 récupérer contentArea depuis NavigationContext
+            BorderPane contentArea = NavigationContext.getContentArea();
+
+            if (contentArea == null) {
+                throw new RuntimeException("contentArea null !");
+            }
+
+            contentArea.setCenter(root);
+
+            return loader.getController();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    @FXML private void onBack(ActionEvent e) {
+        loadWithController("/com/gamilha/interfaces/Admin/AdminStreamList.fxml");
+    }
+
+    @FXML private void onRefresh(ActionEvent e) {
+        searchField.clear();
+        load();
+    }
 }

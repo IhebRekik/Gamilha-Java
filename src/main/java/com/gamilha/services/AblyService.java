@@ -1,90 +1,106 @@
 package com.gamilha.services;
 
-
+import com.gamilha.utils.AppConfig;
 import io.ably.lib.realtime.AblyRealtime;
 import io.ably.lib.realtime.Channel;
-import io.ably.lib.types.Message;
-import io.ably.lib.types.AblyException;
 import javafx.application.Platform;
 
-/**
- * AblyService — équivalent exact de AblyService.php Symfony.
- *
- * Deux rôles :
- *   1. PUBLIER  : quand un user lance un stream → publish()
- *   2. S'ABONNER : écouter les nouveaux streams des autres → subscribe()
- */
+import java.util.function.Consumer;
+
 public class AblyService {
 
-    private static final String API_KEY = ""; // Mettre votre clé Ably ici
+    private static final String ABLY_KEY = AppConfig.get("ably.key", "");
+
+    private static final String CH_STREAMS = "streams:new";
+
+    private static AblyService INSTANCE;
+
+    public static synchronized AblyService getInstance() {
+        if (INSTANCE == null) INSTANCE = new AblyService();
+        return INSTANCE;
+    }
+
     private AblyRealtime ably;
-    private Channel channel;
+    private Channel chStreams;
+    private final boolean enabled;
 
-    public AblyService() throws AblyException {
-        if (API_KEY == null || API_KEY.isBlank()) return; // clé non configurée
-        ably = new AblyRealtime(API_KEY);
-        channel = ably.channels.get("streams:new");
+    public AblyService() {
+
+        boolean ok = ABLY_KEY != null
+                && ABLY_KEY.contains(":")
+                && !ABLY_KEY.isBlank()
+                && !ABLY_KEY.startsWith("VOTRE")
+                && !ABLY_KEY.startsWith("METTEZ");
+        enabled = ok;
+
+        if (!ok) {
+            System.out.println("Ably désactivé");
+            return;
+        }
+
+        try {
+            ably = new AblyRealtime(ABLY_KEY);
+            chStreams = ably.channels.get(CH_STREAMS);
+
+            System.out.println("✅ Ably connecté");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /**
-     * Publier une notification quand un stream est lancé.
-     * Appelé dans StreamFormController après service.create(stream).
-     * Équivalent de $ablyService->publish() dans StreamController Symfony.
-     */
-    public void publishNewStream(int streamId, String title,
-                                 String streamerName, int streamerId,
-                                 String game) throws AblyException {
-        // Construire le payload JSON (même structure que Symfony)
+    public void publishNewStream(int id, String title, String name, int userId, String game) {
+
+        if (!enabled) return;
+
         String payload = String.format(
-                "{\"type\":\"new_stream\",\"streamId\":%d,\"title\":\"%s\"," +
-                        "\"streamerName\":\"%s\",\"streamerId\":%d,\"game\":\"%s\"}",
-                streamId, title, streamerName, streamerId, game
+                "{\"type\":\"new_stream\",\"streamId\":%d,\"title\":\"%s\",\"streamerName\":\"%s\",\"streamerId\":%d,\"game\":\"%s\"}",
+                id,
+                title != null ? title.replace("\"", "\\\"") : "",
+                name != null ? name.replace("\"", "\\\"") : "Streamer",
+                userId,
+                game != null ? game.replace("\"", "\\\"") : ""
         );
-        channel.publish("message", payload);
+
+        try {
+            chStreams.publish("message", payload);
+            System.out.println("📤 envoyé: " + payload);
+        } catch (Exception e) {
+            System.out.println("Erreur publish");
+        }
     }
 
-    /**
-     * S'abonner aux notifications de nouveaux streams.
-     * Appelé au démarrage de l'app (MainApp ou StreamListController).
-     * Équivalent du JS Ably dans base.html.twig.
-     *
-     * @param currentUserId  l'ID du user connecté (pour exclure ses propres streams)
-     * @param onNotification callback appelé sur JavaFX Thread avec le message
-     */
-    public void subscribeToNewStreams(int currentUserId,
-                                      java.util.function.Consumer<String> onNotification)
-            throws AblyException {
-        channel.subscribe("message", msg -> {
-            String data = msg.data.toString();
+    public void subscribeToNewStreams(int currentUserId, Consumer<String> callback) {
 
-            // Extraire streamerId du JSON pour exclure le streamer lui-même
-            // (même logique que le JS : if (data.streamerId === currentUserId) return)
-            if (data.contains("\"streamerId\":" + currentUserId)) return;
+        if (!enabled) return;
 
-            // Revenir sur le JavaFX Application Thread avant de toucher l'UI
-            Platform.runLater(() -> onNotification.accept(data));
-        });
+        try {
+            chStreams.subscribe("message", msg -> {
+
+                String data = msg.data.toString();
+                int streamerId = extractStreamerId(data);
+                if (currentUserId > 0 && streamerId == currentUserId) return;
+
+                Platform.runLater(() -> callback.accept(data));
+            });
+
+            System.out.println("✅ Abonné streams");
+
+        } catch (Exception e) {
+            System.out.println("Erreur subscribe");
+        }
     }
 
-    /**
-     * Publier une notification de donation en temps réel.
-     * Appelé dans StreamShowController.quickDon() après une donation emoji.
-     * Le streamer reçoit la notif sur le canal "streams:donations".
-     */
-    public void publishDonation(int streamId, String streamTitle,
-                                String donorName, double amount,
-                                String emoji) throws AblyException {
-        if (ably == null) return;
-        Channel donChannel = ably.channels.get("streams:donations");
-        String payload = String.format(
-                "{\"type\":\"new_donation\",\"streamId\":%d,\"streamTitle\":\"%s\"," +
-                "\"donorName\":\"%s\",\"amount\":%.2f,\"emoji\":\"%s\"}",
-                streamId, streamTitle, donorName, amount, emoji
-        );
-        donChannel.publish("message", payload);
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void disconnect() {
-        if (ably != null) ably.close();
+    private int extractStreamerId(String payload) {
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(
+                "\\\\?\"streamerId\\\\?\"\\s*:\\s*(\\d+)");
+        java.util.regex.Matcher m = p.matcher(payload);
+        if (!m.find()) return -1;
+        try { return Integer.parseInt(m.group(1)); }
+        catch (NumberFormatException ex) { return -1; }
     }
 }

@@ -24,7 +24,7 @@
     </top>
     <center>
         <StackPane>
-            <VBox spacing="24" maxWidth="520" styleClass="form-wrap show-wrap">
+            <VBox spacing="24" prefWidth="520" styleClass="form-wrap show-wrap">
                 <padding><Insets top="30" right="40" bottom="40" left="40"/></padding>
                 <VBox alignment="CENTER" spacing="4">
                     <Label fx:id="lblEmoji" text="🍩" styleClass="emoji-huge"/>

@@ -89,7 +89,7 @@ public class NavBarAdminController implements Initializable {
     }
 
     // ── Chargement ────────────────────────────────────────────────────
-    void loadPage(String page) {
+    public void loadPage(String page) {
         NavigationContext.setContentArea(contentArea);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(BASE + page));

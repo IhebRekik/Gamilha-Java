@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.net.URL;
@@ -26,7 +27,7 @@ import java.net.URL;
  *                      MainApp.navigate("User/StreamList.fxml")
  */
 public class MainApp extends Application {
-
+    public static BorderPane mainContentArea;
     // Stage partagé pour toute l'application
     public static Stage primaryStage;
 
@@ -37,7 +38,9 @@ public class MainApp extends Application {
     // FXML de démarrage (login de Gamilha-Java)
     private static final String LOGIN_FXML = "/com/gamilha/interfaces/login-view.fxml";
 
-
+    public static void setMainContentArea(BorderPane pane) {
+        mainContentArea = pane;
+    }
 
 
     // ── Démarrage ────────────────────────────────────────────────────────

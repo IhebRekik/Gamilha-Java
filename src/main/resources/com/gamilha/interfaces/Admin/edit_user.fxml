@@ -70,38 +70,6 @@
                        style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
         </GridPane>
 
-        <Separator style="-fx-border-color:#1e293b;"/>
-
-        <!-- Password Section -->
-        <Label text="🔒 Changer le mot de passe"
-               style="-fx-font-size:16px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
-
-        <GridPane hgap="25" vgap="14">
-            <columnConstraints>
-                <ColumnConstraints prefWidth="200"/>
-                <ColumnConstraints hgrow="ALWAYS"/>
-            </columnConstraints>
-
-            <Label text="Ancien mot de passe" style="-fx-text-fill:#94a3b8;"/>
-            <PasswordField fx:id="oldPasswordField" GridPane.columnIndex="1"
-                           promptText="Entrez votre ancien mot de passe"
-                           style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
-
-            <Label text="Nouveau mot de passe" GridPane.rowIndex="1" style="-fx-text-fill:#94a3b8;"/>
-            <VBox GridPane.columnIndex="1" GridPane.rowIndex="1" spacing="6">
-                <PasswordField fx:id="passwordField"
-                               promptText="Laisser vide pour ne pas changer"
-                               style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
-                <Label fx:id="strengthLabel" style="-fx-font-size:12px;" visible="false" managed="false"/>
-                <Label text="Min 8 car., 1 majuscule, 1 chiffre, 1 symbole"
-                       style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
-            </VBox>
-
-            <Label text="Confirmer le mot de passe" GridPane.rowIndex="2" style="-fx-text-fill:#94a3b8;"/>
-            <PasswordField fx:id="confirmPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                           promptText="Confirmez le nouveau mot de passe"
-                           style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
-        </GridPane>
 
         <Separator style="-fx-border-color:#1e293b;"/>
 
@@ -118,8 +86,6 @@
             <Label text="Rôles" style="-fx-text-fill:#94a3b8;"/>
             <HBox GridPane.columnIndex="1" spacing="20" alignment="CENTER_LEFT">
                 <CheckBox fx:id="adminCheckBox"     text="Administrateur" style="-fx-text-fill:white;"/>
-                <CheckBox fx:id="moderatorCheckBox" text="Modérateur"     style="-fx-text-fill:white;"/>
-                <CheckBox fx:id="coachCheckBox"     text="Coach"          style="-fx-text-fill:white;"/>
             </HBox>
 
             <Label text="Compte actif" GridPane.rowIndex="1" style="-fx-text-fill:#94a3b8;"/>
@@ -128,12 +94,7 @@
                 <Label text="Désactiver empêche la connexion" style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
             </HBox>
 
-            <Label text="Signalements" GridPane.rowIndex="2" style="-fx-text-fill:#94a3b8;"/>
-            <HBox GridPane.columnIndex="1" GridPane.rowIndex="2" spacing="10" alignment="CENTER_LEFT">
-                <TextField fx:id="reportsField" prefWidth="80"
-                           style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:8;"/>
-                <Label text="Nombre de signalements reçus" style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
-            </HBox>
+
         </GridPane>
     </VBox>
 

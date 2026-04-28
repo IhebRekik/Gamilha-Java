@@ -52,7 +52,7 @@
             <Button fx:id="btnBrackets"   text="🧩  Brackets"    maxWidth="Infinity"
                     onAction="#goBrackets"   style="-fx-text-fill:white;-fx-background-color:transparent;-fx-font-size:12;-fx-cursor:hand;-fx-alignment:CENTER_LEFT;-fx-padding:7 12;"/>
             <Button fx:id="btnEquipes"    text="👨‍👩‍👧  Équipes"    maxWidth="Infinity"
-                    onAction="#goEquipes"    style="-fx-text-fill:white;-fx-background-color:transparent;-fx-font-size:12;-fx-cursor:hand;-fx-alignment:CENTER_LEFT;-fx-padding:7 12;"/>
+                    onAction="#goEquipe"    style="-fx-text-fill:white;-fx-background-color:transparent;-fx-font-size:12;-fx-cursor:hand;-fx-alignment:CENTER_LEFT;-fx-padding:7 12;"/>
 
             <!-- SECTION : Contenu -->
             <Label text="CONTENU"

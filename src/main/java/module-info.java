@@ -34,7 +34,6 @@ module com.gamilha {
     requires org.slf4j;
     requires webcam.capture;
     requires java.prefs;
-
     // Opens for FXML
     opens com.gamilha to javafx.fxml;
     opens com.gamilha.controllers to javafx.fxml;
