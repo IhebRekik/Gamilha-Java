@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.UserPostFormController"
+            style="-fx-background-color:#0a0a0f;">
+
+    <!-- Header -->
+    <top>
+        <VBox style="-fx-background-color:#0d0d1a;-fx-border-color:#2a2a40;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="14" right="20" bottom="14" left="20"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label fx:id="titleLabel" text="✏  Nouvelle Publication"
+                       style="-fx-font-size:17;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;"
+                       HBox.hgrow="ALWAYS"/>
+                <Label text="🤖 IA"
+                       style="-fx-background-color:rgba(139,92,246,0.2);-fx-text-fill:#a78bfa;
+                              -fx-background-radius:12;-fx-padding:3 8;-fx-font-size:11;"/>
+                <Label text="📸 Multi-images"
+                       style="-fx-background-color:rgba(59,130,246,0.15);-fx-text-fill:#60a5fa;
+                              -fx-background-radius:12;-fx-padding:3 8;-fx-font-size:11;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Contenu formulaire -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <content>
+                <VBox spacing="14">
+                    <padding><Insets top="18" right="22" bottom="18" left="22"/></padding>
+
+                    <!-- 1. Contenu + barre style + bouton IA -->
+                    <VBox spacing="8">
+                        <!-- Barre : label style + sélecteur style + bouton IA -->
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="📝 Contenu" HBox.hgrow="ALWAYS"
+                                   style="-fx-text-fill:#94a3b8;-fx-font-size:12;-fx-font-weight:bold;"/>
+
+                            <!-- Sélecteur style (comme CKEditor Symfony) -->
+                            <ComboBox fx:id="styleCombo" prefWidth="130"
+                                      style="-fx-background-color:#21273a;-fx-text-fill:#e2e8f0;
+                                             -fx-background-radius:8;-fx-border-color:#3a3a5c;
+                                             -fx-border-radius:8;-fx-font-size:12;"/>
+
+                            <!-- Bouton suggestion IA -->
+                            <Button fx:id="btnSuggestIA"
+                                    text="🤖 IA" onAction="#onSuggestIA"
+                                    style="-fx-background-color:linear-gradient(to right,#7c3aed,#a855f7);
+                                           -fx-text-fill:white;-fx-background-radius:20;
+                                           -fx-padding:5 14;-fx-font-size:11;-fx-cursor:hand;
+                                           -fx-font-weight:bold;"/>
+                        </HBox>
+
+                        <!-- TextArea -->
+                        <TextArea fx:id="contentArea"
+                                  promptText="Quoi de neuf ? 🎮 Cliquez sur IA pour une suggestion..."
+                                  wrapText="true" prefHeight="150"
+                                  style="-fx-control-inner-background:#1a1a26;
+                                         -fx-background-color:#1a1a26;
+                                         -fx-text-fill:#e2e8f0;
+                                         -fx-prompt-text-fill:#475569;
+                                         -fx-font-size:13;-fx-border-color:#2a2a40;
+                                         -fx-border-radius:8;-fx-background-radius:8;"/>
+
+                        <!-- Statut IA -->
+                        <Label fx:id="aiStatusLabel" text=""
+                               style="-fx-text-fill:#a78bfa;-fx-font-size:11;-fx-font-style:italic;"/>
+                    </VBox>
+
+                    <!-- 2. URL Média -->
+                    <VBox spacing="6">
+                        <Label text="🔗 URL Média  (optionnel — YouTube, image...)"
+                               style="-fx-text-fill:#94a3b8;-fx-font-size:12;-fx-font-weight:bold;"/>
+                        <TextField fx:id="mediaurlField"
+                                   promptText="https://youtube.com/…  ou  https://image.com/photo.jpg"
+                                   style="-fx-control-inner-background:#1a1a26;
+                                          -fx-background-color:#1a1a26;-fx-text-fill:#e2e8f0;
+                                          -fx-prompt-text-fill:#475569;-fx-background-radius:8;
+                                          -fx-border-color:#2a2a40;-fx-border-radius:8;
+                                          -fx-padding:8 12;-fx-font-size:13;"/>
+                    </VBox>
+
+                    <!-- 3. Multi-images (jusqu'à 5 comme Instagram) -->
+                    <VBox spacing="8">
+                        <HBox alignment="CENTER_LEFT" spacing="12">
+                            <Label text="📸 Images  (jusqu'à 5, comme Instagram)"
+                                   style="-fx-text-fill:#94a3b8;-fx-font-size:12;-fx-font-weight:bold;"
+                                   HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="imageCountLabel" text="0/5"
+                                   style="-fx-text-fill:#64748b;-fx-font-size:11;
+                                          -fx-background-color:#1a1e2e;-fx-background-radius:10;
+                                          -fx-padding:2 8;"/>
+                        </HBox>
+
+                        <!-- Bouton choisir images (multiple) -->
+                        <Button text="📁  Choisir des images (multiple)" onAction="#onChooseImages"
+                                style="-fx-background-color:#21273a;-fx-text-fill:#e2e8f0;
+                                       -fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;
+                                       -fx-border-color:#3a3a5c;-fx-border-radius:8;
+                                       -fx-font-size:12;-fx-font-weight:bold;
+                                       -fx-max-width:Infinity;"/>
+
+                        <!-- Prévisualisation miniatures des images sélectionnées -->
+                        <ScrollPane fitToHeight="true" prefHeight="90" hbarPolicy="AS_NEEDED" vbarPolicy="NEVER"
+                                    style="-fx-background:transparent;-fx-background-color:transparent;
+                                           -fx-border-color:transparent;">
+                            <content>
+                                <HBox fx:id="imagesPreviewBox" spacing="8" alignment="CENTER_LEFT">
+                                    <padding><Insets top="4" bottom="4"/></padding>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+                    </VBox>
+
+                    <!-- Erreur -->
+                    <Label fx:id="errorLabel" text="" wrapText="true"
+                           style="-fx-text-fill:#f87171;-fx-font-size:12;"/>
+
+                    <!-- Boutons action -->
+                    <HBox spacing="12" alignment="CENTER_RIGHT">
+                        <Button text="Annuler" onAction="#onCancel"
+                                style="-fx-background-color:rgba(255,255,255,0.08);
+                                       -fx-text-fill:#e5e7eb;-fx-background-radius:9999;
+                                       -fx-padding:9 24;-fx-cursor:hand;-fx-font-weight:bold;
+                                       -fx-border-color:rgba(255,255,255,0.10);
+                                       -fx-border-radius:9999;-fx-border-width:1;"/>
+                        <Button fx:id="btnSave" text="Publier" onAction="#onSave"
+                                style="-fx-background-color:linear-gradient(to right,#8b5cf6,#d946ef);
+                                       -fx-text-fill:white;-fx-background-radius:9999;
+                                       -fx-padding:9 28;-fx-cursor:hand;-fx-font-weight:bold;
+                                       -fx-font-size:13;"/>
+                    </HBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

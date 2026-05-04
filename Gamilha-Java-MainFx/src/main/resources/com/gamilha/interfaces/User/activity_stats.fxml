@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.UserActivityController"
+            style="-fx-background-color:#0d1117;-fx-background:transparent;">
+
+<VBox spacing="0" style="-fx-background-color:#0d1117;">
+    <padding><Insets top="28" right="28" bottom="40" left="28"/></padding>
+
+    <!-- ── Topbar ── -->
+    <HBox alignment="CENTER_LEFT" spacing="14">
+        <VBox.margin><Insets bottom="24"/></VBox.margin>
+        <Label text="📊 Statistiques d'activité"
+               style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+        <Pane HBox.hgrow="ALWAYS"/>
+        <Button text="🔄 Actualiser" onAction="#handleRefresh"
+                style="-fx-background-color:#1e2a45;-fx-text-fill:#94a3b8;
+                       -fx-background-radius:8;-fx-padding:8 18;-fx-cursor:hand;"/>
+    </HBox>
+
+    <!-- ── Stats cards (ligne 1) ── -->
+    <HBox spacing="16" alignment="CENTER_LEFT">
+        <VBox.margin><Insets bottom="18"/></VBox.margin>
+
+        <!-- Aujourd'hui -->
+        <VBox spacing="6" alignment="CENTER" HBox.hgrow="ALWAYS"
+              style="-fx-background-color:#12172b;-fx-background-radius:14;
+                     -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22 14;">
+            <Label text="⏱" style="-fx-font-size:28px;"/>
+            <Label fx:id="todayTimeLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
+            <Label text="Temps aujourd'hui"
+                   style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+        </VBox>
+
+        <!-- Total -->
+        <VBox spacing="6" alignment="CENTER" HBox.hgrow="ALWAYS"
+              style="-fx-background-color:#12172b;-fx-background-radius:14;
+                     -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22 14;">
+            <Label text="🕐" style="-fx-font-size:28px;"/>
+            <Label fx:id="totalTimeLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#22c55e;"/>
+            <Label text="Temps total"
+                   style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+        </VBox>
+
+        <!-- Sessions -->
+        <VBox spacing="6" alignment="CENTER" HBox.hgrow="ALWAYS"
+              style="-fx-background-color:#12172b;-fx-background-radius:14;
+                     -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22 14;">
+            <Label text="🔗" style="-fx-font-size:28px;"/>
+            <Label fx:id="totalSessionsLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#f59e0b;"/>
+            <Label text="Total sessions"
+                   style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- ── Stats cards (ligne 2) ── -->
+    <HBox spacing="16" alignment="CENTER_LEFT">
+        <VBox.margin><Insets bottom="24"/></VBox.margin>
+
+        <!-- Durée moyenne -->
+        <VBox spacing="6" alignment="CENTER" HBox.hgrow="ALWAYS"
+              style="-fx-background-color:#12172b;-fx-background-radius:14;
+                     -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22 14;">
+            <Label text="📈" style="-fx-font-size:28px;"/>
+            <Label fx:id="avgSessionLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#38bdf8;"/>
+            <Label text="Durée moy./session"
+                   style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+        </VBox>
+
+        <!-- Dernière connexion -->
+        <VBox spacing="6" alignment="CENTER" HBox.hgrow="ALWAYS"
+              style="-fx-background-color:#12172b;-fx-background-radius:14;
+                     -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22 14;">
+            <Label text="📅" style="-fx-font-size:28px;"/>
+            <Label fx:id="lastLoginLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#c084fc;"/>
+            <Label text="Dernière connexion"
+                   style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+        </VBox>
+
+        <!-- Total connexions -->
+        <VBox spacing="6" alignment="CENTER" HBox.hgrow="ALWAYS"
+              style="-fx-background-color:#12172b;-fx-background-radius:14;
+                     -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22 14;">
+            <Label text="🔐" style="-fx-font-size:28px;"/>
+            <Label fx:id="totalLoginsLabel" text="—"
+                   style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#fb923c;"/>
+            <Label text="Connexions totales"
+                   style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+        </VBox>
+
+    </HBox>
+
+    <!-- ── Graphique hebdomadaire ── -->
+    <VBox spacing="10"
+          style="-fx-background-color:#12172b;-fx-background-radius:14;
+                 -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
+        <VBox.margin><Insets bottom="18"/></VBox.margin>
+        <Label text="📅 Activité — 7 derniers jours"
+               style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;
+                      -fx-padding:0 0 10 0;-fx-border-color:transparent transparent #1e2a45 transparent;
+                      -fx-border-width:0 0 1 0;"/>
+        <StackPane fx:id="weeklyChartPane" minHeight="220" prefHeight="220"/>
+    </VBox>
+
+    <!-- ── Graphique mensuel ── -->
+    <VBox spacing="10"
+          style="-fx-background-color:#12172b;-fx-background-radius:14;
+                 -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
+        <VBox.margin><Insets bottom="24"/></VBox.margin>
+        <Label text="📆 Activité — 30 derniers jours"
+               style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;
+                      -fx-padding:0 0 10 0;-fx-border-color:transparent transparent #1e2a45 transparent;
+                      -fx-border-width:0 0 1 0;"/>
+        <StackPane fx:id="monthlyChartPane" minHeight="220" prefHeight="220"/>
+    </VBox>
+
+    <!-- ── Export PDF ── -->
+    <VBox spacing="14"
+          style="-fx-background-color:#12172b;-fx-background-radius:14;
+                 -fx-border-color:#1e2a45;-fx-border-radius:14;-fx-padding:22;">
+        <Label text="📄 Export du profil"
+               style="-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;
+                      -fx-border-color:transparent transparent #1e2a45 transparent;
+                      -fx-border-width:0 0 1 0;-fx-padding:0 0 10 0;"/>
+        <Label text="Téléchargez votre profil complet au format HTML/PDF incluant vos statistiques, historique et informations."
+               wrapText="true"
+               style="-fx-text-fill:#94a3b8;-fx-font-size:13px;"/>
+        <HBox spacing="14" alignment="CENTER_LEFT">
+            <Button text="⬇  Télécharger mon profil" onAction="#handleExportPdf"
+                    style="-fx-background-color:#7c3aed;-fx-text-fill:white;-fx-background-radius:10;
+                           -fx-padding:11 24;-fx-cursor:hand;-fx-font-weight:bold;-fx-font-size:14px;"/>
+            <Label fx:id="exportStatusLabel" text="" visible="false" managed="false"
+                   style="-fx-font-size:13px;"/>
+        </HBox>
+    </VBox>
+
+</VBox>
+</ScrollPane>

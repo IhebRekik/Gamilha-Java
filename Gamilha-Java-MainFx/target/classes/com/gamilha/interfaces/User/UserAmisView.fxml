@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.UserAmisController"
+            style="-fx-background-color:#111827;">
+
+    <!-- Header -->
+    <top>
+        <VBox style="-fx-background-color:#0f1020;
+                     -fx-border-color:#2a2b4a;-fx-border-width:0 0 1 0;">
+            <padding><Insets top="16" right="24" bottom="16" left="24"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                    <Label text="👤  Mes Amis"
+                           style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                    <Label text="Gérez vos amis et découvrez de nouvelles personnes"
+                           style="-fx-text-fill:#8b949e;-fx-font-size:12;"/>
+                </VBox>
+                <Button text="🔄  Rafraîchir" onAction="#onRefresh"
+                        style="-fx-background-color:#1f1f3a;-fx-text-fill:#c9d1d9;
+                               -fx-background-radius:8;-fx-padding:7 14;-fx-cursor:hand;"/>
+            </HBox>
+
+            <!-- Recherche amis -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <VBox.margin><Insets top="12"/></VBox.margin>
+                <Label text="🔍" style="-fx-text-fill:#8b949e;-fx-font-size:14;"/>
+                <TextField fx:id="searchFriendsField"
+                           promptText="Rechercher parmi vos amis…"
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-background-color:#1c1c2e;-fx-text-fill:#e6edf3;
+                                  -fx-prompt-text-fill:#6e7681;-fx-background-radius:8;
+                                  -fx-border-color:#2a2b4a;-fx-border-radius:8;
+                                  -fx-padding:8 12;-fx-font-size:13;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Corps : 2 colonnes -->
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background:transparent;-fx-background-color:transparent;
+                           -fx-border-color:transparent;">
+            <content>
+                <HBox spacing="24" alignment="TOP_LEFT">
+                    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+                    <!-- ── Mes amis ─────────────────────────────── -->
+                    <VBox spacing="14" prefWidth="480" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="🟢  Mes Amis"
+                                   style="-fx-font-size:15;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                            <Label fx:id="friendsCountLabel" text="0 ami(s)"
+                                   style="-fx-text-fill:#8b949e;-fx-font-size:12;
+                                          -fx-background-color:#1f1f3a;-fx-background-radius:10;
+                                          -fx-padding:2 8;"/>
+                        </HBox>
+                        <VBox fx:id="friendsBox" spacing="10"/>
+                    </VBox>
+
+                    <!-- ── Suggestions ────────────────────────────── -->
+                    <VBox spacing="14" prefWidth="380" minWidth="280">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="✨  Suggestions"
+                                   style="-fx-font-size:15;-fx-font-weight:bold;-fx-text-fill:#e6edf3;"/>
+                            <Label fx:id="suggestionsCountLabel" text="0 suggestion(s)"
+                                   style="-fx-text-fill:#8b949e;-fx-font-size:12;
+                                          -fx-background-color:#1f1f3a;-fx-background-radius:10;
+                                          -fx-padding:2 8;"/>
+                        </HBox>
+                        <VBox fx:id="suggestionsBox" spacing="10"/>
+                    </VBox>
+
+                </HBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

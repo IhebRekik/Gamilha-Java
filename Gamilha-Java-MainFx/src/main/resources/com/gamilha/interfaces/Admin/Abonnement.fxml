@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15"
+      style="-fx-background-color:#0f172a;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.abonnement.AbonnementAdminController">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+
+        <Label text="Gestion des abonnements"
+               style="-fx-text-fill:white;-fx-font-size:22;-fx-font-weight:bold;"/>
+
+        <Pane HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnAdd"
+                text="+ Nouvel abonnement"
+                style="-fx-background-color:#22c55e;-fx-text-fill:white;-fx-font-weight:bold;"/>
+    </HBox>
+
+    <HBox spacing="10">
+
+        <TextField fx:id="searchInput"
+                   promptText="Search"
+                   HBox.hgrow="ALWAYS"/>
+
+        <ComboBox fx:id="filterType"
+                  promptText="Type"/>
+
+        <ComboBox fx:id="sortPrice"
+                  promptText="Sort price"/>
+    </HBox>
+
+    <ScrollPane VBox.vgrow="ALWAYS"
+                fitToWidth="true"
+                style="-fx-background-color:transparent;
+                   -fx-background:#020617;
+                   -fx-border-color:transparent;">
+
+        <GridPane fx:id="tableGrid"
+                  hgap="0"
+                  vgap="0"
+                  style="
+              -fx-background-color:#020617;
+              -fx-border-color:#1e293b;
+              -fx-border-radius:8;
+              ">
+
+        </GridPane>
+
+    </ScrollPane>
+
+</VBox>
