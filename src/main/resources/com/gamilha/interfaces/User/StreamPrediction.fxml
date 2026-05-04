@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<!--
+  StreamPrediction.fxml — équivalent de prediction/show.html.twig Symfony.
+  Sections identiques au template Twig :
+    • Badge confiance (vert/orange/rouge selon niveau)
+    • 3 KPIs : streams attendus / min / max
+    • Statistiques contributions 90 jours
+    • Recommandations (high=rouge, medium=orange)
+    • Info modèle IA
+-->
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.gamilha.controllers.StreamPredictionController"
+            stylesheets="@../../css/style.css"
+            prefWidth="1280" prefHeight="800">
+
+    <!-- ══ NAVBAR ══════════════════════════════════════════════════════ -->
+    <top>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="navbar">
+                <padding><Insets topRightBottomLeft="14"/></padding>
+                <Label text="🎮 GAMILHA" styleClass="brand"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="← Retour aux streams" onAction="#onBack"    styleClass="btn-secondary"/>
+                <Button text="🔄 Actualiser"          onAction="#onRefresh" styleClass="btn-primary"/>
+            </HBox>
+
+            <!-- Header : titre + badge confiance -->
+            <HBox alignment="CENTER_LEFT" spacing="16" styleClass="page-header">
+                <padding><Insets top="14" right="24" bottom="10" left="24"/></padding>
+                <Label fx:id="lblUserName" text="📊 Prédiction IA"
+                       styleClass="page-title" wrapText="true"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblConfidenceBadge" text="Confiance : —"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ══ CONTENU ════════════════════════════════════════════════════ -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-dark">
+            <VBox spacing="20">
+                <padding><Insets topRightBottomLeft="28"/></padding>
+
+                <!-- Spinner chargement -->
+                <VBox fx:id="loadingBox" alignment="CENTER" spacing="14"
+                      prefHeight="300" visible="true" managed="true">
+                    <Label text="⏳ Calcul de la prédiction en cours…"
+                           style="-fx-font-size:16px;-fx-text-fill:#94a3b8;"/>
+                    <ProgressIndicator style="-fx-accent:#8b5cf6;" prefWidth="50" prefHeight="50"/>
+                </VBox>
+
+                <!-- Contenu principal (caché pendant le chargement) -->
+                <VBox fx:id="contentBox" spacing="20" visible="false" managed="false">
+
+                    <!-- Sous-titre période -->
+                    <Label fx:id="lblPeriod" text=""
+                           style="-fx-text-fill:#64748b;-fx-font-size:13px;"/>
+
+                    <!-- ── KPIs prédiction ──────────────────────────── -->
+                    <!-- Identique au row col-md-4 Twig -->
+                    <HBox spacing="16">
+
+                        <!-- Streams attendus -->
+                        <VBox spacing="8" alignment="CENTER" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color:#111827;-fx-border-color:#1f2937;
+                                     -fx-border-radius:12;-fx-background-radius:12;-fx-padding:24;">
+                            <Label text="Streams attendus"
+                                   style="-fx-text-fill:#64748b;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                            <Label fx:id="lblExpected" text="—"
+                                   style="-fx-font-size:52px;-fx-font-weight:bold;-fx-text-fill:#8b5cf6;"/>
+                            <Label text="streams prévus"
+                                   style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
+                        </VBox>
+
+                        <!-- Min -->
+                        <VBox spacing="8" alignment="CENTER" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color:#111827;-fx-border-color:#1f2937;
+                                     -fx-border-radius:12;-fx-background-radius:12;-fx-padding:24;">
+                            <Label text="Minimum estimé"
+                                   style="-fx-text-fill:#64748b;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                            <Label fx:id="lblMin" text="—"
+                                   style="-fx-font-size:52px;-fx-font-weight:bold;-fx-text-fill:#60a5fa;"/>
+                            <Label text="streams minimum"
+                                   style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
+                        </VBox>
+
+                        <!-- Max -->
+                        <VBox spacing="8" alignment="CENTER" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color:#111827;-fx-border-color:#1f2937;
+                                     -fx-border-radius:12;-fx-background-radius:12;-fx-padding:24;">
+                            <Label text="Maximum estimé"
+                                   style="-fx-text-fill:#64748b;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                            <Label fx:id="lblMax" text="—"
+                                   style="-fx-font-size:52px;-fx-font-weight:bold;-fx-text-fill:#4ade80;"/>
+                            <Label text="streams maximum"
+                                   style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- ── Statistiques (contributions 90j) ──────────── -->
+                    <VBox spacing="14" styleClass="section-box">
+                        <padding><Insets topRightBottomLeft="18"/></padding>
+                        <Label text="📈 Statistiques des 90 derniers jours" styleClass="section-title"/>
+
+                        <GridPane hgap="24" vgap="10">
+                            <!-- Colonne 1 -->
+                            <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <Label text="Streams réalisés" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblTotalStreams" text="—"
+                                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;"/>
+                            </VBox>
+                            <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <Label text="Fréquence" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblStreamsPerWeek" text="—"
+                                       style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#a78bfa;"/>
+                            </VBox>
+                            <VBox spacing="4" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                <Label text="Viewers total" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblTotalViewers" text="—"
+                                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;"/>
+                            </VBox>
+                            <VBox spacing="4" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                                <Label text="Viewers moyens" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblAvgViewers" text="—"
+                                       style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#67e8f9;"/>
+                            </VBox>
+
+                            <!-- Colonne 2 -->
+                            <VBox spacing="4" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <Label text="Donations reçues" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblTotalDonations" text="—"
+                                       style="-fx-font-size:22px;-fx-font-weight:bold;-fx-text-fill:#e2e8f0;"/>
+                            </VBox>
+                            <VBox spacing="4" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <Label text="Montant total" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblDonationAmount" text="—"
+                                       style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#4ade80;"/>
+                            </VBox>
+                            <VBox spacing="4" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                <Label text="Moy. donation / stream" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblAvgDonPerStream" text="—"
+                                       style="-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#4ade80;"/>
+                            </VBox>
+                            <VBox spacing="4" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                <Label text="Dernier stream" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+                                <Label fx:id="lblLastStream" text="—"
+                                       style="-fx-font-size:13px;-fx-text-fill:#94a3b8;"/>
+                            </VBox>
+                        </GridPane>
+                    </VBox>
+
+                    <!-- ── Recommandations ────────────────────────────── -->
+                    <!-- Identique Twig : priority high=danger, medium=warning -->
+                    <VBox spacing="10" styleClass="section-box">
+                        <padding><Insets topRightBottomLeft="18"/></padding>
+                        <Label text="💡 Recommandations" styleClass="section-title"/>
+                        <VBox fx:id="recBox" spacing="10"/>
+                    </VBox>
+
+                    <!-- ── Info modèle ────────────────────────────────── -->
+                    <VBox spacing="8" styleClass="section-box">
+                        <padding><Insets topRightBottomLeft="18"/></padding>
+                        <Label text="⚙ Informations du modèle"
+                               style="-fx-text-fill:#64748b;-fx-font-size:12px;-fx-font-weight:bold;"/>
+                        <HBox spacing="24">
+                            <VBox spacing="2">
+                                <Label text="Type" style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
+                                <Label fx:id="lblModelType" text="—"
+                                       style="-fx-text-fill:#94a3b8;-fx-font-size:12px;"/>
+                            </VBox>
+                            <VBox spacing="2">
+                                <Label text="Version" style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
+                                <Label fx:id="lblModelVersion" text="—"
+                                       style="-fx-text-fill:#94a3b8;-fx-font-size:12px;"/>
+                            </VBox>
+                            <VBox spacing="2">
+                                <Label text="Calculé le" style="-fx-text-fill:#475569;-fx-font-size:11px;"/>
+                                <Label fx:id="lblModelDate" text="—"
+                                       style="-fx-text-fill:#94a3b8;-fx-font-size:12px;"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ══ FOOTER ══════════════════════════════════════════════════════ -->
+    <bottom>
+        <HBox alignment="CENTER" styleClass="footer">
+            <padding><Insets topRightBottomLeft="10"/></padding>
+            <Label text="Gamilha — E-Sport &amp; Tournois" styleClass="footer-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>

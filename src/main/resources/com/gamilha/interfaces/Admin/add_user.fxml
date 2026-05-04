@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.ColumnConstraints?>
+
+<ScrollPane fitToWidth="true"
+            fx:controller="com.gamilha.controllers.AddUserController"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            style="-fx-background-color:#1a1e2e;-fx-background:transparent;">
+
+<VBox spacing="22" alignment="TOP_CENTER"
+      style="-fx-background-color:#1a1e2e;">
+
+    <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+
+    <HBox maxWidth="900" alignment="CENTER_LEFT">
+        <Button text="← Retour à la liste" onAction="#cancel"
+                style="-fx-font-size:14px;-fx-background-color:transparent;-fx-text-fill:#c084fc;
+                       -fx-background-radius:8;-fx-padding:8 16;-fx-cursor:hand;"/>
+    </HBox>
+
+    <Label text="✚ Nouvel Utilisateur"
+           style="-fx-font-size:26px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+
+    <Label fx:id="errorLabel" wrapText="true" maxWidth="860"
+           style="-fx-text-fill:#fca5a5;-fx-background-color:#2d1111;-fx-padding:12;
+                  -fx-background-radius:8;-fx-font-size:13px;" visible="false" managed="false"/>
+    <Label fx:id="successLabel" wrapText="true" maxWidth="860"
+           style="-fx-text-fill:#86efac;-fx-background-color:#0f2d18;-fx-padding:12;
+                  -fx-background-radius:8;-fx-font-size:13px;" visible="false" managed="false"/>
+
+    <VBox maxWidth="900" spacing="0"
+          style="-fx-background-color:#0d1117;-fx-background-radius:14;
+                 -fx-border-color:#1e293b;-fx-border-radius:14;">
+
+        <GridPane hgap="30" vgap="20">
+            <padding><Insets top="35" right="35" bottom="20" left="35"/></padding>
+            <columnConstraints>
+                <ColumnConstraints prefWidth="210"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+                <ColumnConstraints prefWidth="210"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <!-- Nom -->
+            <Label text="Nom complet" style="-fx-text-fill:#94a3b8;" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                       promptText="Ahmed Ben Ali"
+                       style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+
+            <!-- Email -->
+            <Label text="Adresse email" style="-fx-text-fill:#94a3b8;" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+            <TextField fx:id="emailField" GridPane.rowIndex="0" GridPane.columnIndex="3"
+                       promptText="email@exemple.com"
+                       style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10;"/>
+
+
+            <!-- Image de profil -->
+            <Label text="Image de profil (PNG, JPG)" style="-fx-text-fill:#94a3b8;" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <HBox GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.columnSpan="3" spacing="18" alignment="CENTER_LEFT">
+                <ImageView fx:id="avatarPreview" fitWidth="72" fitHeight="72" preserveRatio="true"/>
+                <VBox spacing="7">
+                    <HBox spacing="10">
+                        <Button text="Choisir un fichier" onAction="#chooseAvatar"
+                                style="-fx-background-color:#1a1e2e;-fx-text-fill:white;-fx-border-color:#374151;-fx-border-radius:6;-fx-background-radius:6;-fx-padding:8 14;-fx-cursor:hand;"/>
+                        <Label fx:id="avatarPathLabel" text="Aucun fichier choisi"
+                               style="-fx-text-fill:#64748b;-fx-font-size:12px;"/>
+                    </HBox>
+                    <Button text="✨ Générer avatar IA" onAction="#generateAiAvatar"
+                            style="-fx-background-color:#6d28d9;-fx-text-fill:white;-fx-background-radius:6;-fx-padding:8 14;-fx-cursor:hand;-fx-font-size:12px;"/>
+                    <Label text="✨ Converti automatiquement en avatar cartoon"
+                           style="-fx-text-fill:#a78bfa;-fx-font-size:11px;"/>
+                </VBox>
+            </HBox>
+        </GridPane>
+
+        <Separator style="-fx-border-color:#1e293b;"/>
+
+        <!-- Rôles -->
+        <VBox spacing="12">
+            <padding><Insets top="20" right="35" bottom="0" left="35"/></padding>
+            <Label text="Rôles" style="-fx-font-size:15px;-fx-font-weight:bold;-fx-text-fill:white;"/>
+            <HBox spacing="30">
+                <CheckBox text="Utilisateur"    style="-fx-text-fill:white;" selected="true"/>
+                <CheckBox text="Administrateur" style="-fx-text-fill:white;"/>
+            </HBox>
+        </VBox>
+
+        <Separator style="-fx-border-color:#1e293b;">
+            <VBox.margin>
+                <Insets top="10" right="35" bottom="10" left="35"/>
+            </VBox.margin>
+        </Separator>
+
+        <!-- Statut + Ban + Signalements -->
+        <HBox spacing="40" alignment="TOP_LEFT">
+            <padding><Insets top="0" right="35" bottom="24" left="35"/></padding>
+
+            <VBox spacing="8">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="activeCheckBox" selected="true" style="-fx-text-fill:white;"/>
+                    <Label text="Compte actif" style="-fx-text-fill:white;-fx-font-weight:bold;"/>
+                </HBox>
+                <Label text="ℹ Désactiver empêche la connexion" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label text="Banni jusqu'au" style="-fx-text-fill:#94a3b8;-fx-font-size:13px;"/>
+                <DatePicker fx:id="banDatePicker" promptText="jj/mm/aaaa"
+                            style="-fx-background-color:#1a1e2e;"/>
+                <Label text="ℹ Bannir temporairement l'utilisateur" style="-fx-text-fill:#64748b;-fx-font-size:11px;"/>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <!-- Boutons -->
+    <HBox spacing="15" alignment="CENTER_RIGHT" maxWidth="900">
+        <Button text="← Retour à la liste" onAction="#cancel"
+                style="-fx-background-color:transparent;-fx-text-fill:#94a3b8;-fx-border-color:#374151;-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10 20;-fx-cursor:hand;"/>
+        <Button text="💾 Enregistrer" onAction="#saveUser"
+                style="-fx-background-color:#2563eb;-fx-text-fill:white;-fx-background-radius:8;-fx-padding:10 28;-fx-cursor:hand;-fx-font-weight:bold;-fx-font-size:14px;"/>
+    </HBox>
+</VBox>
+</ScrollPane>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="18"
+      style="-fx-background-color:#0a0f1e;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.coaching.FavoritesController">
+
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+    <VBox spacing="4">
+        <Label text="Mes favoris"
+               style="-fx-text-fill:white;-fx-font-size:24;-fx-font-weight:bold;"/>
+        <Label fx:id="lblCount"
+               style="-fx-text-fill:#f472b6;-fx-font-size:13;"/>
+    </VBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                style="-fx-background-color:transparent;-fx-background:#0a0f1e;-fx-border-color:transparent;">
+        <FlowPane fx:id="cardsPane"
+                  hgap="18" vgap="18"
+                  style="-fx-background-color:#0a0f1e;-fx-padding:4;"/>
+    </ScrollPane>
+
+</VBox>

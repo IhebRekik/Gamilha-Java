@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="18"
+      style="-fx-background-color:#0a0f1e;"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.gamilha.controllers.coaching.PlaylistController">
+
+    <padding><Insets top="24" right="24" bottom="24" left="24"/></padding>
+
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <HBox spacing="14" alignment="CENTER_LEFT">
+
+        <VBox spacing="2">
+            <Label text="🎓 Playlists de Coaching"
+                   style="-fx-text-fill:white;-fx-font-size:24;-fx-font-weight:bold;"/>
+            <Label text="Parcourez et gérez vos playlists"
+                   style="-fx-text-fill:#64748b;-fx-font-size:13;"/>
+        </VBox>
+
+        <Pane HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnAdd"
+                text="➕ Nouvelle Playlist"
+                onAction="#handleAdd"
+                style="-fx-background-color:linear-gradient(to right,#7c3aed,#4c1d95);
+                       -fx-text-fill:white;-fx-font-weight:bold;-fx-font-size:13;
+                       -fx-background-radius:9;-fx-padding:10 22;
+                       -fx-effect:dropshadow(gaussian,rgba(124,58,237,0.5),10,0,0,3);"/>
+    </HBox>
+
+    <!-- ═══ BARRE DE RECHERCHE / FILTRE ════════════════════════════════════ -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+
+        <StackPane HBox.hgrow="ALWAYS">
+            <TextField fx:id="searchInput"
+                       promptText="   🔍  Rechercher une playlist..."
+                       style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                              -fx-prompt-text-fill:#475569;-fx-background-radius:8;
+                              -fx-padding:10 14;-fx-font-size:13;-fx-border-color:#334155;
+                              -fx-border-radius:8;-fx-border-width:1;"/>
+        </StackPane>
+
+        <ComboBox fx:id="filterNiveau"
+                  promptText="Niveau"
+                  prefWidth="150"
+                  style="-fx-background-color:#1e293b;-fx-text-fill:white;
+                         -fx-background-radius:8;-fx-padding:4;"/>
+    </HBox>
+
+    <!-- ═══ GRILLE DE CARDS ═════════════════════════════════════════════════ -->
+    <ScrollPane VBox.vgrow="ALWAYS"
+                fitToWidth="true"
+                style="-fx-background-color:transparent;-fx-background:#0a0f1e;
+                       -fx-border-color:transparent;-fx-padding:0;">
+
+        <FlowPane fx:id="cardsPane"
+                  hgap="20" vgap="20"
+                  style="-fx-background-color:#0a0f1e;-fx-padding:4;">
+        </FlowPane>
+
+    </ScrollPane>
+
+</VBox>
