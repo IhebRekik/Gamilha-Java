@@ -1,458 +1,542 @@
-# 📘 Documentation Complète — Gamilha JavaFX
+<div align="center">
 
-Projet JavaFX qui reproduit la partie **Social** (Posts + Commentaires) du projet
-Symfony Gamilha. Cette documentation explique **chaque couche, chaque fichier et
-chaque décision de conception**.
+```
+  ██████╗  █████╗ ███╗   ███╗██╗██╗     ██╗  ██╗ █████╗ 
+ ██╔════╝ ██╔══██╗████╗ ████║██║██║     ██║  ██║██╔══██╗
+ ██║  ███╗███████║██╔████╔██║██║██║     ███████║███████║
+ ██║   ██║██╔══██║██║╚██╔╝██║██║██║     ██╔══██║██╔══██║
+ ╚██████╔╝██║  ██║██║ ╚═╝ ██║██║███████╗██║  ██║██║  ██║
+  ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝
+```
+
+### 🎮 All-in-One Gaming Platform
+
+**Compete · Stream · Connect · Rise**
+
+<br/>
+
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![JavaFX](https://img.shields.io/badge/JavaFX-17.0.8-0078D7?style=for-the-badge&logo=java&logoColor=white)](https://openjfx.io/)
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Symfony](https://img.shields.io/badge/Symfony-6.x-000000?style=for-the-badge&logo=symfony&logoColor=white)](https://symfony.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+
+<br/>
+
+[![Stripe](https://img.shields.io/badge/Stripe-Payments-635BFF?style=flat-square&logo=stripe&logoColor=white)](https://stripe.com/)
+[![Ably](https://img.shields.io/badge/Ably-Realtime-FF5416?style=flat-square)](https://ably.com/)
+[![Ollama](https://img.shields.io/badge/Ollama-AI%20Chat-black?style=flat-square)](https://ollama.com/)
+[![Vosk](https://img.shields.io/badge/Vosk-Speech-green?style=flat-square)](https://alphacephei.com/vosk/)
+[![ZXing](https://img.shields.io/badge/ZXing-QR%20Code-orange?style=flat-square)](https://github.com/zxing/zxing)
+[![VLC](https://img.shields.io/badge/VLCJ-Media-FF8800?style=flat-square&logo=vlcmediaplayer&logoColor=white)](https://github.com/caprica/vlcj)
+[![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
+
+<br/>
+
+> **Gamilha** est une plateforme gaming complète disponible en deux versions :  
+> une **application desktop Java/JavaFX** et une **application web Symfony/PHP**.  
+> Les deux partagent la même base de données MySQL et les mêmes intégrations tierces.
+
+</div>
 
 ---
 
-## 🗂️ Arborescence complète du projet
+## 📋 Table des Matières
 
-```
-gamilha-javafx/
-│
-├── pom.xml                              ← Configuration Maven (dépendances + plugins)
-│
-├── src/
-│   ├── main/
-│   │   ├── java/com/gamilha/
-│   │   │   │
-│   │   │   ├── MainApp.java             ← Point d'entrée de l'application
-│   │   │   │
-│   │   │   ├── model/                   ← Entités (miroir des entités Symfony)
-│   │   │   │   ├── User.java
-│   │   │   │   ├── Post.java
-│   │   │   │   └── Commentaire.java
-│   │   │   │
-│   │   │   ├── service/                 ← Accès BD + logique métier
-│   │   │   │   ├── DBConnection.java
-│   │   │   │   ├── SessionContext.java
-│   │   │   │   ├── MediaHelper.java
-│   │   │   │   ├── UserService.java
-│   │   │   │   ├── PostService.java
-│   │   │   │   ├── CommentaireService.java
-│   │   │   │   └── FriendService.java
-│   │   │   │
-│   │   │   └── controller/              ← Contrôleurs JavaFX (liés aux FXML)
-│   │   │       ├── NavBarUserController.java
-│   │   │       ├── NavBarAdminController.java
-│   │   │       ├── UserPostController.java
-│   │   │       ├── UserPostFormController.java
-│   │   │       ├── UserAmisController.java
-│   │   │       ├── UserMesPostsController.java
-│   │   │       ├── UserMesCommentairesController.java
-│   │   │       ├── UserCommentaireFormController.java
-│   │   │       ├── AdminPostController.java
-│   │   │       ├── AdminCommentaireController.java
-│   │   │       ├── PostFormController.java
-│   │   │       └── CommentaireFormController.java
-│   │   │
-│   │   └── resources/com/gamilha/
-│   │       ├── styles.css               ← Thème sombre global
-│   │       ├── images/
-│   │       │   └── logo.png             ← Logo Gamilha
-│   │       └── interfaces/
-│   │           ├── User/                ← Interfaces côté utilisateur
-│   │           │   ├── NavBarUser.fxml
-│   │           │   ├── UserPostView.fxml
-│   │           │   ├── UserPostFormView.fxml
-│   │           │   ├── UserAmisView.fxml
-│   │           │   ├── UserMesPostsView.fxml
-│   │           │   ├── UserMesCommentairesView.fxml
-│   │           │   └── UserCommentaireFormView.fxml
-│   │           └── Admin/               ← Interfaces côté admin
-│   │               ├── NavBarAdmin.fxml
-│   │               ├── AdminPostView.fxml
-│   │               ├── AdminCommentaireView.fxml
-│   │               ├── PostFormView.fxml
-│   │               └── CommentaireFormView.fxml
-│   │
-│   └── test/java/com/gamilha/           ← Tests unitaires
-│       ├── GamilhaTestSuite.java
-│       ├── model/
-│       │   ├── UserTest.java
-│       │   ├── PostTest.java
-│       │   └── CommentaireTest.java
-│       └── service/
-│           ├── SessionContextTest.java
-│           ├── MediaHelperTest.java
-│           ├── PostServiceTest.java
-│           └── CommentaireServiceTest.java
-```
+- [Description](#-description)
+- [Architecture Physique](#-architecture-physique)
+- [Fonctionnalités & Modules](#-fonctionnalités--modules)
+- [Version Desktop — Java/JavaFX](#-version-desktop--javajavafx)
+- [Version Web — Symfony/PHP](#-version-web--symfonyphp)
+- [Base de Données Partagée](#-base-de-données-partagée)
+- [Équipe & Modules](#-équipe--modules)
+- [Topics & Mots-clés](#-topics--mots-clés)
 
 ---
 
-## 🧱 COUCHE 1 — Modèles (`model/`)
+## 📖 Description
 
-Les modèles sont la **représentation Java** des entités Symfony.
+**Gamilha** (de l'arabe *جميلة* — belle) est un projet universitaire développé à **ESPRIT**, conçu comme une plateforme gaming communautaire tout-en-un. Elle réunit dans un seul écosystème tout ce dont un gamer a besoin :
 
-### `User.java`
-**Miroir de** `src/Entity/User.php`
+-  **Compétitions** : tournois, brackets, matchs, équipes
+-  **Streaming** : streams en direct, donations temps réel, analytics, prédiction ML
+-  **Social** : posts, commentaires, amis, messagerie privée
+-  **Coaching** : vidéos, playlists, ressources par jeu
+-  **Monétisation** : abonnements premium, paiements Stripe, QR codes
+-  **IA** : assistant ChatAI (Ollama), avatars générés, reconnaissance vocale (Vosk)
 
-```java
-private int     id;           // #[ORM\Id]
-private String  name;         // #[ORM\Column]
-private String  email;        // #[ORM\Column]
-private String  profileImage; // #[ORM\Column(nullable: true)]
-private String  roles;        // #[ORM\Column(type: 'json')]  → stocké en JSON
-private boolean isActive;     // #[ORM\Column(type: 'boolean')]
-private String  banUntil;     // #[ORM\Column(nullable: true)]
-```
+Le projet existe en **deux implémentations complémentaires** partageant la même base de données :
 
-**Méthode clé : `isAdmin()`**
-```java
-public boolean isAdmin() {
-    return roles != null && roles.contains("ROLE_ADMIN");
-}
-```
-Reproduit en Java la logique Symfony `is_granted('ROLE_ADMIN')`.
-Le champ `roles` est stocké en JSON dans MySQL : `["ROLE_USER"]` ou `["ROLE_ADMIN"]`.
-
----
-
-### `Post.java`
-**Miroir de** `src/Entity/Post.php`
-
-```java
-private int           id;
-private String        content;     // #[Assert\Length(min: 12)]
-private String        image;       // nom du fichier dans public/uploads/
-private String        mediaurl;    // URL YouTube ou image distante
-private LocalDateTime createdAt;
-private User          user;        // #[ORM\ManyToOne] → jointure SQL JOIN
-private int           likesCount;  // calculé via COUNT(post_likes)
-private List<Commentaire> commentaires; // #[ORM\OneToMany]
-```
-
-La liste `commentaires` est initialisée à `new ArrayList<>()` dans le constructeur
-vide pour éviter les `NullPointerException`.
-
----
-
-### `Commentaire.java`
-**Miroir de** `src/Entity/Commentaire.php`
-
-```java
-private int           id;
-private String        text;     // #[Assert\Length(min:5, max:500)]
-private LocalDateTime createdAt;
-private Post          post;     // #[ORM\ManyToOne] → ManyToOne vers Post
-private User          user;     // #[ORM\ManyToOne] → ManyToOne vers User
-```
-
-**Relations** :
-- Un commentaire appartient à **un** post (`ManyToOne`)
-- Un commentaire est écrit par **un** utilisateur (`ManyToOne`)
-
----
-
-## 🗄️ COUCHE 2 — Services (`service/`)
-
-Les services sont la **couche d'accès à la base de données**.
-Ils remplacent les Repository Symfony et les Controller Symfony en un seul endroit.
-
-### `DBConnection.java`
-```java
-// Singleton : une seule instance de connexion
-private static Connection instance;
-
-public static Connection getInstance() {
-    if (instance == null || instance.isClosed()) {
-        instance = DriverManager.getConnection(URL, USER, PASSWORD);
-    }
-    return instance;
-}
-```
-**Pourquoi un Singleton ?** Pour ne pas ouvrir 10 connexions MySQL simultanées.
-La connexion est réutilisée dans tous les services.
-
-⚠️ **À configurer** : `URL`, `USER`, `PASSWORD` selon ton `.env` Symfony.
-
----
-
-### `PostService.java`
-Contient les 5 opérations CRUD + la recherche.
-
-**Requête `findAll()` avec JOIN** :
-```sql
-SELECT p.id, p.content, p.image, p.created_at, p.mediaurl, p.user_id,
-       u.name AS u_name, u.email AS u_email, u.profile_image AS u_pic,
-       u.roles, u.is_active, u.ban_until,
-       (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id) AS likes_count
-FROM post p
-JOIN `user` u ON u.id = p.user_id
-ORDER BY p.id DESC
-```
-
-Cette requête charge le Post ET son User en **une seule requête SQL**
-(évite le problème N+1 qu'on a en Symfony si on ne fait pas `JOIN`).
-
-**Méthode `map()`** : convertit une ligne SQL (`ResultSet`) en objet Java (`Post`).
-
----
-
-### `CommentaireService.java`
-Deux variantes de mapping :
-- `mapLight()` : juste l'ID du post (pour `findByPost()`)
-- `mapFull()` : avec les infos du post (pour `findAll()` admin)
-
----
-
-### `MediaHelper.java`
-**Reproduit la logique Twig** de `social/index.html.twig` :
-
-```twig
-{% if 'youtube.com' in post.mediaurl %}
-    → embed YouTube
-{% elseif post.mediaurl starts with 'http' %}
-    → afficher comme image
-{% else %}
-    → lien générique
-{% endif %}
-```
-
-En Java :
-```java
-public static MediaType detect(String url) {
-    if (url.contains("youtube.com") || url.contains("youtu.be")) return YOUTUBE;
-    if (url.toLowerCase().endsWith(".jpg") || ...) return IMAGE_URL;
-    if (url.startsWith("http")) return IMAGE_URL;
-    return LINK;
-}
-```
-
-Pour YouTube, `WebView` charge directement l'URL embed :
-`https://www.youtube.com/embed/{videoId}`
-
----
-
-### `SessionContext.java`
-**Équivalent de `app.user` dans Twig.**
-```java
-// Symfony :  app.user
-// JavaFX  :  SessionContext.getCurrentUser()
-
-public static void setCurrentUser(User user) { currentUser = user; }
-public static User getCurrentUser()          { return currentUser; }
-public static void clear()                   { currentUser = null; }  // logout
-public static boolean isLoggedIn()           { return currentUser != null; }
-```
-
----
-
-### `FriendService.java`
-Gère la table `friend` de Symfony.
-- `findFriends(userId)` → liste des amis
-- `findSuggestions(userId, limit)` → utilisateurs pas encore amis
-- `addFriend(userId, friendId)` → INSERT dans `friend`
-
----
-
-## 🎮 COUCHE 3 — Contrôleurs (`controller/`)
-
-Les contrôleurs sont le **lien entre les FXML (vues) et les services (données)**.
-C'est l'équivalent des contrôleurs Symfony, mais pour JavaFX.
-
-### `NavBarUserController.java`
-**C'est le contrôleur principal.** Il gère la navigation entre les pages.
-
-```java
-@FXML public void goReseaux() {
-    User u = SessionContext.getCurrentUser();
-    if (u != null && u.isAdmin()) {
-        // ROLE_ADMIN → cards admin (gestion de tous les posts)
-        load(BASE_ADMIN + "AdminPostView.fxml");
-    } else {
-        // ROLE_USER → fil social (fil + sidebar amis)
-        load(BASE_USER + "UserPostView.fxml");
-    }
-}
-```
-
-**Sous-menu Social** (masqué pour les admins) :
-```
-🏠 Fil d'actualité   → UserPostView.fxml
-📝 Mes Posts         → UserMesPostsView.fxml
-💬 Mes Commentaires  → UserMesCommentairesView.fxml
-👤 Amis              → UserAmisView.fxml
-```
-
----
-
-### `UserPostController.java`
-**Le plus complexe.** Reproduit `social/index.html.twig`.
-
-**Construction dynamique des cards** (JavaFX n'a pas de moteur de template) :
-```java
-private VBox buildPostCard(Post post) {
-    VBox card = new VBox(0);
-    card.getChildren().addAll(
-        buildPostHeader(post),    // avatar + nom + date + ⋮
-        buildPostContent(post),   // texte + image locale
-        buildPostMedia(post),     // YouTube WebView ou image URL
-        buildPostStats(post),     // ❤ likes + 💬 commentaires
-        sep(16),                  // séparateur
-        buildCommentsList(post),  // liste des commentaires
-        buildAddCommentRow(post)  // champ "Écrire un commentaire..."
-    );
-    return card;
-}
-```
-
-**Bouton ⋮ (3 points)** — reproduit `{% if post.user == app.user %}` :
-```java
-// FXML Symfony :
-// {% if post.user == app.user %}
-//     <button data-bs-toggle="modal">...</button>
-// {% endif %}
-
-// JavaFX équivalent :
-if (isOwner(post.getUser())) {
-    Button menuBtn = menuButton();   // bouton ⋮
-    menuBtn.setOnAction(e -> showPostMenu(menuBtn, post));
-    header.getChildren().add(menuBtn);
-}
-
-private boolean isOwner(User u) {
-    return currentUser != null && u != null && u.getId() == currentUser.getId();
-}
-```
-
-**Menu contextuel** (équivalent du modal Bootstrap) :
-```java
-private void showPostMenu(Button anchor, Post post) {
-    ContextMenu menu = new ContextMenu();
-    MenuItem editItem = new MenuItem("✏ Modifier");
-    MenuItem delItem  = new MenuItem("🗑 Supprimer");
-    editItem.setOnAction(e -> openEditPost(post));
-    delItem.setOnAction(e -> confirmDeletePost(post));
-    menu.getItems().addAll(editItem, new SeparatorMenuItem(), delItem);
-    menu.show(anchor, Side.BOTTOM, 0, 4);
-}
-```
-
----
-
-### `AdminPostController.java`
-Affiche **tous** les posts en cards (pas filtré par utilisateur).
-Le bouton ⋮ est visible sur **chaque** post (pas de vérification de propriété).
-Inclut un toggle "Voir commentaires" qui charge les commentaires du post inline.
-
----
-
-## 🎨 COUCHE 4 — Interfaces FXML (`resources/interfaces/`)
-
-Les fichiers `.fxml` sont l'équivalent des templates Twig.
-Ils définissent la **structure visuelle** et les **liaisons avec les contrôleurs**.
-
-### Syntaxe FXML
-```xml
-<!-- Lier la vue au contrôleur -->
-fx:controller="com.gamilha.controllers.UserPostController"
-
-<!-- Lier un élément à une variable @FXML du contrôleur -->
-<VBox fx:id="feedBox"/>
-
-<!-- Lier un bouton à une méthode @FXML -->
-<Button onAction="#onNewPost" text="Publier"/>
-```
-
-### Correction du TextArea (fond blanc → fond sombre)
-Le problème venait de `-fx-control-inner-background` non défini.
-Dans `styles.css` :
-```css
-.text-area .content {
-    -fx-background-color: #1a1a30;
-    -fx-control-inner-background: #1a1a30;  /* ← la clé */
-}
-```
-Et dans chaque FXML :
-```xml
-<TextArea style="-fx-control-inner-background:#1a1a30;
-                 -fx-text-fill:#e6edf3;
-                 -fx-background-color:#1a1a30;"/>
-```
-
-### Logo dans la NavBar
-```xml
-<ImageView fitHeight="38" fitWidth="38" preserveRatio="true">
-    <image>
-        <!-- @ = chemin relatif dans le classpath (resources/) -->
-        <Image url="@/com/gamilha/images/logo.png"/>
-    </image>
-</ImageView>
-```
-
----
-
-## 🧪 COUCHE 5 — Tests unitaires (`src/test/`)
-
-### Technologies utilisées
-| Outil | Rôle |
-|---|---|
-| **JUnit 5** | Framework de test principal |
-| **Mockito** | Simuler la BD sans connexion réelle |
-| `@Test` | Déclarer un test |
-| `@BeforeEach` | Initialiser avant chaque test |
-| `@AfterEach` | Nettoyer après chaque test |
-| `@ParameterizedTest` | Exécuter avec plusieurs valeurs |
-| `@Mock` | Créer un faux objet |
-| `when().thenReturn()` | Définir le comportement du mock |
-| `verify()` | Vérifier qu'une méthode a été appelée |
-
-### Fichiers de tests
-
-| Fichier | Ce qu'il teste | Complexité |
+| | Desktop | Web |
 |---|---|---|
-| `UserTest.java` | Modèle User : getters/setters, `isAdmin()` | ⭐ Simple |
-| `PostTest.java` | Modèle Post : constructeurs, relations, dates | ⭐ Simple |
-| `CommentaireTest.java` | Modèle Commentaire : validations Symfony | ⭐ Simple |
-| `SessionContextTest.java` | Gestion de la session (login/logout) | ⭐⭐ Moyen |
-| `MediaHelperTest.java` | Détection YouTube/image/lien | ⭐⭐ Moyen |
-| `PostServiceTest.java` | Service Post avec Mockito BD | ⭐⭐⭐ Avancé |
-| `CommentaireServiceTest.java` | Service Commentaire avec Mockito | ⭐⭐⭐ Avancé |
+| **Langage** | Java 17 | PHP 8.2 |
+| **Framework** | JavaFX 17 + FXML | Symfony 6 + Twig |
+| **Public** | Gamers power-users | Tous publics, tout device |
 
-### Lancer les tests
-```bash
-# Tous les tests
-mvn test
+---
 
-# Un fichier spécifique
-mvn test -Dtest=UserTest
+## 🏗️ Architecture Physique
 
-# Voir le rapport HTML
-open target/surefire-reports/index.html
+```
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                         GAMILHA — ARCHITECTURE PHYSIQUE                        ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                          POSTE UTILISATEUR / CLIENT                         │
+  │                                                                             │
+  │   ┌──────────────────────────────┐   ┌──────────────────────────────────┐  │
+  │   │     APPLICATION DESKTOP      │   │         NAVIGATEUR WEB           │  │
+  │   │       Java 17 + JavaFX       │   │    Chrome / Firefox / Edge       │  │
+  │   │                              │   │                                  │  │
+  │   │  ┌────────────────────────┐  │   │  ┌────────────────────────────┐  │  │
+  │   │  │    Couche Vue (FXML)   │  │   │  │    Couche Vue (Twig/HTML)  │  │  │
+  │   │  │  • Interfaces User     │  │   │  │  • Templates Symfony       │  │  │
+  │   │  │  • Interfaces Admin    │  │   │  │  • Tailwind CSS            │  │  │
+  │   │  │  • CSS JavaFX          │  │   │  │  • JavaScript ES6+         │  │  │
+  │   │  └────────────┬───────────┘  │   │  └────────────┬───────────────┘  │  │
+  │   │               │              │   │               │                  │  │
+  │   │  ┌────────────▼───────────┐  │   │  ┌────────────▼───────────────┐  │  │
+  │   │  │  Couche Contrôleurs    │  │   │  │   Couche Contrôleurs       │  │  │
+  │   │  │  (MVC JavaFX)          │  │   │  │   (Symfony MVC)            │  │  │
+  │   │  │  • StreamController    │  │   │  │  • StreamController.php    │  │  │
+  │   │  │  • DonationController  │  │   │  │  • DonationController.php  │  │  │
+  │   │  │  • AdminControllers    │  │   │  │  • AdminControllers.php    │  │  │
+  │   │  │  • BadgeController     │  │   │  │  • SecurityController.php  │  │  │
+  │   │  └────────────┬───────────┘  │   │  └────────────┬───────────────┘  │  │
+  │   │               │              │   │               │                  │  │
+  │   │  ┌────────────▼───────────┐  │   │  ┌────────────▼───────────────┐  │  │
+  │   │  │   Couche Services      │  │   │  │   Couche Services          │  │  │
+  │   │  │  • StreamService       │  │   │  │  • StreamService.php       │  │  │
+  │   │  │  • DonationService     │  │   │  │  • DonationService.php     │  │  │
+  │   │  │  • StreamAnalytics     │  │   │  │  • AblyService.php         │  │  │
+  │   │  │  • StreamPrediction    │  │   │  │  • StripeService.php       │  │  │
+  │   │  │  • AblyService         │  │   │  └────────────┬───────────────┘  │  │
+  │   │  │  • BadgeService        │  │   │               │                  │  │
+  │   │  │  • OllamaService       │  │   │  ┌────────────▼───────────────┐  │  │
+  │   │  │  • UserService         │  │   │  │    Couche Repository       │  │  │
+  │   │  └────────────┬───────────┘  │   │  │    Doctrine ORM            │  │  │
+  │   │               │              │   │  └────────────┬───────────────┘  │  │
+  │   │  ┌────────────▼───────────┐  │   │               │                  │  │
+  │   │  │  Couche Utilitaires    │  │   └───────────────┼──────────────────┘  │
+  │   │  │  • AppConfig           │  │                   │                     │
+  │   │  │  • SessionContext      │  │                   │                     │
+  │   │  │  • QrCodeUtil (ZXing)  │  │                   │                     │
+  │   │  │  • EmailSender (Mail)  │  │                   │                     │
+  │   │  │  • DatabaseConnection  │  │                   │                     │
+  │   │  └────────────┬───────────┘  │                   │                     │
+  │   └───────────────┼──────────────┘                   │                     │
+  │                   │                                  │                     │
+  │   ┌───────────────▼──────────────────────────────────▼─────────────────┐  │
+  │   │                    COMPOSANTS LOCAUX INSTALLÉS                      │  │
+  │   │   ┌───────────┐  ┌───────────┐  ┌──────────────┐  ┌─────────────┐ │  │
+  │   │   │ VLC Media │  │   Vosk    │  │   Webcam     │  │    SMTP     │ │  │
+  │   │   │  Player   │  │  (Speech) │  │   Capture    │  │   Client    │ │  │
+  │   │   │  (vlcj)   │  │  Local    │  │  (sarxos)    │  │ (Jakarta)   │ │  │
+  │   │   └───────────┘  └───────────┘  └──────────────┘  └─────────────┘ │  │
+  │   └────────────────────────────────────────────────────────────────────┘  │
+  └─────────────────────────────────────────────────────────────────────────────┘
+                │  JDBC / MySQL Connector         │  HTTP/HTTPS (Doctrine)
+                │  HTTPS (REST APIs)              │  HTTPS (REST APIs)
+                ▼                                 ▼
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                           SERVEUR LOCAL / LAN                               │
+  │                                                                             │
+  │   ┌──────────────────────────────────────────────────────────────────────┐ │
+  │   │                     MySQL Server 8.0                                 │ │
+  │   │                  Base de données partagée                            │ │
+  │   │                                                                      │ │
+  │   │  Tables :  users · streams · donations · posts · commentaires        │ │
+  │   │            equipes · evenements · inscriptions · brackets            │ │
+  │   │            game_matches · abonnements · coaching_videos              │ │
+  │   │            playlists · chat_messages · historique_paiement           │ │
+  │   │            badges · password_reset_tokens                            │ │
+  │   └──────────────────────────────────────────────────────────────────────┘ │
+  │                                                                             │
+  │   ┌──────────────────────────────────────────────────────────────────────┐ │
+  │   │                   Ollama — LLM Local                                 │ │
+  │   │               http://localhost:11434                                 │ │
+  │   │            Modèle : llama3 / mistral (ChatAI + Avatar)              │ │
+  │   └──────────────────────────────────────────────────────────────────────┘ │
+  │                                                                             │
+  │   ┌──────────────────────────────────────────────────────────────────────┐ │
+  │   │               Serveur Web Symfony (Dev)                              │ │
+  │   │                  symfony serve / Apache                              │ │
+  │   │                  http://localhost:8000                               │ │
+  │   └──────────────────────────────────────────────────────────────────────┘ │
+  └─────────────────────────────────────────────────────────────────────────────┘
+                │  HTTPS / WSS (WebSocket Secure)
+                ▼
+  ┌─────────────────────────────────────────────────────────────────────────────┐
+  │                          SERVICES CLOUD EXTERNES                            │
+  │                                                                             │
+  │   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────────────┐ │
+  │   │   ABLY.IO       │   │   STRIPE API    │   │     SMTP / EMAIL        │ │
+  │   │                 │   │                 │   │                         │ │
+  │   │ WebSocket temps │   │ Paiements       │   │ Réinitialisation MDP    │ │
+  │   │ réel :          │   │ sécurisés :     │   │ Notifications           │ │
+  │   │ • Donations     │   │ • Checkout      │   │ Confirmations           │ │
+  │   │   live          │   │ • Webhooks      │   │                         │ │
+  │   │ • Streams new   │   │ • Abonnements   │   │ Jakarta Mail            │ │
+  │   │ • Badges        │   │ • Historique    │   │ Symfony Mailer          │ │
+  │   │                 │   │                 │   │                         │ │
+  │   │ Canal :         │   │ SDK Java 24.x   │   │ Gmail SMTP              │ │
+  │   │ streams:new     │   │ SDK PHP         │   │ Port 587 (TLS)          │ │
+  │   │ donations:live  │   │                 │   │                         │ │
+  │   └─────────────────┘   └─────────────────┘   └─────────────────────────┘ │
+  │                                                                             │
+  │   ┌─────────────────┐   ┌─────────────────┐                               │
+  │   │  OPENROUTER AI  │   │   MAVEN CENTRAL │                               │
+  │   │  (optionnel)    │   │   / JITPACK     │                               │
+  │   │                 │   │                 │                               │
+  │   │ Renforcement    │   │ Dépôts Maven :  │                               │
+  │   │ prédictions ML  │   │ • emoji-java    │                               │
+  │   │ streams via API │   │ • webcam-cap.   │                               │
+  │   │ REST            │   │ • calendarfx    │                               │
+  │   └─────────────────┘   └─────────────────┘                               │
+  └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Lancement de l'application
+##  Fonctionnalités & Modules
+
+###  Authentification & Sécurité
+- Inscription, connexion, gestion des rôles (`ROLE_USER` / `ROLE_ADMIN`)
+- Réinitialisation mot de passe par email (Jakarta Mail / Symfony Mailer)
+- Verrouillage de compte, 2FA, audit log
+- Capture webcam sur tentatives échouées *(Desktop)*
+- Présence en ligne et dernière connexion
+
+###  Tournois, Équipes & Matchs
+- CRUD complet sur les **équipes**, **événements**, **inscriptions**
+- **Brackets** de tournoi avec rendu visuel
+- **Game Matches** : suivi des scores et classements
+- Calendrier des participations (CalendarFX *(Desktop)*)
+
+###  Streams & Donations 
+- Création de streams (RTMP, clé stream, thumbnail, statut live)
+- **Donations** avec réactions par paliers : 
+- Mises à jour **temps réel via Ably** (WebSocket — canal `donations:live`)
+- **Badges** débloqués selon les dons reçus
+- **Prédiction ML** du pic de viewers (régression pondérée + OpenRouter optionnel)
+- Dashboard analytics : viewers, revenus, tendances
+- Modération admin : gestion streams & donations
+
+###  Réseau Social
+- Feed de posts avec emoji et images
+- Commentaires et réactions
+- Système d'amis, profils publics
+- Messagerie privée temps réel
+
+###  Coaching & Playlists
+- Bibliothèque de vidéos coaching
+- Lecteur VLCJ *(Desktop)* / HTML5 *(Web)*
+- Playlists organisées par jeu et catégorie
+
+###  Abonnements & Paiements
+- Plans d'abonnement configurables
+- Paiement sécurisé **Stripe** avec webhooks
+- QR Code unique par abonnement (ZXing / endroid)
+- Historique des transactions
+
+###  Intelligence Artificielle
+- **ChatAI** via Ollama (LLM local — llama3/mistral)
+- Génération d'avatars IA
+- Reconnaissance vocale **Vosk** *(Desktop)*
+- Prédictions analytiques streams (régression + tendance)
+
+###  Dashboard Admin
+- KPIs globaux : users, revenus, streams actifs
+- Gestion CRUD de tous les modules
+- Statistiques donations & abonnements
+
+---
+
+##  Version Desktop — Java/JavaFX
+
+### Tech Stack
+
+| Catégorie | Technologie | Version |
+|-----------|-------------|---------|
+| Langage | Java | 17 |
+| UI | JavaFX + FXML | 17.0.8 |
+| Build | Apache Maven | 3.x |
+| BDD | MySQL Connector/J | 8.3.0 |
+| Temps réel | Ably Java SDK | 1.2.40 |
+| Paiements | Stripe Java SDK | 24.10.0 |
+| Lecteur media | VLCJ | 4.8.2 |
+| IA LLM | Ollama (local) | — |
+| Reconnaissance vocale | Vosk | 0.3.45 |
+| QR Code | ZXing | 3.5.3 |
+| Calendrier | CalendarFX | 11.12.6 |
+| Email | Jakarta Mail | — |
+| Sécurité mots de passe | jBCrypt | 0.4 |
+| Webcam | Sarxos Webcam Capture | 0.3.12 |
+| Emoji | emoji-java | 5.1.1 |
+| JSON | Gson | 2.10.1 |
+| Tests | JUnit 5 + Mockito | — |
+
+### Structure
+
+```
+src/main/java/com/gamilha/
+├── MainApp.java
+├── controllers/
+│   ├── admin/
+│   │   ├── AdminStreamListController.java
+│   │   ├── AdminStreamFormController.java
+│   │   ├── AdminStreamPredictionController.java
+│   │   ├── AdminDonationListController.java
+│   │   ├── AdminDonationFormController.java
+│   │   ├── AdminDonationStreamsController.java
+│   │   ├── AdminAnalyticsController.java
+│   │   └── AdminUsersController.java
+│   ├── StreamFormController.java
+│   ├── StreamListController.java
+│   ├── StreamShowController.java
+│   ├── DonationFormController.java
+│   ├── DonationListController.java
+│   ├── DonationShowController.java
+│   ├── BadgeController.java
+│   └── ...
+├── entity/
+│   ├── User.java                ├── Stream.java
+│   ├── Donation.java            ├── Post.java
+│   ├── Equipe.java              ├── Evenement.java
+│   ├── Bracket.java             ├── GameMatch.java
+│   ├── Abonnement.java          ├── CoachingVideo.java
+│   ├── Playlist.java            ├── ChatMessage.java
+│   └── HistoriquePaiement.java
+├── services/
+│   ├── StreamService.java
+│   ├── DonationService.java
+│   ├── StreamAnalyticsService.java
+│   ├── StreamPredictionService.java
+│   ├── AblyService.java
+│   ├── BadgeService.java
+│   ├── OllamaService.java
+│   ├── UserService.java
+│   └── ...
+└── utils/
+    ├── AppConfig.java           ├── SessionContext.java
+    ├── ToastUtil.java           ├── QrCodeUtil.java
+    ├── EmailSender.java         └── NavigationContext.java
+```
+
+### Installation Desktop
+
+**Prérequis :** Java 17+, Maven 3.8+, MySQL 8.0, VLC installé
 
 ```bash
-# Modifier DBConnection.java : URL / USER / PASSWORD
-# Modifier AdminPostController.java : UPLOADS = chemin vers public/uploads/
+git clone https://github.com/your-username/gamilha-java.git
+cd gamilha-java
 
-# Lancer en mode USER (ROLE_USER)
+# Configurer src/main/resources/com/gamilha/config.properties
 mvn clean javafx:run
+```
 
-# Pour basculer en ADMIN : dans MainApp.java,
-# changer l'ID de l'utilisateur pour un ROLE_ADMIN
+**`config.properties` :**
+```properties
+db.url=jdbc:mysql://localhost:3306/gamilha
+db.username=root
+db.password=
+
+stripe.secret.key=sk_test_xxxx
+ably.api.key=xxxx.xxxx:xxxx
+mail.username=your@email.com
+mail.password=yourpassword
+ollama.url=http://localhost:11434
+```
+
+### Tests Desktop
+
+```bash
+mvn test
+```
+
+| Classe de test | Couverture |
+|----------------|------------|
+| `StreamPredictionServiceTest` | Algorithme ML prédiction |
+| `StreamEntityBusinessTest` | Logique métier stream |
+| `DonationTest` | Calculs & formatage donations |
+| `PostServiceTest` | CRUD posts |
+| `CommentaireServiceTest` | Logique commentaires |
+| `UserTest` | Gestion utilisateurs |
+| `AbonnementTest` | Plans & abonnements |
+| `InscriptionTest` | Tournois & inscriptions |
+| `SessionContextTest` | Gestion de session |
+| `MediaHelperTest` | Utilitaire media |
+
+---
+
+##  Version Web — Symfony/PHP
+
+### Tech Stack
+
+| Catégorie | Technologie | Version |
+|-----------|-------------|---------|
+| Langage | PHP | 8.2 |
+| Framework | Symfony | 6.x |
+| Templates | Twig | 3.x |
+| ORM | Doctrine | 2.x |
+| CSS | Tailwind CSS | 3.x |
+| JS | JavaScript ES6+ | — |
+| BDD | MySQL | 8.0 |
+| Temps réel | Ably JS SDK | — |
+| Paiements | Stripe PHP SDK | — |
+| Email | Symfony Mailer | — |
+| QR Code | endroid/qr-code | — |
+| Tests | PHPUnit | — |
+
+### Structure
+
+```
+gamilha-web/
+├── src/
+│   ├── Controller/
+│   │   ├── Admin/
+│   │   │   ├── AdminStreamController.php
+│   │   │   ├── AdminDonationController.php
+│   │   │   ├── AdminAnalyticsController.php
+│   │   │   └── AdminUserController.php
+│   │   ├── StreamController.php
+│   │   ├── DonationController.php
+│   │   ├── PostController.php
+│   │   ├── EquipeController.php
+│   │   ├── AbonnementController.php
+│   │   └── SecurityController.php
+│   ├── Entity/
+│   ├── Repository/
+│   ├── Service/
+│   │   ├── StreamService.php
+│   │   ├── DonationService.php
+│   │   ├── AblyService.php
+│   │   └── StripeService.php
+│   └── Form/
+├── templates/
+│   ├── admin/stream/
+│   ├── admin/donation/
+│   ├── stream/
+│   ├── donation/
+│   └── base.html.twig
+├── migrations/
+├── .env
+└── composer.json
+```
+
+### Installation Web
+
+**Prérequis :** PHP 8.2+, Composer, MySQL 8.0, Symfony CLI
+
+```bash
+git clone https://github.com/your-username/gamilha-web.git
+cd gamilha-web
+
+composer install
+npm install && npm run build
+
+cp .env .env.local
+# Configurer .env.local
+
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+
+symfony serve
+```
+
+**`.env.local` :**
+```env
+DATABASE_URL="mysql://root:@127.0.0.1:3306/gamilha"
+STRIPE_SECRET_KEY=sk_test_xxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxx
+ABLY_API_KEY=xxxx.xxxx:xxxx
+MAILER_DSN=smtp://user:pass@smtp.gmail.com:587
+APP_SECRET=your_secret_here
+```
+
+### API Endpoints principaux
+
+| Méthode | Route | Description |
+|---------|-------|-------------|
+| `GET` | `/streams` | Liste des streams |
+| `GET` | `/streams/{id}` | Détail d'un stream |
+| `POST` | `/streams/new` | Créer un stream |
+| `POST` | `/donations/new` | Enregistrer une donation |
+| `GET` | `/donations/stream/{id}` | Donations par stream |
+| `POST` | `/abonnements/checkout` | Initier paiement Stripe |
+| `GET` | `/admin/analytics` | Dashboard analytics |
+| `GET` | `/admin/streams` | Gestion admin streams |
+| `GET` | `/admin/donations` | Gestion admin donations |
+
+---
+
+## 🗄️ Base de Données Partagée
+
+```
+users                   streams                 donations
+├── id (PK)             ├── id (PK)             ├── id (PK)
+├── name                ├── title               ├── amount
+├── email               ├── description         ├── donor_name
+├── password (BCrypt)   ├── game                ├── user_id  ──► users
+├── roles (JSON)        ├── thumbnail           ├── stream_id ──► streams
+├── is_active           ├── status              └── created_at
+├── login_attempts      ├── stream_key
+├── two_factor_enabled  ├── rtmp_server
+├── is_online           ├── viewers
+└── created_at          ├── is_live
+                        ├── user_id  ──► users
+equipes                 └── created_at          abonnements
+├── id (PK)                                     ├── id (PK)
+├── name                evenements              ├── type
+├── logo                ├── id (PK)             ├── price
+└── user_id  ──► users  ├── name                ├── qr_code
+                        ├── date                ├── user_id ──► users
+posts                   ├── lieu                └── created_at
+├── id (PK)             └── equipe_id ──► equip.
+├── content                                     historique_paiement
+├── image               coaching_videos         ├── id (PK)
+├── user_id  ──► users  ├── id (PK)             ├── montant
+└── created_at          ├── title               ├── stripe_id
+                        ├── url                 └── user_id ──► users
+commentaires            └── playlist_id ──► pl.
+├── id (PK)
+├── content             badges
+├── post_id  ──► posts  ├── id (PK)
+└── user_id  ──► users  ├── name
+                        ├── threshold
+                        └── stream_id ──► streams
 ```
 
 ---
 
-## 🔄 Correspondance Symfony ↔ JavaFX
+##  Équipe & Modules
 
-| Symfony | JavaFX |
-|---|---|
-| `src/Entity/Post.php` | `model/Post.java` |
-| `src/Repository/PostRepository.php` | `service/PostService.java` |
-| `templates/social/index.html.twig` | `UserPostView.fxml` + `UserPostController.java` |
-| `{% if post.user == app.user %}` | `isOwner(post.getUser())` |
-| `app.user` | `SessionContext.getCurrentUser()` |
-| `is_granted('ROLE_ADMIN')` | `user.isAdmin()` |
-| `asset('uploads/' ~ post.image)` | `new File(UPLOADS + post.getImage())` |
-| `MediaUrl → YouTube embed` | `MediaHelper.toEmbedUrl()` + `WebView` |
-| Modal Bootstrap "Options" | `ContextMenu` JavaFX |
-| `@Route('/social')` | `NavBarUserController.goReseaux()` |
-| `KnpPaginator` | `FlowPane` + filtre Java en mémoire |
+| Module | Responsable | Desktop | Web |
+|--------|-------------|:-------:|:---:|
+| Authentification & Utilisateurs | — | 
+| Posts & Commentaires | — | 
+| Événements & Inscriptions | — | 
+| Équipes & Brackets | — | 
+| **Streams & Donations**  | — | 
+| Coaching & Playlists | — |
+| Abonnements & Paiements | — |
+| Chat & Messagerie | — | 
+| Dashboard Admin | — | 
+
+---
+
+##  Topics & Mots-clés
+
+`java` · `javafx` · `php` · `symfony` · `twig` · `doctrine` · `mysql` · `maven` · `mvc` · `desktop-app` · `web-application` · `gaming-platform` · `esport` · `live-streaming` · `donations` · `realtime` · `ably` · `websocket` · `stripe` · `payments` · `tournament` · `bracket` · `coaching` · `vlcj` · `media-player` · `ai-chat` · `ollama` · `llm` · `speech-recognition` · `vosk` · `qr-code` · `zxing` · `tailwindcss` · `bcrypt` · `machine-learning` · `stream-prediction` · `university-project` · `esprit` · `tunisia`
+
+---
+
+<div align="center">
+
+Built with  at **ESPRIT University** — Tunisia · 2024/2025
+
+* Play ·  Connect ·  Rise*
+
+</div>
